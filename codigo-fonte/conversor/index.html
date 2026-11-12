@@ -22,7 +22,16 @@
       // Por defeito usa o endereço de pré-visualização do seu projeto.
       // ───────────────────────────────────────────────────────────────
       window.IMAGENS_ORIGEM = "https://id-preview--b91f0283-22d3-4367-9e85-37db06e0321c.lovable.app";
-      window.__IMG = function (p) { return p.charAt(0) === "/" ? (window.IMAGENS_ORIGEM || "") + p : p; };
+      // As fotos da Lovable foram copiadas (em WebP) para codigo-fonte/public/lovable/.
+      // O site usa essas cópias locais. Para voltar a ir buscá-las à Lovable,
+      // mude FOTOS_LOCAIS para false.
+      window.FOTOS_LOCAIS = true;
+      window.__IMG = function (p) {
+        if (p.charAt(0) !== "/") return p;
+        var m = window.FOTOS_LOCAIS && p.match(/^\/__l5e\/assets-v1\/[^\/]+\/(.+)\.[a-z0-9]+$/i);
+        if (m) return "./lovable/" + m[1] + ".webp";
+        return (window.IMAGENS_ORIGEM || "") + p;
+      };
     </script>
   </head>
   <body>

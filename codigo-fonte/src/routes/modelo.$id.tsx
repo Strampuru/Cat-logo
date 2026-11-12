@@ -2,8 +2,8 @@ import { createFileRoute, notFound, Link, useNavigate } from "@tanstack/react-ro
 import { useState } from "react";
 import { SiteLayout } from "@/components/site-layout";
 import { useSwipe } from "@/hooks/use-swipe";
-import { getModelo, getCategoria } from "@/lib/catalogo";
-import type { Categoria, Cor, Modelo, Peca } from "@/lib/catalogo";
+import { getModelo, getCategoria, coresDaFaixa, tamanhosDaFaixa } from "@/lib/catalogo";
+import type { Categoria, Cor, FaixaEtaria, Modelo, Peca } from "@/lib/catalogo";
 
 export const Route = createFileRoute("/modelo/$id")({
   loader: ({ params }) => {
@@ -153,21 +153,25 @@ function PecaCard({
           alt={`${modelo.nome} — ${peca.nome}${atual ? ` — ${atual.nome}` : ""}`}
           width={1024}
           height={1280}
-          className="w-full h-full object-contain p-4 sm:p-6"
+          className={`w-full h-full ${modelo.fotosCheias ? "object-cover" : "object-contain p-4 sm:p-6"}`}
         />
-        <span className="absolute top-3 left-3 text-[10px] uppercase tracking-widest bg-background/80 backdrop-blur px-2 py-1 ring-1 ring-black/10">
-          {peca.nome}
-        </span>
+        {!modelo.semLegenda && (
+          <span className="absolute top-3 left-3 text-[10px] uppercase tracking-widest bg-background/80 backdrop-blur px-2 py-1 ring-1 ring-black/10">
+            {peca.nome}
+          </span>
+        )}
       </div>
 
       <div className="space-y-2">
         <div className="flex items-baseline justify-between gap-3">
           <h3 className="font-display text-lg sm:text-xl">{peca.nome}</h3>
-          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
-            {peca.referencia ?? modelo.referencia}
-          </span>
+          {!modelo.semFicha && (
+            <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+              {peca.referencia ?? modelo.referencia}
+            </span>
+          )}
         </div>
-        <p className="text-[11px] text-muted-foreground">{peca.composicao}</p>
+        {!modelo.semFicha && <p className="text-[11px] text-muted-foreground">{peca.composicao}</p>}
 
         {corControlada === undefined && peca.cores.length > 0 && (
           <div className="flex flex-wrap items-center gap-2 pt-1">
@@ -418,6 +422,9 @@ function ConfiguradorAbuDhabi({ modelo, categoria, pecas }: {
               <span>/</span><span>{modelo.subcategoria}</span>
             </nav>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-display italic leading-tight">{modelo.nome}</h1>
+            {modelo.semFicha && modelo.descricao && (
+              <p className="max-w-2xl text-muted-foreground leading-relaxed pt-2">{modelo.descricao}</p>
+            )}
           </header>
 
           {/* Separadores de peças */}
@@ -440,13 +447,13 @@ function ConfiguradorAbuDhabi({ modelo, categoria, pecas }: {
               >
                 <img key={`${peca.nome}-${imagem}`} src={imagem}
                   alt={`${modelo.nome} — ${peca.nome}${corAtual ? ` — ${corAtual.nome}` : ""}`}
-                  width={1024} height={1280} className="w-full h-full object-contain p-5" />
+                  width={1024} height={1280} className={`w-full h-full ${modelo.fotosCheias ? "object-cover" : "object-contain p-5"}`} />
               </div>
               <div className="flex justify-between items-baseline gap-4">
                 <h2 className="font-display text-2xl italic">{peca.nome}</h2>
                 <p className="text-[9px] tracking-[0.2em] uppercase text-accent font-medium">{corAtual?.nome}</p>
               </div>
-              <p className="text-xs text-muted-foreground">{peca.composicao}</p>
+              {!modelo.semFicha && <p className="text-xs text-muted-foreground">{peca.composicao}</p>}
             </div>
 
             {/* Controlos */}
@@ -490,7 +497,7 @@ function ConfiguradorAbuDhabi({ modelo, categoria, pecas }: {
                   </tbody>
                 </table>
               </div>
-              <p className="text-[10px] text-muted-foreground italic">Medidas em centímetros.</p>
+              {!modelo.semNotaTamanhos && <p className="text-[10px] text-muted-foreground italic">Medidas em centímetros.</p>}
             </div>
           )}
         </div>
@@ -565,6 +572,14 @@ function DetalheModelo({
   categoria: Categoria | null;
   vista: Vista;
 }) {
+  // Escolha Adulto / Criança (só nos modelos com escolhaIdade)
+  const temEscolhaIdade = Boolean(modelo.escolhaIdade);
+  const pesquisa = Route.useSearch() as { idade?: string };
+  const [faixa, setFaixa] = useState<FaixaEtaria>(
+    pesquisa?.idade === "crianca" ? "crianca" : "adulto",
+  );
+  const coresV = temEscolhaIdade ? coresDaFaixa(vista.cores, faixa) : vista.cores;
+  const tamanhosV = temEscolhaIdade ? tamanhosDaFaixa(vista.tamanhos, faixa) : vista.tamanhos;
   // Diapositivos: foto lifestyle primeiro, depois uma imagem por cor
   const slides = [
     ...(vista.lifestyle
@@ -577,7 +592,7 @@ function DetalheModelo({
           },
         ]
       : []),
-    ...vista.cores.map((c, i) => ({
+    ...(modelo.soFotoPrincipal && vista.lifestyle ? [] : coresV).map((c, i) => ({
       src: c.imagem,
       alt: `${modelo.nome} — ${c.nome}`,
       legenda: `${modelo.referenciaNome}${vista.titulo ? ` ${vista.titulo}` : ""} — ${c.nome}`,
@@ -596,8 +611,8 @@ function DetalheModelo({
     };
   const ativa = atual.corIndex;
   const cor =
-    (ativa >= 0 ? vista.cores[ativa] : undefined) ??
-    vista.cores[0] ?? {
+    (ativa >= 0 ? coresV[ativa] : undefined) ??
+    coresV[0] ?? {
       nome: "",
       hex: "",
       hexes: [] as string[],
@@ -613,7 +628,18 @@ function DetalheModelo({
     setSlide((s) => (s - 1 + slides.length) % slides.length);
   const seguinte = () => setSlide((s) => (s + 1) % slides.length);
 
-  const [cabecalho, ...linhas] = vista.tamanhos;
+  const mudarFaixa = (nova: FaixaEtaria) => {
+    if (nova === faixa) return;
+    const nomeCor = ativa >= 0 ? coresV[ativa]?.nome : undefined;
+    const novas = coresDaFaixa(vista.cores, nova);
+    const i = nomeCor ? novas.findIndex((c) => c.nome === nomeCor) : -1;
+    const fotosCores = !(modelo.soFotoPrincipal && vista.lifestyle);
+    setFaixa(nova);
+    setSlide(i >= 0 && fotosCores ? i + (vista.lifestyle ? 1 : 0) : 0);
+  };
+  const totalCores = vista.cores.length;
+
+  const [cabecalho, ...linhas] = tamanhosV;
   const swipe = useSwipe({
     onSwipeLeft: seguinte,
     onSwipeRight: anterior,
@@ -635,7 +661,7 @@ function DetalheModelo({
               width={1024}
               height={1280}
               className={`w-full h-full ${
-                atual.corIndex === -1
+                atual.corIndex === -1 || modelo.fotosCheias
                   ? "object-cover"
                   : "object-contain p-4 sm:p-6"
               }`}
@@ -662,9 +688,11 @@ function DetalheModelo({
               </>
             )}
           </div>
-          <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
-            {atual.legenda}
-          </p>
+          {!modelo.semLegenda && (
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
+              {atual.legenda}
+            </p>
+          )}
         </div>
 
         {/* Conteúdo */}
@@ -698,19 +726,42 @@ function DetalheModelo({
             </p>
           </div>
 
+          {/* Adulto / Criança */}
+          {temEscolhaIdade && (
+            <div className="space-y-3">
+              <span className="text-[11px] uppercase tracking-widest font-semibold">Tamanho</span>
+              <div className="flex" role="group" aria-label="Escolher tamanhos de adulto ou de criança">
+                {(["adulto", "crianca"] as const).map((f) => (
+                  <button
+                    key={f}
+                    onClick={() => mudarFaixa(f)}
+                    aria-pressed={faixa === f}
+                    className={`px-5 py-2.5 text-[11px] uppercase tracking-widest border transition-colors -ml-px first:ml-0 ${
+                      faixa === f
+                        ? "bg-foreground text-background border-foreground relative z-10"
+                        : "border-border text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {f === "adulto" ? "Adulto" : "Criança"}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Cores */}
-          {vista.cores.length > 0 && (
+          {coresV.length > 0 && (
             <div className="space-y-4">
               <div className="flex items-baseline justify-between">
                 <span className="text-[11px] uppercase tracking-widest font-semibold">
-                  Cores Disponíveis ({vista.cores.length})
+                  Cores Disponíveis ({coresV.length})
                 </span>
                 <span className="text-[11px] uppercase tracking-widest text-muted-foreground">
                   {cor.nome}
                 </span>
               </div>
               <div className="flex flex-wrap gap-3">
-                {vista.cores.map((c, i) => (
+                {coresV.map((c, i) => (
                   <button
                     key={c.nome}
                     onClick={() => irParaCor(i)}
@@ -730,10 +781,18 @@ function DetalheModelo({
                   />
                 ))}
               </div>
+              {temEscolhaIdade && coresV.length < totalCores && (
+                <p className="text-[11px] text-muted-foreground italic">
+                  {faixa === "crianca"
+                    ? `Em tamanhos de criança estão disponíveis ${coresV.length} das ${totalCores} cores.`
+                    : `Em tamanhos de adulto estão disponíveis ${coresV.length} das ${totalCores} cores.`}
+                </p>
+              )}
             </div>
           )}
 
           {/* Ficha */}
+          {!modelo.semFicha && (
           <div className="pt-10 border-t border-border flex flex-col gap-6">
             <div className="flex justify-between items-start gap-6">
               <span className="text-sm">Composição</span>
@@ -754,6 +813,7 @@ function DetalheModelo({
               </span>
             </div>
           </div>
+          )}
 
           {/* Preços */}
           {vista.precos.length > 0 && (
@@ -778,15 +838,22 @@ function DetalheModelo({
       </section>
 
       {/* Tamanhos */}
-      {cabecalho && (
+      {cabecalho && !modelo.semTamanhos && (
         <section className="bg-card border-t border-border py-12 md:py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-4 md:space-y-6">
             <h2 className="font-display text-2xl sm:text-3xl">
               Tamanhos{vista.titulo ? ` — ${vista.titulo}` : ""}
+              {temEscolhaIdade && (
+                <span className="italic text-muted-foreground">
+                  {faixa === "crianca" ? " — Criança" : " — Adulto"}
+                </span>
+              )}
             </h2>
-            <p className="text-[11px] uppercase tracking-widest text-muted-foreground">
-              Medidas em centímetros — desliza para ver toda a tabela
-            </p>
+            {!modelo.semNotaTamanhos && (
+              <p className="text-[11px] uppercase tracking-widest text-muted-foreground">
+                Medidas em centímetros — desliza para ver toda a tabela
+              </p>
+            )}
             <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               <table className="min-w-full text-[13px] sm:text-sm border-collapse">
                 <thead>

@@ -550,6 +550,10 @@ export type Cor = {
   /** Hexes adicionais para cores combinadas (bicolor / tricolor). */
   hexes: string[];
   imagem: string;
+  /** true = esta cor só existe em tamanhos de adulto (não aparece em «Criança»). */
+  soAdulto?: boolean;
+  /** true = esta cor só existe em tamanhos de criança (não aparece em «Adulto»). */
+  soCrianca?: boolean;
 };
 
 /** Peça individual de um conjunto (ex.: T-shirt, calças). */
@@ -588,7 +592,46 @@ export type Modelo = {
   /** [quantidade, preço] */
   precos: [string, string][];
   caracteristicas: string[];
+  /** true = a galeria mostra só a foto principal (sem uma foto por cor). */
+  soFotoPrincipal?: boolean;
+  /** true = esconde a ficha (Composição, Referência e Família). */
+  semFicha?: boolean;
+  /** true = esconde a legenda por baixo da foto (ex.: «Em uso»). */
+  semLegenda?: boolean;
+  /** true = esconde a tabela de tamanhos. */
+  semTamanhos?: boolean;
+  /** true = esconde a frase por baixo de «Tamanhos». */
+  semNotaTamanhos?: boolean;
+  /** true = todas as fotos da galeria ocupam a moldura toda (como a primeira). */
+  fotosCheias?: boolean;
+  /**
+   * true = a página do modelo mostra o botão «Adulto / Criança».
+   * Ao escolher uma faixa, só aparecem as cores dessa faixa (ver Cor.soAdulto / Cor.soCrianca)
+   * e as colunas de tamanhos correspondentes. Os tamanhos de criança são detetados sozinhos
+   * (tudo o que não seja XS, S, M, L, XL, XXL, 3XL…).
+   */
+  escolhaIdade?: boolean;
 };
+
+export type FaixaEtaria = "adulto" | "crianca";
+
+/** true se o tamanho for de criança (ex.: «4/5», «6/8», «10/12», «2 anos»). */
+export function eTamanhoCrianca(tamanho: string): boolean {
+  return !/^(XXS|XS|S|M|L|XL|XXL|XXXL|[2-6]XL|Único|Única|Adulto)$/i.test(tamanho.trim());
+}
+
+/** Cores disponíveis numa faixa etária. */
+export function coresDaFaixa(cores: Cor[], faixa: FaixaEtaria): Cor[] {
+  return cores.filter((c) => (faixa === "crianca" ? !c.soAdulto : !c.soCrianca));
+}
+
+/** Tabela de tamanhos só com as colunas de uma faixa etária (a 1.ª coluna fica sempre). */
+export function tamanhosDaFaixa(tamanhos: string[][], faixa: FaixaEtaria): string[][] {
+  const cabecalho = tamanhos[0];
+  if (!cabecalho) return tamanhos;
+  const fica = cabecalho.map((t, i) => i === 0 || eTamanhoCrianca(t) === (faixa === "crianca"));
+  return tamanhos.map((linha) => linha.filter((_, i) => fica[i]));
+}
 
 export type Categoria = {
   id: CategoriaId;
@@ -657,14 +700,14 @@ export function getFamiliaPorSubcategoria(nome: string | undefined): Categoria |
 const coresCairo: Cor[] = [
   { nome: "Branco", hex: "#dfe0e4", hexes: ["#dfe0e4"], imagem: asset_cairo_1.url },
   { nome: "Caqui", hex: "#9b8866", hexes: ["#9b8866"], imagem: asset_cairo_2.url },
-  { nome: "Verde lima", hex: "#859e43", hexes: ["#859e43"], imagem: asset_cairo_3.url },
+  { nome: "Verde lima", hex: "#9bb550", hexes: ["#9bb550"], imagem: asset_cairo_3.url },
   { nome: "Verde escuro", hex: "#005142", hexes: ["#005142"], imagem: asset_cairo_4.url },
   { nome: "Laranja", hex: "#c1541a", hexes: ["#c1541a"], imagem: asset_cairo_5.url },
   { nome: "Vermelho", hex: "#871526", hexes: ["#871526"], imagem: asset_cairo_6.url },
   { nome: "Bordô", hex: "#680a2f", hexes: ["#680a2f"], imagem: asset_cairo_7.url },
   { nome: "Rosa", hex: "#bf4580", hexes: ["#bf4580"], imagem: asset_cairo_8.url },
   { nome: "Azul escuro", hex: "#24265f", hexes: ["#24265f"], imagem: asset_cairo_9.url },
-  { nome: "Azul claro", hex: "#7f98b7", hexes: ["#7f98b7"], imagem: asset_cairo_10.url },
+  { nome: "Azul claro", hex: "#93adce", hexes: ["#93adce"], imagem: asset_cairo_10.url },
   { nome: "Azul turquesa", hex: "#2a85b2", hexes: ["#2a85b2"], imagem: asset_cairo_11.url },
   { nome: "Azul", hex: "#1a578f", hexes: ["#1a578f"], imagem: asset_cairo_12.url },
   { nome: "Azul petróleo", hex: "#053655", hexes: ["#053655"], imagem: asset_cairo_13.url },
@@ -685,12 +728,17 @@ const coresRabat: Cor[] = [
 export const modelos: Modelo[] = [
   {
     "id": "racing",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
+    "incluiCrianca": true,
     "nome": "T-shirt LISBOA",
     "referenciaNome": "LISBOA",
     "categoria": "tshirts",
     "subcategoria": "Clássicas",
     "genero": "homem",
-    "descricao": "T-shirt LISBOA disponível em 35 cores. 100% Algodão",
+    "descricao": "A T-shirt de todos os dias, para todas as idades. A T-shirt LISBOA é feita em algodão macio e respirável, com gola redonda e corte clássico que assenta bem em adultos e crianças. Com 35 cores à escolha — dos tons neutros aos mais vibrantes —, é a escolha mais versátil para vestir equipas, escolas, associações e eventos com a sua marca.",
     "composicao": "100% Algodão, Densidade: 160 g/m²",
     "referencia": "#LIS-LIS",
     "imagem": "/__l5e/assets-v1/aa79323b-1815-4aae-a0d8-9d9d23713003/lisboa-1.png",
@@ -698,281 +746,281 @@ export const modelos: Modelo[] = [
     "cores": [
       {
         "nome": "Branco",
-        "hex": "#eaedf1",
+        "hex": "#f6f7fa",
         "hexes": [
-          "#eaedf1"
+          "#f6f7fa"
         ],
         "imagem": "/__l5e/assets-v1/aa79323b-1815-4aae-a0d8-9d9d23713003/lisboa-1.png"
       },
       {
-        "nome": "Bege 1",
-        "hex": "#f0ebd8",
+        "nome": "Cru",
+        "hex": "#f2ebdc",
         "hexes": [
-          "#f0ebd8"
+          "#f2ebdc"
         ],
         "imagem": "/__l5e/assets-v1/b6527f24-7336-4797-9047-66d29e2d2c08/lisboa-2.png"
       },
       {
-        "nome": "Bege 2",
-        "hex": "#afac9d",
+        "nome": "Bege",
+        "hex": "#b3b1a1",
         "hexes": [
-          "#afac9d"
+          "#b3b1a1"
         ],
         "imagem": "/__l5e/assets-v1/50808463-8b17-4363-8b44-de2e9cad131c/lisboa-3.png"
       },
       {
-        "nome": "Castanho 1",
-        "hex": "#a18b67",
+        "nome": "Castanho claro",
+        "hex": "#a58d6a",
         "hexes": [
-          "#a18b67"
+          "#a58d6a"
         ],
         "imagem": "/__l5e/assets-v1/c701edf5-edae-43a8-9a06-2629a3a838a8/lisboa-4.png"
       },
       {
-        "nome": "Castanho 2",
-        "hex": "#6e594b",
+        "nome": "Castanho",
+        "hex": "#725c4c",
         "hexes": [
-          "#6e594b"
+          "#725c4c"
         ],
         "imagem": "/__l5e/assets-v1/d4af67e1-7e09-4e3a-a631-7c7635ac92e6/lisboa-5.png"
       },
       {
-        "nome": "Verde 1",
-        "hex": "#96bb54",
+        "nome": "Verde lima",
+        "hex": "#9dbb5f",
         "hexes": [
-          "#96bb54"
+          "#9dbb5f"
         ],
         "imagem": "/__l5e/assets-v1/361be716-a638-48d7-93ed-c999ab61dcc1/lisboa-6.png"
       },
       {
-        "nome": "Verde 2",
-        "hex": "#5ca144",
+        "nome": "Verde relva",
+        "hex": "#5da245",
         "hexes": [
-          "#5ca144"
+          "#5da245"
         ],
         "imagem": "/__l5e/assets-v1/0c0a1072-5ec6-459a-85da-2a719718ec0f/lisboa-7.png"
       },
       {
-        "nome": "Verde 3",
-        "hex": "#197351",
+        "nome": "Verde",
+        "hex": "#237156",
         "hexes": [
-          "#197351"
+          "#237156"
         ],
         "imagem": "/__l5e/assets-v1/1874d879-14e2-464a-9809-6e81711913d9/lisboa-8.png"
       },
       {
-        "nome": "Verde 4",
-        "hex": "#024a3b",
+        "nome": "Verde escuro",
+        "hex": "#00463a",
         "hexes": [
-          "#024a3b"
+          "#00463a"
         ],
         "imagem": "/__l5e/assets-v1/574ad066-9485-49fa-b8b9-604ce5a3fdf3/lisboa-9.png"
       },
       {
-        "nome": "Verde 5",
-        "hex": "#4e675d",
+        "nome": "Verde acinzentado",
+        "hex": "#405c53",
         "hexes": [
-          "#4e675d"
+          "#405c53"
         ],
         "imagem": "/__l5e/assets-v1/7f3275f9-360c-4ed7-8df8-cd8b18be99c5/lisboa-10.png"
       },
       {
-        "nome": "Verde 6",
-        "hex": "#53573f",
+        "nome": "Verde tropa",
+        "hex": "#54553a",
         "hexes": [
-          "#53573f"
+          "#54553a"
         ],
         "imagem": "/__l5e/assets-v1/30663fed-ec27-4c60-983a-659ed767a894/lisboa-11.png"
       },
       {
-        "nome": "Amarelo 1",
-        "hex": "#f9e24d",
+        "nome": "Amarelo",
+        "hex": "#f9e065",
         "hexes": [
-          "#f9e24d"
+          "#f9e065"
         ],
         "imagem": "/__l5e/assets-v1/db228014-6027-4a09-a6e3-ccf76ea66c2f/lisboa-12.png"
       },
       {
-        "nome": "Amarelo 2",
-        "hex": "#e9bd19",
+        "nome": "Amarelo torrado",
+        "hex": "#e8ba2b",
         "hexes": [
-          "#e9bd19"
+          "#e8ba2b"
         ],
         "imagem": "/__l5e/assets-v1/a5527a93-833d-4e45-9307-45f8cc5e6402/lisboa-13.png"
       },
       {
-        "nome": "Laranja 1",
-        "hex": "#df9f1d",
+        "nome": "Ocre",
+        "hex": "#dba02a",
         "hexes": [
-          "#df9f1d"
+          "#dba02a"
         ],
         "imagem": "/__l5e/assets-v1/7482996b-aa50-4ffc-811f-5af5fda41bc7/lisboa-14.png"
       },
       {
-        "nome": "Laranja 2",
-        "hex": "#c9541d",
+        "nome": "Laranja",
+        "hex": "#c8571d",
         "hexes": [
-          "#c9541d"
+          "#c8571d"
         ],
         "imagem": "/__l5e/assets-v1/edca8795-ddcc-402f-ad77-4f469c142757/lisboa-15.png"
       },
       {
         "nome": "Vermelho",
-        "hex": "#90162a",
+        "hex": "#7d111c",
         "hexes": [
-          "#90162a"
+          "#7d111c"
         ],
         "imagem": "/__l5e/assets-v1/d90ad0b9-e9c2-45b8-95bd-53ed97c241fe/lisboa-16.png"
       },
       {
-        "nome": "Rosa 1",
-        "hex": "#6d1034",
+        "nome": "Bordô",
+        "hex": "#65142d",
         "hexes": [
-          "#6d1034"
+          "#65142d"
         ],
         "imagem": "/__l5e/assets-v1/38798ae1-0c57-482f-86c4-ce8d7d46f385/lisboa-17.png"
       },
       {
-        "nome": "Rosa 2",
-        "hex": "#e9c8d8",
+        "nome": "Rosa claro",
+        "hex": "#eacfdd",
         "hexes": [
-          "#e9c8d8"
+          "#eacfdd"
         ],
         "imagem": "/__l5e/assets-v1/70e58bc2-3bb6-4bf6-864d-9cf4dbfffe6d/lisboa-18.png"
       },
       {
-        "nome": "Rosa 3",
-        "hex": "#c74283",
+        "nome": "Rosa",
+        "hex": "#c64082",
         "hexes": [
-          "#c74283"
+          "#c64082"
         ],
         "imagem": "/__l5e/assets-v1/2870b867-f2ed-4a08-8aca-d81c10115baa/lisboa-19.png"
       },
       {
-        "nome": "Roxo 1",
-        "hex": "#7d7fb2",
+        "nome": "Lilás",
+        "hex": "#7c7eb0",
         "hexes": [
-          "#7d7fb2"
+          "#7c7eb0"
         ],
         "imagem": "/__l5e/assets-v1/26c2b8cf-27a9-4ee0-b378-681b8dc1db49/lisboa-20.png"
       },
       {
-        "nome": "Roxo 2",
-        "hex": "#53387a",
+        "nome": "Roxo",
+        "hex": "#513678",
         "hexes": [
-          "#53387a"
+          "#513678"
         ],
         "imagem": "/__l5e/assets-v1/3244b508-0677-4505-a125-ba907d3c3140/lisboa-21.png"
       },
       {
-        "nome": "Roxo 3",
-        "hex": "#351a53",
+        "nome": "Roxo escuro",
+        "hex": "#331751",
         "hexes": [
-          "#351a53"
+          "#331751"
         ],
         "imagem": "/__l5e/assets-v1/4b9f9674-0cee-4cea-9737-ec7fcf0f112e/lisboa-22.png"
       },
       {
-        "nome": "Azul 1",
-        "hex": "#9ab7dc",
+        "nome": "Azul claro",
+        "hex": "#99b6dd",
         "hexes": [
-          "#9ab7dc"
+          "#99b6dd"
         ],
         "imagem": "/__l5e/assets-v1/8eb022a2-b4ad-4a98-98c4-82b943ba8e1c/lisboa-23.png"
       },
       {
-        "nome": "Azul 2",
-        "hex": "#0490cb",
+        "nome": "Turquesa",
+        "hex": "#008fcc",
         "hexes": [
-          "#0490cb"
+          "#008fcc"
         ],
         "imagem": "/__l5e/assets-v1/e2649ed3-7927-4dae-930a-a400ae328e9a/lisboa-24.png"
       },
       {
-        "nome": "Azul 3",
-        "hex": "#215d98",
+        "nome": "Azul",
+        "hex": "#1d5b98",
         "hexes": [
-          "#215d98"
+          "#1d5b98"
         ],
         "imagem": "/__l5e/assets-v1/cc7d2835-a295-4cb8-b057-95fa55448529/lisboa-25.png"
       },
       {
-        "nome": "Azul 4",
-        "hex": "#5475a8",
+        "nome": "Azul médio",
+        "hex": "#5173a7",
         "hexes": [
-          "#5475a8"
+          "#5173a7"
         ],
         "imagem": "/__l5e/assets-v1/63142417-db71-4082-8a57-8c7e9c396734/lisboa-26.png"
       },
       {
-        "nome": "Azul 5",
-        "hex": "#263962",
+        "nome": "Azul escuro",
+        "hex": "#233861",
         "hexes": [
-          "#263962"
+          "#233861"
         ],
         "imagem": "/__l5e/assets-v1/71320613-4697-4377-ac51-08c49d5203ed/lisboa-27.png"
       },
       {
-        "nome": "Azul 6",
-        "hex": "#144267",
+        "nome": "Azul oceano",
+        "hex": "#0f4066",
         "hexes": [
-          "#144267"
+          "#0f4066"
         ],
         "imagem": "/__l5e/assets-v1/5a72e232-6e7f-4595-943c-e756aaf87a06/lisboa-28.png"
       },
       {
-        "nome": "Azul 7",
-        "hex": "#0a3755",
+        "nome": "Azul marinho",
+        "hex": "#063453",
         "hexes": [
-          "#0a3755"
+          "#063453"
         ],
         "imagem": "/__l5e/assets-v1/031bf332-0564-4b99-987a-905f0e5cd3a0/lisboa-29.png"
       },
       {
-        "nome": "Cinzento 1",
-        "hex": "#777c90",
+        "nome": "Cinzento azulado",
+        "hex": "#757b90",
         "hexes": [
-          "#777c90"
+          "#757b90"
         ],
         "imagem": "/__l5e/assets-v1/ac29ad62-99cd-4c4b-af69-25b6da4e62f6/lisboa-30.png"
       },
       {
-        "nome": "Cinzento 2",
-        "hex": "#e6e5eb",
+        "nome": "Cinzento claro",
+        "hex": "#e2e1e7",
         "hexes": [
-          "#e6e5eb"
+          "#e2e1e7"
         ],
         "imagem": "/__l5e/assets-v1/86177454-d104-471e-a551-0971e3a11155/lisboa-31.png"
       },
       {
-        "nome": "Cinzento 3",
-        "hex": "#b5b3bf",
+        "nome": "Cinzento mesclado",
+        "hex": "#afadba",
         "hexes": [
-          "#b5b3bf"
+          "#afadba"
         ],
         "imagem": "/__l5e/assets-v1/b1d9317e-e588-4430-9611-7f1d193a892d/lisboa-32.png"
       },
       {
-        "nome": "Cinzento 4",
-        "hex": "#646c79",
+        "nome": "Cinzento chumbo",
+        "hex": "#626b78",
         "hexes": [
-          "#646c79"
+          "#626b78"
         ],
         "imagem": "/__l5e/assets-v1/d8744c6b-92a3-485c-9cdb-5af67b6c593a/lisboa-33.png"
       },
       {
-        "nome": "Cinzento 5",
-        "hex": "#58575d",
+        "nome": "Cinzento escuro",
+        "hex": "#57565b",
         "hexes": [
-          "#58575d"
+          "#57565b"
         ],
         "imagem": "/__l5e/assets-v1/bf246fec-8d02-4e27-b592-484d6ddb7d48/lisboa-34.png"
       },
       {
         "nome": "Preto",
-        "hex": "#332e2a",
+        "hex": "#312d28",
         "hexes": [
-          "#332e2a"
+          "#312d28"
         ],
         "imagem": "/__l5e/assets-v1/650a88a8-e9e2-4421-b6ec-81673829dc11/lisboa-35.png"
       }
@@ -995,33 +1043,33 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "40",
-        "45",
-        "49",
-        "53",
-        "57",
-        "61",
-        "65",
-        "67",
-        "68",
-        "72",
-        "76",
-        "80"
+        "40 cm",
+        "45 cm",
+        "49 cm",
+        "53 cm",
+        "57 cm",
+        "61 cm",
+        "65 cm",
+        "67 cm",
+        "68 cm",
+        "72 cm",
+        "76 cm",
+        "80 cm"
       ],
       [
         "Largura",
-        "30",
-        "32",
-        "35",
-        "38",
-        "41",
-        "44",
-        "46",
-        "48",
-        "52",
-        "56",
-        "59",
-        "62"
+        "30 cm",
+        "32 cm",
+        "35 cm",
+        "38 cm",
+        "41 cm",
+        "44 cm",
+        "46 cm",
+        "48 cm",
+        "52 cm",
+        "56 cm",
+        "59 cm",
+        "62 cm"
       ]
     ],
     "precos": [
@@ -1045,12 +1093,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "wave",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "T-shirt MADRID",
     "referenciaNome": "MADRID",
     "categoria": "tshirts",
     "subcategoria": "Clássicas",
     "genero": "homem",
-    "descricao": "T-shirt MADRID disponível em 6 cores. 100% Algodão",
+    "descricao": "Robusta e confortável, a T-shirt MADRID é feita em algodão encorpado de toque macio, que mantém a forma lavagem após lavagem. A gola redonda reforçada e o corte clássico fazem dela uma peça de confiança para o dia a dia, para o trabalho ou para eventos. Em seis cores intemporais, é a tela ideal para a sua marca.",
     "composicao": "100% Algodão, Densidade: 190 g/m²",
     "referencia": "#MAD-MAD",
     "imagem": asset_madrid_cor_1.url,
@@ -1058,50 +1110,50 @@ export const modelos: Modelo[] = [
     "cores": [
   {
     "nome": "Preto",
-    "hex": "#2b2622",
+    "hex": "#312d29",
     "hexes": [
-      "#2b2622"
-    ],
+          "#312d29"
+        ],
     "imagem": asset_madrid_cor_1.url
   },
   {
     "nome": "Azul marinho",
-    "hex": "#063453",
+    "hex": "#063554",
     "hexes": [
-      "#063453"
-    ],
+          "#063554"
+        ],
     "imagem": asset_madrid_cor_2.url
   },
   {
     "nome": "Azul",
-    "hex": "#1d5c98",
+    "hex": "#1c5d9a",
     "hexes": [
-      "#1d5c98"
-    ],
+          "#1c5d9a"
+        ],
     "imagem": asset_madrid_cor_3.url
   },
   {
     "nome": "Vermelho",
-    "hex": "#8c1425",
+    "hex": "#8d1424",
     "hexes": [
-      "#8c1425"
-    ],
+          "#8d1424"
+        ],
     "imagem": asset_madrid_cor_4.url
   },
   {
     "nome": "Bege",
-    "hex": "#9c8662",
+    "hex": "#a08b67",
     "hexes": [
-      "#9c8662"
-    ],
+          "#a08b67"
+        ],
     "imagem": asset_madrid_cor_5.url
   },
   {
     "nome": "Branco",
-    "hex": "#dde1e6",
+    "hex": "#f5f7fa",
     "hexes": [
-      "#dde1e6"
-    ],
+          "#f5f7fa"
+        ],
     "imagem": asset_madrid_cor_6.url
   }
 ],
@@ -1117,21 +1169,21 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "64",
-        "68",
-        "72",
-        "76",
-        "80",
-        "84"
+        "64 cm",
+        "68 cm",
+        "72 cm",
+        "76 cm",
+        "80 cm",
+        "84 cm"
       ],
       [
         "Largura",
-        "48",
-        "52",
-        "56",
-        "59",
-        "62",
-        "65"
+        "48 cm",
+        "52 cm",
+        "56 cm",
+        "59 cm",
+        "62 cm",
+        "65 cm"
       ]
     ],
     "precos": [
@@ -1155,11 +1207,15 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "nappa",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "T-shirt ROMA",
     "referenciaNome": "ROMA",
     "categoria": "tshirts",
     "subcategoria": "Clássicas",
-    "descricao": "T-shirt ROMA disponível em 2 cores. 95% Algodão",
+    "descricao": "Descontraída e com um corte limpo, a T-shirt ROMA dispensa as mangas para garantir máxima liberdade de movimentos e frescura nos dias quentes. O algodão com um toque de elastano é suave ao toque e acompanha o corpo sem perder a forma. Em branco e preto, os dois essenciais, é uma peça versátil para vestir a sua equipa com a sua marca, no treino ou no dia a dia.",
     "composicao": "95% Algodão, 5% Elastano, Densidade: 190 g/m²",
     "referencia": "#ROM-ROM",
     "imagem": roma1.url,
@@ -1167,17 +1223,17 @@ export const modelos: Modelo[] = [
     "cores": [
       {
         "nome": "Branco",
-        "hex": "#c9cacc",
+        "hex": "#f2f3f5",
         "hexes": [
-          "#c9cacc"
+          "#f2f3f5"
         ],
         "imagem": roma1.url
       },
       {
         "nome": "Preto",
-        "hex": "#2f2c27",
+        "hex": "#2b2826",
         "hexes": [
-          "#2f2c27"
+          "#2b2826"
         ],
         "imagem": roma2.url
       }
@@ -1194,21 +1250,21 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "58",
-        "61",
-        "64",
-        "67",
-        "70",
-        "73"
+        "58 cm",
+        "61 cm",
+        "64 cm",
+        "67 cm",
+        "70 cm",
+        "73 cm"
       ],
       [
         "Largura",
-        "44",
-        "46",
-        "49",
-        "51",
-        "54",
-        "56"
+        "44 cm",
+        "46 cm",
+        "49 cm",
+        "51 cm",
+        "54 cm",
+        "56 cm"
       ]
     ],
     "precos": [
@@ -1233,12 +1289,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "tirana",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "T-shirt TIRANA",
     "referenciaNome": "TIRANA",
     "categoria": "tshirts",
     "subcategoria": "Clássicas",
     "genero": "homem",
-    "descricao": "T-shirt TIRANA disponível em 8 cores..",
+    "descricao": "Clássica com um toque de estilo, a T-shirt TIRANA destaca-se pelo decote em V que lhe dá um ar descontraído e elegante. O algodão suave e respirável garante conforto em qualquer ocasião, do trabalho ao tempo livre. Em oito cores versáteis, é uma peça essencial para vestir a sua equipa com a sua marca.",
     "composicao": "100% Algodão, Densidade: 160 g/m²",
     "referencia": "#TIR-TIR",
     "lifestyle": tiranaEditorial,
@@ -1246,66 +1306,66 @@ export const modelos: Modelo[] = [
     "cores": [
   {
     "nome": "Branco",
-    "hex": "#caccd0",
+    "hex": "#f5f5f8",
     "hexes": [
-      "#caccd0"
-    ],
+          "#f5f5f8"
+        ],
     "imagem": asset_tirana_cor_1.url
   },
   {
-    "nome": "Cinzento",
-    "hex": "#8c9095",
+    "nome": "Cinzento claro",
+    "hex": "#e3e2e8",
     "hexes": [
-      "#8c9095"
-    ],
+          "#e3e2e8"
+        ],
     "imagem": asset_tirana_cor_2.url
   },
   {
     "nome": "Preto",
-    "hex": "#2b2622",
+    "hex": "#322e2b",
     "hexes": [
-      "#2b2622"
-    ],
+          "#322e2b"
+        ],
     "imagem": asset_tirana_cor_3.url
   },
   {
     "nome": "Verde",
-    "hex": "#166e4a",
+    "hex": "#15704d",
     "hexes": [
-      "#166e4a"
-    ],
+          "#15704d"
+        ],
     "imagem": asset_tirana_cor_4.url
   },
   {
     "nome": "Laranja",
-    "hex": "#c6501a",
+    "hex": "#c8551a",
     "hexes": [
-      "#c6501a"
-    ],
+          "#c8551a"
+        ],
     "imagem": asset_tirana_cor_5.url
   },
   {
     "nome": "Vermelho",
-    "hex": "#8b1524",
+    "hex": "#8d1424",
     "hexes": [
-      "#8b1524"
-    ],
+          "#8d1424"
+        ],
     "imagem": asset_tirana_cor_6.url
   },
   {
     "nome": "Azul",
-    "hex": "#1d5b97",
+    "hex": "#1c5d99",
     "hexes": [
-      "#1d5b97"
-    ],
+          "#1c5d99"
+        ],
     "imagem": asset_tirana_cor_7.url
   },
   {
     "nome": "Azul marinho",
-    "hex": "#053352",
+    "hex": "#053554",
     "hexes": [
-      "#053352"
-    ],
+          "#053554"
+        ],
     "imagem": asset_tirana_cor_8.url
   }
 ],
@@ -1320,19 +1380,19 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "70",
-        "72",
-        "74",
-        "76",
-        "78"
+        "70 cm",
+        "72 cm",
+        "74 cm",
+        "76 cm",
+        "78 cm"
       ],
       [
         "Largura",
-        "49",
-        "52",
-        "55",
-        "58",
-        "62"
+        "49 cm",
+        "52 cm",
+        "55 cm",
+        "58 cm",
+        "62 cm"
       ]
     ],
     "precos": [
@@ -1356,72 +1416,76 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "viena",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "incluiCrianca": true,
     "nome": "T-shirt VIENA",
     "referenciaNome": "VIENA",
     "categoria": "tshirts",
     "subcategoria": "Clássicas",
     "genero": "homem",
-    "descricao": "T-shirt VIENA disponível em 7 cores..",
+    "descricao": "Conforto para os dias mais frescos, a T-shirt VIENA tem manga comprida, gola redonda e um corte clássico que funciona sozinha ou por baixo de outras peças. O algodão macio e respirável é agradável ao toque e acompanha toda a família, com tamanhos de criança a adulto. Em sete cores essenciais, é uma base versátil para levar a sua marca durante todo o ano.",
     "composicao": "100% Algodão, Densidade: 160 g/m²",
     "referencia": "#VIE-VIE",
-    "lifestyle": vienaEditorial,
+    "lifestyle": pub("/lifestyle/viena-gemini.jpg"),
     "imagem": asset_viena_cor_1.url,
     "cores": [
   {
     "nome": "Branco",
-    "hex": "#c1c7cb",
+    "hex": "#f6f6f8",
     "hexes": [
-      "#c1c7cb"
-    ],
+          "#f6f6f8"
+        ],
     "imagem": asset_viena_cor_1.url
   },
   {
     "nome": "Cinzento claro",
-    "hex": "#d8d8e1",
+    "hex": "#e3e2e8",
     "hexes": [
-      "#d8d8e1"
-    ],
+          "#e3e2e8"
+        ],
     "imagem": asset_viena_cor_2.url
   },
   {
     "nome": "Preto",
-    "hex": "#2d2824",
+    "hex": "#322e2b",
     "hexes": [
-      "#2d2824"
-    ],
+          "#322e2b"
+        ],
     "imagem": asset_viena_cor_3.url
   },
   {
     "nome": "Verde",
     "hex": "#005445",
     "hexes": [
-      "#005445"
-    ],
+          "#005445"
+        ],
     "imagem": asset_viena_cor_4.url
   },
   {
     "nome": "Vermelho",
-    "hex": "#8e1426",
+    "hex": "#8d1524",
     "hexes": [
-      "#8e1426"
-    ],
+          "#8d1524"
+        ],
     "imagem": asset_viena_cor_5.url
   },
   {
     "nome": "Azul",
-    "hex": "#1f528d",
+    "hex": "#1e528e",
     "hexes": [
-      "#1f528d"
-    ],
+          "#1e528e"
+        ],
     "imagem": asset_viena_cor_6.url
   },
   {
     "nome": "Azul marinho",
-    "hex": "#063657",
+    "hex": "#063655",
     "hexes": [
-      "#063657"
-    ],
+          "#063655"
+        ],
     "imagem": asset_viena_cor_7.url
   }
 ],
@@ -1440,27 +1504,27 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "50",
-        "55",
-        "60",
-        "64",
-        "68",
-        "72",
-        "76",
-        "80",
-        "84"
+        "50 cm",
+        "55 cm",
+        "60 cm",
+        "64 cm",
+        "68 cm",
+        "72 cm",
+        "76 cm",
+        "80 cm",
+        "84 cm"
       ],
       [
         "Largura",
-        "39",
-        "42",
-        "45",
-        "48",
-        "52",
-        "56",
-        "59",
-        "62",
-        "66"
+        "39 cm",
+        "42 cm",
+        "45 cm",
+        "48 cm",
+        "52 cm",
+        "56 cm",
+        "59 cm",
+        "62 cm",
+        "66 cm"
       ]
     ],
     "precos": [
@@ -1484,12 +1548,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "paris",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "T-shirt PARIS",
     "referenciaNome": "PARIS",
     "categoria": "tshirts",
     "subcategoria": "Clássicas",
     "genero": "mulher",
-    "descricao": "T-shirt PARIS disponível em 7 cores..",
+    "descricao": "Simples, feminina e intemporal, a T-shirt PARIS tem um corte ajustado que valoriza a silhueta e gola redonda de acabamento cuidado. Em algodão macio e respirável, é confortável do primeiro ao último minuto do dia. Disponível em sete cores, é a base perfeita para personalizar com a identidade da sua marca.",
     "composicao": "100% Algodão, Densidade: 160 g/m²",
     "referencia": "#PAR-PAR",
     "lifestyle": parisEditorial,
@@ -1497,58 +1565,58 @@ export const modelos: Modelo[] = [
     "cores": [
   {
     "nome": "Preto",
-    "hex": "#2e2925",
+    "hex": "#34302d",
     "hexes": [
-      "#2e2925"
-    ],
+          "#34302d"
+        ],
     "imagem": asset_paris_cor_1.url
   },
   {
     "nome": "Azul turquesa",
-    "hex": "#0092d0",
+    "hex": "#0092ce",
     "hexes": [
-      "#0092d0"
-    ],
+          "#0092ce"
+        ],
     "imagem": asset_paris_cor_2.url
   },
   {
     "nome": "Rosa",
-    "hex": "#c23d7f",
+    "hex": "#c84986",
     "hexes": [
-      "#c23d7f"
-    ],
+          "#c84986"
+        ],
     "imagem": asset_paris_cor_3.url
   },
   {
     "nome": "Vermelho",
     "hex": "#95132e",
     "hexes": [
-      "#95132e"
-    ],
+          "#95132e"
+        ],
     "imagem": asset_paris_cor_4.url
   },
   {
     "nome": "Laranja",
-    "hex": "#c9571a",
+    "hex": "#c9581b",
     "hexes": [
-      "#c9571a"
-    ],
+          "#c9581b"
+        ],
     "imagem": asset_paris_cor_5.url
   },
   {
     "nome": "Verde lima",
-    "hex": "#93b953",
+    "hex": "#9abc58",
     "hexes": [
-      "#93b953"
-    ],
+          "#9abc58"
+        ],
     "imagem": asset_paris_cor_6.url
   },
   {
     "nome": "Branco",
-    "hex": "#dee4e9",
+    "hex": "#f4f6fa",
     "hexes": [
-      "#dee4e9"
-    ],
+          "#f4f6fa"
+        ],
     "imagem": asset_paris_cor_7.url
   }
 ],
@@ -1564,30 +1632,30 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "53",
-        "56",
-        "59",
-        "62",
-        "65",
-        "68"
+        "53 cm",
+        "56 cm",
+        "59 cm",
+        "62 cm",
+        "65 cm",
+        "68 cm"
       ],
       [
         "Largura peito",
-        "39",
-        "42",
-        "45",
-        "48",
-        "51",
-        "54"
+        "39 cm",
+        "42 cm",
+        "45 cm",
+        "48 cm",
+        "51 cm",
+        "54 cm"
       ],
       [
         "Largura cintura",
-        "35",
-        "38",
-        "41",
-        "44",
-        "46",
-        "48"
+        "35 cm",
+        "38 cm",
+        "41 cm",
+        "44 cm",
+        "46 cm",
+        "48 cm"
       ]
     ],
     "precos": [
@@ -1611,12 +1679,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "berlim",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "T-shirt BERLIM",
     "referenciaNome": "BERLIM",
     "categoria": "tshirts",
     "subcategoria": "Clássicas",
     "genero": "mulher",
-    "descricao": "T-shirt BERLIM disponível em 9 cores.",
+    "descricao": "Feminina e confortável, a T-shirt BERLIM é uma camisola de alças com costas nadador que acompanha a silhueta com naturalidade. O algodão com um toque de elastano oferece suavidade e liberdade de movimentos, seja no treino, num evento ou no dia a dia. Em nove cores, é uma peça fresca e versátil para vestir a sua equipa com a sua marca.",
     "composicao": "95% Algodão, 5% Elastano, Densidade: 190 g/m²",
     "referencia": "#BER-BER",
     "lifestyle": berlimEditorial,
@@ -1624,73 +1696,73 @@ export const modelos: Modelo[] = [
 "cores": [
       {
         "nome": "Branco",
-        "hex": "#e4e4e4",
+        "hex": "#e6e8ec",
         "hexes": [
-          "#e4e4e4"
+          "#e6e8ec"
         ],
         "imagem": asset_berlim_1.url
       },
       {
         "nome": "Verde lima",
-        "hex": "#84a848",
+        "hex": "#88ac4e",
         "hexes": [
-          "#84a848"
+          "#88ac4e"
         ],
         "imagem": asset_berlim_2.url
       },
       {
         "nome": "Laranja",
-        "hex": "#c05418",
+        "hex": "#bb5418",
         "hexes": [
-          "#c05418"
+          "#bb5418"
         ],
         "imagem": asset_berlim_3.url
       },
       {
         "nome": "Bordô",
-        "hex": "#840c24",
+        "hex": "#861524",
         "hexes": [
-          "#840c24"
+          "#861524"
         ],
         "imagem": asset_berlim_4.url
       },
       {
-        "nome": "Cinzento claro",
-        "hex": "#d8c0cc",
+        "nome": "Rosa claro",
+        "hex": "#dabdcb",
         "hexes": [
-          "#d8c0cc"
+          "#dabdcb"
         ],
         "imagem": asset_berlim_5.url
       },
       {
         "nome": "Rosa",
-        "hex": "#b43c78",
+        "hex": "#b83f7a",
         "hexes": [
-          "#b43c78"
+          "#b83f7a"
         ],
         "imagem": asset_berlim_6.url
       },
       {
-        "nome": "Azul",
-        "hex": "#789ccc",
+        "nome": "Azul claro",
+        "hex": "#799fcb",
         "hexes": [
-          "#789ccc"
+          "#799fcb"
         ],
         "imagem": asset_berlim_7.url
       },
       {
         "nome": "Turquesa",
-        "hex": "#0084c0",
+        "hex": "#0086be",
         "hexes": [
-          "#0084c0"
+          "#0086be"
         ],
         "imagem": asset_berlim_8.url
       },
       {
         "nome": "Preto",
-        "hex": "#303024",
+        "hex": "#312d28",
         "hexes": [
-          "#303024"
+          "#312d28"
         ],
         "imagem": asset_berlim_9.url
       }
@@ -1707,30 +1779,30 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "53",
-        "56",
-        "59",
-        "62",
-        "65",
-        "68"
+        "53 cm",
+        "56 cm",
+        "59 cm",
+        "62 cm",
+        "65 cm",
+        "68 cm"
       ],
       [
         "Largura peito",
-        "38",
-        "41",
-        "44",
-        "47",
-        "50",
-        "53"
+        "38 cm",
+        "41 cm",
+        "44 cm",
+        "47 cm",
+        "50 cm",
+        "53 cm"
       ],
       [
         "Largura cintura",
-        "34",
-        "37",
-        "40",
-        "43",
-        "45",
-        "47"
+        "34 cm",
+        "37 cm",
+        "40 cm",
+        "43 cm",
+        "45 cm",
+        "47 cm"
       ]
     ],
     "precos": [
@@ -1754,12 +1826,17 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "resistance",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
+    "incluiCrianca": true,
     "nome": "T-shirt ZAGREB",
     "referenciaNome": "ZAGREB",
     "categoria": "tshirts",
     "subcategoria": "Desportivas",
-    "genero": "homem",
-    "descricao": "T-shirt ZAGREB disponível em 24 cores. 100% Poliéster",
+    "genero": "unissexo",
+    "descricao": "Leve, fresca e cheia de cor, a T-shirt ZAGREB é a escolha certa para quem está sempre em movimento. O tecido técnico respirável seca depressa e as mangas raglã garantem total liberdade nos ombros. Com 24 cores à escolha e tamanhos de criança a adulto, permite equipar clubes, escolas, corridas e eventos inteiros com a imagem da sua marca.",
     "composicao": "100% Poliéster, Densidade: 145 g/m²",
     "referencia": "#ZAG-ZAG",
     "imagem": "/__l5e/assets-v1/e7b6f801-7e45-41f5-8496-e5cfe4cc7d5e/zagreb-24.png",
@@ -1767,146 +1844,194 @@ export const modelos: Modelo[] = [
     "cores": [
       {
         "nome": "Branco",
-        "hex": "#efeff3",
-        "hexes": [],
+        "hex": "#eef0f3",
+        "hexes": [
+          "#eef0f3"
+        ],
         "imagem": "/__l5e/assets-v1/e7b6f801-7e45-41f5-8496-e5cfe4cc7d5e/zagreb-24.png"
       },
       {
         "nome": "Bege",
-        "hex": "#aba89a",
-        "hexes": [],
+        "hex": "#acaa9a",
+        "hexes": [
+          "#acaa9a"
+        ],
         "imagem": "/__l5e/assets-v1/8472cb04-371b-414d-8617-c97ff1654620/zagreb-19.png"
       },
       {
         "nome": "Castanho",
-        "hex": "#543d34",
-        "hexes": [],
+        "hex": "#533b31",
+        "hexes": [
+          "#533b31"
+        ],
         "imagem": "/__l5e/assets-v1/71f9b5a2-4635-4ed0-babf-cc8c9ead13aa/zagreb-20.png"
       },
       {
-        "nome": "Verde 1",
-        "hex": "#92b553",
-        "hexes": [],
+        "nome": "Verde claro",
+        "hex": "#80b748",
+        "hexes": [
+          "#80b748"
+        ],
         "imagem": "/__l5e/assets-v1/34ba5e0c-add4-4bd0-89f9-e10aeec0d8cc/zagreb-21.png"
       },
       {
-        "nome": "Verde 2",
-        "hex": "#1a704e",
-        "hexes": [],
+        "nome": "Verde",
+        "hex": "#006f47",
+        "hexes": [
+          "#006f47"
+        ],
         "imagem": "/__l5e/assets-v1/3efa9028-5646-4035-bf92-70ca1baa3227/zagreb-22.png"
       },
       {
-        "nome": "Verde 3",
-        "hex": "#025443",
-        "hexes": [],
+        "nome": "Verde escuro",
+        "hex": "#00523d",
+        "hexes": [
+          "#00523d"
+        ],
         "imagem": "/__l5e/assets-v1/5bc0fbf1-cfe2-43d4-901a-767f377329cd/zagreb-14.png"
       },
       {
-        "nome": "Verde 4",
-        "hex": "#51553f",
-        "hexes": [],
+        "nome": "Verde tropa",
+        "hex": "#4c5338",
+        "hexes": [
+          "#4c5338"
+        ],
         "imagem": "/__l5e/assets-v1/397a1b12-e9e9-4e58-9d4c-2f383b2b73c3/zagreb-13.png"
       },
       {
-        "nome": "Verde 5",
-        "hex": "#9fba37",
-        "hexes": [],
+        "nome": "Verde lima",
+        "hex": "#94bc1d",
+        "hexes": [
+          "#94bc1d"
+        ],
         "imagem": "/__l5e/assets-v1/d6cd94ab-13c5-4cc6-967d-cf1b7d203be7/zagreb-12.png"
       },
       {
-        "nome": "Amarelo 1",
-        "hex": "#dcd71e",
-        "hexes": [],
+        "nome": "Amarelo limão",
+        "hex": "#e1d900",
+        "hexes": [
+          "#e1d900"
+        ],
         "imagem": "/__l5e/assets-v1/cd9cc272-c81d-44f9-9146-20148abbf308/zagreb-11.png"
       },
       {
-        "nome": "Amarelo 2",
-        "hex": "#f1db4c",
-        "hexes": [],
+        "nome": "Amarelo",
+        "hex": "#f9dc3a",
+        "hexes": [
+          "#f9dc3a"
+        ],
         "imagem": "/__l5e/assets-v1/c43c474c-ec1f-4fb7-a58b-426083b2b241/zagreb-10.png"
       },
       {
-        "nome": "Amarelo 3",
-        "hex": "#f1b803",
-        "hexes": [],
+        "nome": "Amarelo ouro",
+        "hex": "#f3b801",
+        "hexes": [
+          "#f3b801"
+        ],
         "imagem": "/__l5e/assets-v1/2cee2b29-66cb-45d2-b96b-def28bbd8f33/zagreb-5.png"
       },
       {
-        "nome": "Laranja 1",
-        "hex": "#c4521d",
-        "hexes": [],
+        "nome": "Laranja",
+        "hex": "#e4500e",
+        "hexes": [
+          "#e4500e"
+        ],
         "imagem": "/__l5e/assets-v1/1129ca87-b5d7-4b91-8fb9-83b30f8d28e8/zagreb-4.png"
       },
       {
         "nome": "Vermelho",
-        "hex": "#8b1727",
-        "hexes": [],
+        "hex": "#a30e20",
+        "hexes": [
+          "#a30e20"
+        ],
         "imagem": "/__l5e/assets-v1/c47425e8-67c9-4914-96d2-a1a4c31d3e9b/zagreb-3.png"
       },
       {
-        "nome": "Rosa 1",
-        "hex": "#eec3d4",
-        "hexes": [],
+        "nome": "Rosa claro",
+        "hex": "#edc3d4",
+        "hexes": [
+          "#edc3d4"
+        ],
         "imagem": "/__l5e/assets-v1/2dd631aa-f87a-42c5-8f00-02c627a3fbd0/zagreb-2.png"
       },
       {
-        "nome": "Rosa 2",
-        "hex": "#c0437f",
-        "hexes": [],
+        "nome": "Fúcsia",
+        "hex": "#e03f81",
+        "hexes": [
+          "#e03f81"
+        ],
         "imagem": "/__l5e/assets-v1/1c8dd78c-9f37-4588-8d06-64914d17cb44/zagreb-1.png"
       },
       {
-        "nome": "Rosa 3",
-        "hex": "#c46097",
-        "hexes": [],
+        "nome": "Rosa",
+        "hex": "#e05e9a",
+        "hexes": [
+          "#e05e9a"
+        ],
         "imagem": "/__l5e/assets-v1/9ce57c33-2c45-44b7-b0d6-44ad8205ff2b/zagreb-23.png"
       },
       {
-        "nome": "Roxo 1",
-        "hex": "#503677",
-        "hexes": [],
+        "nome": "Roxo",
+        "hex": "#583179",
+        "hexes": [
+          "#583179"
+        ],
         "imagem": "/__l5e/assets-v1/abcc5a44-7d9a-4600-946b-d17034d3af66/zagreb-18.png"
       },
       {
-        "nome": "Roxo 2",
-        "hex": "#272863",
-        "hexes": [],
+        "nome": "Azul escuro",
+        "hex": "#212165",
+        "hexes": [
+          "#212165"
+        ],
         "imagem": "/__l5e/assets-v1/abfe831b-d352-4c75-962d-bf22b6d9b55d/zagreb-17.png"
       },
       {
-        "nome": "Azul 1",
-        "hex": "#7ca4d1",
-        "hexes": [],
+        "nome": "Azul claro",
+        "hex": "#66a5d4",
+        "hexes": [
+          "#66a5d4"
+        ],
         "imagem": "/__l5e/assets-v1/f709a41a-0f6d-436c-ba5a-29d1e763f4cd/zagreb-16.png"
       },
       {
-        "nome": "Azul 2",
-        "hex": "#047db7",
-        "hexes": [],
+        "nome": "Turquesa",
+        "hex": "#007cbb",
+        "hexes": [
+          "#007cbb"
+        ],
         "imagem": "/__l5e/assets-v1/3f41ad4c-d2a5-4f30-9ccd-f7e3df93e823/zagreb-15.png"
       },
       {
-        "nome": "Azul 3",
-        "hex": "#205c95",
-        "hexes": [],
+        "nome": "Azul",
+        "hex": "#005a98",
+        "hexes": [
+          "#005a98"
+        ],
         "imagem": "/__l5e/assets-v1/4bdc7d42-4c42-4eea-9ec7-c1fa1791f71e/zagreb-9.png"
       },
       {
-        "nome": "Azul 4",
-        "hex": "#11324f",
-        "hexes": [],
+        "nome": "Azul marinho",
+        "hex": "#002a4e",
+        "hexes": [
+          "#002a4e"
+        ],
         "imagem": "/__l5e/assets-v1/fb3859c2-419d-4571-b487-829fa69d08fa/zagreb-7.png"
       },
       {
-        "nome": "Cinzento 1",
-        "hex": "#616976",
-        "hexes": [],
+        "nome": "Cinzento",
+        "hex": "#5c6876",
+        "hexes": [
+          "#5c6876"
+        ],
         "imagem": "/__l5e/assets-v1/a3202a03-1f22-4e9b-9d46-e02c3f55b872/zagreb-8.png"
       },
       {
         "nome": "Preto",
-        "hex": "#342f2b",
-        "hexes": [],
+        "hex": "#302824",
+        "hexes": [
+          "#302824"
+        ],
         "imagem": "/__l5e/assets-v1/3dee18a7-2335-4999-9f2a-f5ab1bb2c0a6/zagreb-6.png"
       }
     ],
@@ -1925,27 +2050,27 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "50",
-        "55",
-        "60",
-        "66",
-        "69",
-        "72",
-        "75",
-        "78",
-        "81"
+        "50 cm",
+        "55 cm",
+        "60 cm",
+        "66 cm",
+        "69 cm",
+        "72 cm",
+        "75 cm",
+        "78 cm",
+        "81 cm"
       ],
       [
         "Largura",
-        "37",
-        "41",
-        "45",
-        "48",
-        "51",
-        "54",
-        "57",
-        "60",
-        "63"
+        "37 cm",
+        "41 cm",
+        "45 cm",
+        "48 cm",
+        "51 cm",
+        "54 cm",
+        "57 cm",
+        "60 cm",
+        "63 cm"
       ]
     ],
     "precos": [
@@ -1969,45 +2094,60 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "rockspeed",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "T-shirt COPENHAGA",
     "referenciaNome": "COPENHAGA",
     "categoria": "tshirts",
     "subcategoria": "Desportivas",
     "genero": "homem",
-    "descricao": "T-shirt COPENHAGA disponível em 5 cores. 100% Poliéster",
+    "descricao": "Moderna e funcional, a T-shirt COPENHAGA tem corte de manga raglã e um painel lateral em contraste que acompanha a silhueta. O tecido técnico, leve e respirável, mantém o corpo fresco e seco durante a atividade. Disponível em cinco cores vivas, é a escolha ideal para equipas desportivas e eventos que querem mostrar a sua marca em movimento.",
     "composicao": "100% Poliéster, Densidade: 145 g/m²",
     "referencia": "#COP-COP",
     "imagem": "/__l5e/assets-v1/bea9f71a-db83-4911-9cb0-acc0485c6ea5/copenhaga-5.png",
     "lifestyle": pub("/lifestyle/copenhaga-new.jpg"),
     "cores": [
       {
-        "nome": "Branco",
-        "hex": "#e8e8e8",
-        "hexes": [],
+        "nome": "Branco e cinzento",
+        "hex": "#f1f1f1",
+        "hexes": [
+          "#f1f1f1",
+          "#555c66"
+        ],
         "imagem": "/__l5e/assets-v1/bea9f71a-db83-4911-9cb0-acc0485c6ea5/copenhaga-5.png"
       },
       {
-        "nome": "Verde",
-        "hex": "#88b848",
-        "hexes": [],
+        "nome": "Verde lima",
+        "hex": "#84bb48",
+        "hexes": [
+          "#84bb48"
+        ],
         "imagem": "/__l5e/assets-v1/fb22774d-238a-4de7-b33f-4ea289fecd09/copenhaga-4.png"
       },
       {
         "nome": "Amarelo",
-        "hex": "#e8d808",
-        "hexes": [],
+        "hex": "#e3dc00",
+        "hexes": [
+          "#e3dc00"
+        ],
         "imagem": "/__l5e/assets-v1/238d19c8-a32b-43e8-94ba-9b7ec63e425b/copenhaga-3.png"
       },
       {
         "nome": "Rosa",
-        "hex": "#e898b8",
-        "hexes": [],
+        "hex": "#ee9ab9",
+        "hexes": [
+          "#ee9ab9"
+        ],
         "imagem": "/__l5e/assets-v1/1db8da2f-0a91-4b2a-b8aa-2ac414bbd9bb/copenhaga-2.png"
       },
       {
-        "nome": "Azul",
-        "hex": "#0888c8",
-        "hexes": [],
+        "nome": "Turquesa",
+        "hex": "#0091cd",
+        "hexes": [
+          "#0091cd"
+        ],
         "imagem": "/__l5e/assets-v1/0ed3499e-c8fb-4b24-8c5d-8a4e365249de/copenhaga-1.png"
       }
     ],
@@ -2022,19 +2162,19 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "69",
-        "72",
-        "75",
-        "78",
-        "82"
+        "69 cm",
+        "72 cm",
+        "75 cm",
+        "78 cm",
+        "82 cm"
       ],
       [
         "Largura",
-        "49",
-        "52",
-        "55",
-        "58",
-        "61"
+        "49 cm",
+        "52 cm",
+        "55 cm",
+        "58 cm",
+        "61 cm"
       ]
     ],
     "precos": [
@@ -2058,59 +2198,63 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "brickplus",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "T-shirt BRATISLAVA",
     "referenciaNome": "BRATISLAVA",
     "categoria": "tshirts",
     "subcategoria": "Desportivas",
     "genero": "homem",
-    "descricao": "T-shirt BRATISLAVA disponível em 5 cores. 100% Poliéster",
+    "descricao": "Desportiva e cheia de detalhe, a T-shirt BRATISLAVA combina um corpo branco em tecido técnico leve com apontamentos de cor nos ombros, nas mangas e na bainha. O resultado é uma peça fresca, que seca depressa e se destaca em qualquer treino, corrida ou evento. Em cinco combinações vibrantes, pronta a dar visibilidade à sua marca.",
     "composicao": "100% Poliéster, Densidade: 145 g/m²",
     "referencia": "#BRA-BRA",
     "imagem": "/__l5e/assets-v1/cc8a9651-b300-4343-a886-b9f773ef66b6/bratislava-2.png",
     "lifestyle": pub("/lifestyle/bratislava-new.jpg"),
     "cores": [
       {
-        "nome": "Verde",
-        "hex": "#f0f2f2",
+        "nome": "Branco e verde",
+        "hex": "#e6e8ea",
         "hexes": [
-          "#f0f2f2",
-          "#78a838"
+          "#e6e8ea",
+          "#8cc63f"
         ],
         "imagem": "/__l5e/assets-v1/cc8a9651-b300-4343-a886-b9f773ef66b6/bratislava-2.png"
       },
       {
-        "nome": "Amarelo",
-        "hex": "#f0f2f2",
+        "nome": "Branco e amarelo",
+        "hex": "#e6e8ea",
         "hexes": [
-          "#f0f2f2",
-          "#c8c808"
+          "#e6e8ea",
+          "#e8dc20"
         ],
         "imagem": "/__l5e/assets-v1/57593b04-e03d-4d74-afc8-fc63bba45c74/bratislava-3.png"
       },
       {
-        "nome": "Laranja",
-        "hex": "#f0f2f2",
+        "nome": "Branco e laranja",
+        "hex": "#e5e7e9",
         "hexes": [
-          "#f0f2f2",
-          "#c84808"
+          "#e5e7e9",
+          "#e0661c"
         ],
         "imagem": "/__l5e/assets-v1/8939c34a-b050-449b-b04e-726247a222a9/bratislava-1.png"
       },
       {
-        "nome": "Rosa",
-        "hex": "#f0f2f2",
+        "nome": "Branco e rosa",
+        "hex": "#e8eaec",
         "hexes": [
-          "#f0f2f2",
-          "#d84878"
+          "#e8eaec",
+          "#d63c8c"
         ],
         "imagem": "/__l5e/assets-v1/0d3bf5e7-17e5-46fe-852d-4457560d1175/bratislava-4.png"
       },
       {
-        "nome": "Preto",
-        "hex": "#f0f2f2",
+        "nome": "Branco e preto",
+        "hex": "#e7e9eb",
         "hexes": [
-          "#f0f2f2",
-          "#3a332e"
+          "#e7e9eb",
+          "#2a2a2a"
         ],
         "imagem": "/__l5e/assets-v1/8133fdac-9707-492f-a443-cc49247a9027/bratislava-5.png"
       }
@@ -2126,19 +2270,19 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "66",
-        "69",
-        "72",
-        "75",
-        "78"
+        "66 cm",
+        "69 cm",
+        "72 cm",
+        "75 cm",
+        "78 cm"
       ],
       [
         "Largura",
-        "50",
-        "53",
-        "56",
-        "59",
-        "62"
+        "50 cm",
+        "53 cm",
+        "56 cm",
+        "59 cm",
+        "62 cm"
       ]
     ],
     "precos": [
@@ -2162,50 +2306,55 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "leopard",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
+    "incluiCrianca": true,
     "nome": "T-shirt HELSÍNQUIA",
     "referenciaNome": "HELSÍNQUIA",
     "categoria": "tshirts",
     "subcategoria": "Desportivas",
     "genero": "homem",
-    "descricao": "T-shirt HELSÍNQUIA disponível em 4 cores. 100% Poliéster",
+    "descricao": "Leve e fresca, a T-shirt HELSÍNQUIA foi pensada para quem não para. O corpo branco em tecido técnico respirável é marcado por uma faixa lateral de cor que lhe dá um toque desportivo e dinâmico. Seca depressa e acompanha cada movimento, em tamanhos para adulto e criança — ideal para equipas, escolas e eventos que querem vestir a sua marca com energia.",
     "composicao": "100% Poliéster, Densidade: 145 g/m²",
     "referencia": "#HEL-HEL",
     "imagem": "/__l5e/assets-v1/c2d5f353-c871-4d26-9fca-3fbd34c0f428/helsinquia-4.png",
     "lifestyle": pub("/lifestyle/helsinquia-new.jpg"),
     "cores": [
       {
-        "nome": "Verde",
-        "hex": "#f1f1f1",
+        "nome": "Branco e verde",
+        "hex": "#ebebeb",
         "hexes": [
-          "#f1f1f1",
-          "#689838"
+          "#ebebeb",
+          "#7fbf3f"
         ],
         "imagem": "/__l5e/assets-v1/c2d5f353-c871-4d26-9fca-3fbd34c0f428/helsinquia-4.png"
       },
       {
-        "nome": "Vermelho",
-        "hex": "#f1f1f1",
+        "nome": "Branco e vermelho",
+        "hex": "#ececec",
         "hexes": [
-          "#f1f1f1",
-          "#980818"
+          "#ececec",
+          "#a01828"
         ],
         "imagem": "/__l5e/assets-v1/43962334-3136-4a1e-a791-688dca56f235/helsinquia-3.png"
       },
       {
-        "nome": "Azul",
-        "hex": "#f1f1f1",
+        "nome": "Branco e azul",
+        "hex": "#ececec",
         "hexes": [
-          "#f1f1f1",
-          "#085898"
+          "#ececec",
+          "#1c5aa0"
         ],
         "imagem": "/__l5e/assets-v1/9a046c16-f335-47b8-9893-a03e47f790ed/helsinquia-2.png"
       },
       {
-        "nome": "Preto",
-        "hex": "#f1f1f1",
+        "nome": "Branco e preto",
+        "hex": "#ececec",
         "hexes": [
-          "#f1f1f1",
-          "#181818"
+          "#ececec",
+          "#2a2a2a"
         ],
         "imagem": "/__l5e/assets-v1/047cb56f-ba31-4763-9e37-e37b9ab5600d/helsinquia-1.png"
       }
@@ -2224,25 +2373,25 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "48",
-        "54",
-        "62",
-        "66",
-        "69",
-        "72",
-        "75",
-        "78"
+        "48 cm",
+        "54 cm",
+        "62 cm",
+        "66 cm",
+        "69 cm",
+        "72 cm",
+        "75 cm",
+        "78 cm"
       ],
       [
         "Largura",
-        "35",
-        "40",
-        "46",
-        "49",
-        "53",
-        "56",
-        "59",
-        "62"
+        "35 cm",
+        "40 cm",
+        "46 cm",
+        "49 cm",
+        "53 cm",
+        "56 cm",
+        "59 cm",
+        "62 cm"
       ]
     ],
     "precos": [
@@ -2266,45 +2415,65 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "maurice",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
+    "incluiCrianca": true,
     "nome": "T-shirt MOSCOVO",
     "referenciaNome": "MOSCOVO",
     "categoria": "tshirts",
     "subcategoria": "Desportivas",
     "genero": "homem",
-    "descricao": "T-shirt MOSCOVO disponível em 5 cores. 100% Poliéster",
+    "descricao": "Feita para se mexer, a T-shirt MOSCOVO alia um tecido técnico leve e respirável a um desenho desportivo marcante: canesca preta nos ombros, separada da cor principal por um debrum branco em curva. Seca depressa e mantém a frescura durante o esforço, sendo ideal para clubes, escolas e eventos desportivos. Disponível em cinco combinações de cor e em tamanhos para adulto e criança, pronta a vestir toda a equipa com a sua marca.",
     "composicao": "100% Poliéster, Densidade: 145 g/m²",
     "referencia": "#DUB-DUB",
     "imagem": "/__l5e/assets-v1/3d4760fa-28ca-4c8e-8c66-9dbf04567f1e/moscovo-5.png",
-    "lifestyle": pub("/lifestyle/moscovo-new.jpg"),
+    "lifestyle": pub("/lifestyle/moscovo-gemini.jpg"),
     "cores": [
       {
-        "nome": "Verde",
-        "hex": "#98b858",
-        "hexes": [],
+        "nome": "Verde lima e preto",
+        "hex": "#97bc53",
+        "hexes": [
+          "#97bc53",
+          "#1e1e1e"
+        ],
         "imagem": "/__l5e/assets-v1/3d4760fa-28ca-4c8e-8c66-9dbf04567f1e/moscovo-5.png"
       },
       {
-        "nome": "Laranja",
-        "hex": "#c85828",
-        "hexes": [],
+        "nome": "Laranja e preto",
+        "hex": "#c75421",
+        "hexes": [
+          "#c75421",
+          "#1e1e1e"
+        ],
         "imagem": "/__l5e/assets-v1/7c7b8ca2-46fc-4f97-a7e0-c5f924317f77/moscovo-4.png"
       },
       {
-        "nome": "Vermelho",
-        "hex": "#881828",
-        "hexes": [],
+        "nome": "Vermelho e preto",
+        "hex": "#8d1d25",
+        "hexes": [
+          "#8d1d25",
+          "#1e1e1e"
+        ],
         "imagem": "/__l5e/assets-v1/74a94a6b-cb3e-4c4c-9de4-6a7e9b67c823/moscovo-3.png"
       },
       {
-        "nome": "Azul",
-        "hex": "#285898",
-        "hexes": [],
+        "nome": "Azul e preto",
+        "hex": "#265e98",
+        "hexes": [
+          "#265e98",
+          "#1e1e1e"
+        ],
         "imagem": "/__l5e/assets-v1/96c0495a-7611-4215-8895-f6821b7556cd/moscovo-2.png"
       },
       {
-        "nome": "Cinzento",
-        "hex": "#585858",
-        "hexes": [],
+        "nome": "Cinzento e preto",
+        "hex": "#56555a",
+        "hexes": [
+          "#56555a",
+          "#1e1e1e"
+        ],
         "imagem": "/__l5e/assets-v1/e0550993-1bad-4316-8ed6-0d02c8572a32/moscovo-1.png"
       }
     ],
@@ -2322,25 +2491,25 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "48",
-        "54",
-        "62",
-        "66",
-        "69",
-        "72",
-        "75",
-        "78"
+        "48 cm",
+        "54 cm",
+        "62 cm",
+        "66 cm",
+        "69 cm",
+        "72 cm",
+        "75 cm",
+        "78 cm"
       ],
       [
         "Largura",
-        "35",
-        "41",
-        "46",
-        "50",
-        "53",
-        "56",
-        "59",
-        "62"
+        "35 cm",
+        "41 cm",
+        "46 cm",
+        "50 cm",
+        "53 cm",
+        "56 cm",
+        "59 cm",
+        "62 cm"
       ]
     ],
     "precos": [
@@ -2364,39 +2533,43 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "dacita",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "T-shirt BUDAPESTE",
     "referenciaNome": "BUDAPESTE",
     "categoria": "tshirts",
     "subcategoria": "Desportivas",
     "genero": "homem",
-    "descricao": "T-shirt BUDAPESTE disponível em 3 cores. 23% Poliéster",
+    "descricao": "Técnica e com personalidade, a T-shirt BUDAPESTE destaca-se pelo padrão em chevron tecido no próprio tecido, que lhe dá um visual moderno e dinâmico. Leve, elástica e de secagem rápida, acompanha o ritmo dos treinos mais intensos e mantém o conforto do início ao fim. Em três cores sóbrias, é a escolha certa para equipas desportivas que querem levar a sua marca mais longe.",
     "composicao": "77% Poliamida, 23% Poliéster, Densidade: 180 g/m²",
     "referencia": "#BUD-BUD",
     "imagem": asset_budapeste_cor_1.url,
     "lifestyle": pub("/lifestyle/budapeste-new.jpg"),
     "cores": [
   {
-    "nome": "Azul",
-    "hex": "#01365a",
+    "nome": "Azul marinho",
+    "hex": "#013559",
     "hexes": [
-      "#01365a"
-    ],
+          "#013559"
+        ],
     "imagem": asset_budapeste_cor_1.url
   },
   {
     "nome": "Cinzento",
-    "hex": "#41464c",
+    "hex": "#45494e",
     "hexes": [
-      "#41464c"
-    ],
+          "#45494e"
+        ],
     "imagem": asset_budapeste_cor_2.url
   },
   {
     "nome": "Preto",
-    "hex": "#2b271d",
+    "hex": "#2f2e2d",
     "hexes": [
-      "#2b271d"
-    ],
+          "#2f2e2d"
+        ],
     "imagem": asset_budapeste_cor_3.url
   }
 ],
@@ -2411,19 +2584,19 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "66",
-        "69",
-        "72",
-        "75",
-        "78"
+        "66 cm",
+        "69 cm",
+        "72 cm",
+        "75 cm",
+        "78 cm"
       ],
       [
         "Largura",
-        "50",
-        "53",
-        "56",
-        "59",
-        "62"
+        "50 cm",
+        "53 cm",
+        "56 cm",
+        "59 cm",
+        "62 cm"
       ]
     ],
     "precos": [
@@ -2448,12 +2621,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "moscow",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "T-shirt DUBLIN",
     "referenciaNome": "DUBLIN",
     "categoria": "tshirts",
     "subcategoria": "Desportivas",
     "genero": "homem",
-    "descricao": "T-shirt DUBLIN disponível em 5 cores..",
+    "descricao": "Uma segunda pele para quem leva o desempenho a sério. A T-shirt DUBLIN, de manga comprida, é feita num tecido elástico de poliamida e elastano que se ajusta ao corpo e acompanha cada movimento, com zonas texturadas que apoiam a musculatura e favorecem a respiração do tecido. Ideal para treino, competição ou como camada base nos dias frios, em cinco cores com a identidade da sua marca.",
     "composicao": "90% Poliamida, 10% Elastano, Densidade: 230 g/m²",
     "referencia": "#MEL-MEL",
     "lifestyle": dublinTshirtEditorial,
@@ -2461,42 +2638,42 @@ export const modelos: Modelo[] = [
     "cores": [
   {
     "nome": "Branco",
-    "hex": "#dedede",
+    "hex": "#ebebeb",
     "hexes": [
-      "#dedede"
-    ],
+          "#ebebeb"
+        ],
     "imagem": asset_dublin_cor_1.url
   },
   {
     "nome": "Vermelho",
-    "hex": "#8a1427",
+    "hex": "#831524",
     "hexes": [
-      "#8a1427"
-    ],
+          "#831524"
+        ],
     "imagem": asset_dublin_cor_2.url
   },
   {
     "nome": "Azul",
-    "hex": "#1e528b",
+    "hex": "#1e4e83",
     "hexes": [
-      "#1e528b"
-    ],
+          "#1e4e83"
+        ],
     "imagem": asset_dublin_cor_3.url
   },
   {
     "nome": "Azul marinho",
-    "hex": "#033553",
+    "hex": "#03324f",
     "hexes": [
-      "#033553"
-    ],
+          "#03324f"
+        ],
     "imagem": asset_dublin_cor_4.url
   },
   {
     "nome": "Preto",
-    "hex": "#0e1003",
+    "hex": "#312e2b",
     "hexes": [
-      "#0e1003"
-    ],
+          "#312e2b"
+        ],
     "imagem": asset_dublin_cor_5.url
   }
 ],
@@ -2513,23 +2690,23 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "56",
-        "59",
-        "62",
-        "65",
-        "68",
-        "70",
-        "72"
+        "56 cm",
+        "59 cm",
+        "62 cm",
+        "65 cm",
+        "68 cm",
+        "70 cm",
+        "72 cm"
       ],
       [
         "Largura",
-        "35",
-        "38",
-        "40",
-        "43",
-        "45",
-        "47",
-        "49"
+        "35 cm",
+        "38 cm",
+        "40 cm",
+        "43 cm",
+        "45 cm",
+        "47 cm",
+        "49 cm"
       ]
     ],
     "precos": [
@@ -2553,214 +2730,219 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "patrol",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
+    "incluiCrianca": true,
     "nome": "Polo BOGOTÁ",
     "referenciaNome": "BOGOTÁ",
     "categoria": "polos",
     "subcategoria": "Polos",
     "genero": "unissexo",
-    "descricao": "Polo BOGOTÁ disponível em 25 cores. 100% Algodão",
+    "descricao": "Fresco, cuidado e intemporal, o Polo BOGOTÁ é feito em 100% algodão para um toque natural e agradável durante todo o dia. A gola de pólo com botões e o corte clássico conferem-lhe uma imagem profissional sem perder o conforto. Com 25 cores e tamanhos desde os 2 anos até ao adulto, é a escolha certa para uniformizar a sua equipa — dos mais pequenos aos mais crescidos — com a sua marca.",
     "composicao": "100% Algodão, Densidade: 220 g/m²",
     "referencia": "#BOG-BOG",
     "imagem": asset_bogota_1.url,
     "lifestyle": pub("/lifestyle/bogota-new.jpg"),
 "cores": [
       {
-        "nome": "Branco 1",
-        "hex": "#e4e4e4",
+        "nome": "Branco",
+        "hex": "#f0eff2",
         "hexes": [
-          "#e4e4e4"
+          "#f0eff2"
         ],
         "imagem": asset_bogota_1.url
       },
       {
-        "nome": "Cinzento claro 1",
-        "hex": "#9c9c90",
+        "nome": "Bege",
+        "hex": "#aaa899",
         "hexes": [
-          "#9c9c90"
+          "#aaa899"
         ],
         "imagem": asset_bogota_2.url
       },
       {
         "nome": "Castanho",
-        "hex": "#54483c",
+        "hex": "#695749",
         "hexes": [
-          "#54483c"
+          "#695749"
         ],
         "imagem": asset_bogota_3.url
       },
       {
-        "nome": "Amarelo 1",
-        "hex": "#a8b43c",
+        "nome": "Verde lima",
+        "hex": "#b2bb46",
         "hexes": [
-          "#a8b43c"
+          "#b2bb46"
         ],
         "imagem": asset_bogota_4.url
       },
       {
-        "nome": "Turquesa",
-        "hex": "#308484",
+        "nome": "Verde-água",
+        "hex": "#3a9088",
         "hexes": [
-          "#308484"
+          "#3a9088"
         ],
         "imagem": asset_bogota_5.url
       },
       {
         "nome": "Verde",
-        "hex": "#0c603c",
+        "hex": "#156c4b",
         "hexes": [
-          "#0c603c"
+          "#156c4b"
         ],
         "imagem": asset_bogota_6.url
       },
       {
         "nome": "Verde escuro",
-        "hex": "#00483c",
+        "hex": "#005141",
         "hexes": [
-          "#00483c"
+          "#005141"
         ],
         "imagem": asset_bogota_7.url
       },
       {
-        "nome": "Amarelo 2",
-        "hex": "#f0d848",
+        "nome": "Amarelo",
+        "hex": "#f0da4b",
         "hexes": [
-          "#f0d848"
+          "#f0da4b"
         ],
         "imagem": asset_bogota_8.url
       },
       {
-        "nome": "Amarelo 3",
-        "hex": "#e4b40c",
+        "nome": "Mostarda",
+        "hex": "#e5b916",
         "hexes": [
-          "#e4b40c"
+          "#e5b916"
         ],
         "imagem": asset_bogota_9.url
       },
       {
         "nome": "Laranja",
-        "hex": "#b44818",
+        "hex": "#c5531b",
         "hexes": [
-          "#b44818"
+          "#c5531b"
         ],
         "imagem": asset_bogota_10.url
       },
       {
-        "nome": "Bordô",
-        "hex": "#840c24",
+        "nome": "Vermelho",
+        "hex": "#891524",
         "hexes": [
-          "#840c24"
+          "#891524"
         ],
         "imagem": asset_bogota_11.url
       },
       {
-        "nome": "Vinho",
-        "hex": "#540024",
+        "nome": "Bordô",
+        "hex": "#680a2e",
         "hexes": [
-          "#540024"
+          "#680a2e"
         ],
         "imagem": asset_bogota_12.url
       },
       {
         "nome": "Rosa",
-        "hex": "#c03c78",
+        "hex": "#c34280",
         "hexes": [
-          "#c03c78"
+          "#c34280"
         ],
         "imagem": asset_bogota_13.url
       },
       {
         "nome": "Roxo",
-        "hex": "#300c48",
+        "hex": "#321750",
         "hexes": [
-          "#300c48"
+          "#321750"
         ],
         "imagem": asset_bogota_14.url
       },
       {
         "nome": "Azul claro",
-        "hex": "#90a8cc",
+        "hex": "#94b1d5",
         "hexes": [
-          "#90a8cc"
+          "#94b1d5"
         ],
         "imagem": asset_bogota_15.url
       },
       {
-        "nome": "Azul 1",
-        "hex": "#185490",
+        "nome": "Azul",
+        "hex": "#1c5a93",
         "hexes": [
-          "#185490"
+          "#1c5a93"
         ],
         "imagem": asset_bogota_16.url
       },
       {
-        "nome": "Azul 2",
-        "hex": "#486c9c",
+        "nome": "Azul acinzentado",
+        "hex": "#5273a3",
         "hexes": [
-          "#486c9c"
+          "#5273a3"
         ],
         "imagem": asset_bogota_17.url
       },
       {
-        "nome": "Azul petróleo 1",
-        "hex": "#184854",
+        "nome": "Verde petróleo",
+        "hex": "#174c5c",
         "hexes": [
-          "#184854"
+          "#174c5c"
         ],
         "imagem": asset_bogota_18.url
       },
       {
         "nome": "Azul marinho",
-        "hex": "#243054",
+        "hex": "#25385f",
         "hexes": [
-          "#243054"
+          "#25385f"
         ],
         "imagem": asset_bogota_19.url
       },
       {
-        "nome": "Azul petróleo 2",
-        "hex": "#003048",
+        "nome": "Azul petróleo",
+        "hex": "#043552",
         "hexes": [
-          "#003048"
+          "#043552"
         ],
         "imagem": asset_bogota_20.url
       },
       {
-        "nome": "Branco 2",
-        "hex": "#d8d8e4",
+        "nome": "Cinzento claro",
+        "hex": "#e1e1e7",
         "hexes": [
-          "#d8d8e4"
+          "#e1e1e7"
         ],
         "imagem": asset_bogota_21.url
       },
       {
-        "nome": "Cinzento claro 2",
-        "hex": "#9c9ca8",
+        "nome": "Cinzento mesclado",
+        "hex": "#aaa8b4",
         "hexes": [
-          "#9c9ca8"
+          "#aaa8b4"
         ],
         "imagem": asset_bogota_22.url
       },
       {
-        "nome": "Azul petróleo 3",
-        "hex": "#54606c",
+        "nome": "Cinzento azulado",
+        "hex": "#626977",
         "hexes": [
-          "#54606c"
+          "#626977"
         ],
         "imagem": asset_bogota_23.url
       },
       {
         "nome": "Cinzento escuro",
-        "hex": "#484848",
+        "hex": "#545359",
         "hexes": [
-          "#484848"
+          "#545359"
         ],
         "imagem": asset_bogota_24.url
       },
       {
         "nome": "Preto",
-        "hex": "#242418",
+        "hex": "#2f2c26",
         "hexes": [
-          "#242418"
+          "#2f2c26"
         ],
         "imagem": asset_bogota_25.url
       }
@@ -2782,31 +2964,31 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "41",
-        "46",
-        "51",
-        "55",
-        "60",
-        "65",
-        "69",
-        "73",
-        "77",
-        "81",
-        "84"
+        "41 cm",
+        "46 cm",
+        "51 cm",
+        "55 cm",
+        "60 cm",
+        "65 cm",
+        "69 cm",
+        "73 cm",
+        "77 cm",
+        "81 cm",
+        "84 cm"
       ],
       [
         "Largura",
-        "33",
-        "36",
-        "39",
-        "42",
-        "45",
-        "48",
-        "52",
-        "56",
-        "59",
-        "62",
-        "66"
+        "33 cm",
+        "36 cm",
+        "39 cm",
+        "42 cm",
+        "45 cm",
+        "48 cm",
+        "52 cm",
+        "56 cm",
+        "59 cm",
+        "62 cm",
+        "66 cm"
       ]
     ],
     "precos": [
@@ -2830,12 +3012,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "kentucky",
-    "nome": "Polo BRASILIA",
-    "referenciaNome": "BRASILIA",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
+    "nome": "Polo BRASÍLIA",
+    "referenciaNome": "BRASÍLIA",
     "categoria": "polos",
     "subcategoria": "Polos",
     "genero": "unissexo",
-    "descricao": "Polo BRASILIA disponível em 9 cores. 100% Poliéster",
+    "descricao": "Leve, prático e sempre impecável, o Polo BRASÍLIA é feito em tecido técnico respirável que seca depressa e mantém a forma ao longo do dia. O corte clássico com gola de pólo e carcela de botões assenta bem em homem e mulher, ideal para equipas, eventos e atividades ao ar livre. Em nove cores vivas e intemporais, é a tela perfeita para a sua marca.",
     "composicao": "100% Poliéster, Densidade: 170 g/m²",
     "referencia": "#BRA-BRA",
     "imagem": asset_brasilia_1.url,
@@ -2843,73 +3029,73 @@ export const modelos: Modelo[] = [
 "cores": [
       {
         "nome": "Preto",
-        "hex": "#242424",
+        "hex": "#2c2622",
         "hexes": [
-          "#242424"
+          "#2c2622"
         ],
         "imagem": asset_brasilia_1.url
       },
       {
-        "nome": "Azul petróleo",
-        "hex": "#003048",
+        "nome": "Azul marinho",
+        "hex": "#04304d",
         "hexes": [
-          "#003048"
+          "#04304d"
         ],
         "imagem": asset_brasilia_2.url
       },
       {
         "nome": "Azul",
-        "hex": "#185484",
+        "hex": "#1c538a",
         "hexes": [
-          "#185484"
+          "#1c538a"
         ],
         "imagem": asset_brasilia_3.url
       },
       {
         "nome": "Turquesa",
-        "hex": "#0084b4",
+        "hex": "#0182b5",
         "hexes": [
-          "#0084b4"
+          "#0182b5"
         ],
         "imagem": asset_brasilia_4.url
       },
       {
-        "nome": "Vinho",
-        "hex": "#600024",
+        "nome": "Bordô",
+        "hex": "#63092c",
         "hexes": [
-          "#600024"
+          "#63092c"
         ],
         "imagem": asset_brasilia_5.url
       },
       {
-        "nome": "Bordô",
-        "hex": "#840c18",
+        "nome": "Vermelho",
+        "hex": "#80161f",
         "hexes": [
-          "#840c18"
+          "#80161f"
         ],
         "imagem": asset_brasilia_6.url
       },
       {
         "nome": "Laranja",
-        "hex": "#b44818",
+        "hex": "#b84b19",
         "hexes": [
-          "#b44818"
+          "#b84b19"
         ],
         "imagem": asset_brasilia_7.url
       },
       {
         "nome": "Verde lima",
-        "hex": "#84a848",
+        "hex": "#88ab4c",
         "hexes": [
-          "#84a848"
+          "#88ab4c"
         ],
         "imagem": asset_brasilia_8.url
       },
       {
         "nome": "Branco",
-        "hex": "#f0f0f0",
+        "hex": "#eef0f4",
         "hexes": [
-          "#f0f0f0"
+          "#eef0f4"
         ],
         "imagem": asset_brasilia_9.url
       }
@@ -2926,21 +3112,21 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "69",
-        "72",
-        "75",
-        "78",
-        "81",
-        "84"
+        "69 cm",
+        "72 cm",
+        "75 cm",
+        "78 cm",
+        "81 cm",
+        "84 cm"
       ],
       [
         "Largura",
-        "51",
-        "54",
-        "57",
-        "60",
-        "63",
-        "66"
+        "51 cm",
+        "54 cm",
+        "57 cm",
+        "60 cm",
+        "63 cm",
+        "66 cm"
       ]
     ],
     "precos": [
@@ -2964,47 +3150,55 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "sagano",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Polo BUENOS AIRES",
     "referenciaNome": "BUENOS AIRES",
     "categoria": "polos",
     "subcategoria": "Polos",
     "genero": "homem",
-    "descricao": "Polo BUENOS AIRES disponível em 4 cores. 100% Poliéster",
+    "descricao": "Clássico com um toque de distinção, o Polo BUENOS AIRES apresenta corpo branco impecável e duplo filete de cor na gola e nas mangas, um detalhe subtil que eleva qualquer uniforme. O tecido técnico, leve e de secagem rápida, mantém o conforto e a frescura durante todo o dia. Em quatro combinações de cor, é a escolha elegante para apresentar a sua equipa com a sua marca.",
     "composicao": "100% Poliéster, Densidade: 170 g/m²",
     "referencia": "#BUE-BUE",
     "imagem": asset_buenos_aires_cor_1.url,
     "lifestyle": pub("/lifestyle/buenos-aires-corrected.jpg"),
     "cores": [
   {
-    "nome": "Branco e verde",
-    "hex": "#dfdee1",
+    "nome": "Branco e preto",
+    "hex": "#f0eff2",
     "hexes": [
-      "#dfdee1"
-    ],
+          "#f0eff2",
+          "#333333"
+        ],
     "imagem": asset_buenos_aires_cor_1.url
   },
   {
     "nome": "Branco e azul",
-    "hex": "#5b8aa5",
+    "hex": "#f0eff2",
     "hexes": [
-      "#5b8aa5"
-    ],
+          "#f0eff2",
+          "#2a7fb5"
+        ],
     "imagem": asset_buenos_aires_cor_2.url
   },
   {
     "nome": "Branco e vermelho",
-    "hex": "#a2656d",
+    "hex": "#f0eff2",
     "hexes": [
-      "#a2656d"
-    ],
+          "#f0eff2",
+          "#9b1c2c"
+        ],
     "imagem": asset_buenos_aires_cor_3.url
   },
   {
-    "nome": "Branco e verde água",
-    "hex": "#599292",
+    "nome": "Branco e verde",
+    "hex": "#f0eff2",
     "hexes": [
-      "#599292"
-    ],
+          "#f0eff2",
+          "#16876e"
+        ],
     "imagem": asset_buenos_aires_cor_4.url
   }
 ],
@@ -3019,19 +3213,19 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "69",
-        "72",
-        "75",
-        "78",
-        "81"
+        "69 cm",
+        "72 cm",
+        "75 cm",
+        "78 cm",
+        "81 cm"
       ],
       [
         "Largura",
-        "51",
-        "54",
-        "57",
-        "60",
-        "63"
+        "51 cm",
+        "54 cm",
+        "57 cm",
+        "60 cm",
+        "63 cm"
       ]
     ],
     "precos": [
@@ -3055,63 +3249,73 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "strategy",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Polo SANTIAGO",
     "referenciaNome": "SANTIAGO",
     "categoria": "polos",
     "subcategoria": "Polos",
     "genero": "homem",
-    "descricao": "Polo SANTIAGO disponível em 6 cores. 100% Poliéster",
+    "descricao": "Desportivo na atitude e elegante nos detalhes, o Polo SANTIAGO combina um tecido técnico leve e respirável com painéis laterais em cor de contraste que desenham uma silhueta dinâmica. A gola com filete, a carcela debruada e os remates nas mangas dão-lhe um acabamento cuidado, perfeito para equipas, clubes e eventos. Disponível em seis combinações de cor, é a escolha certa para dar energia à imagem da sua marca.",
     "composicao": "100% Poliéster, Densidade: 170 g/m²",
     "referencia": "#STR-SNT",
     "imagem": asset_santiago_cor_1.url,
-    "lifestyle": pub("/lifestyle/santiago-corrected.jpg"),
+    "lifestyle": pub("/lifestyle/santiago-gemini.jpg"),
     "cores": [
   {
-    "nome": "Vermelho e branco",
-    "hex": "#7d1520",
+    "nome": "Branco e vermelho",
+    "hex": "#f0f0f2",
     "hexes": [
-      "#7d1520"
-    ],
+          "#f0f0f2",
+          "#8b1428"
+        ],
     "imagem": asset_santiago_cor_1.url
   },
   {
-    "nome": "Azul e branco",
-    "hex": "#1a5287",
+    "nome": "Branco e azul",
+    "hex": "#f0f0f2",
     "hexes": [
-      "#1a5287"
-    ],
+          "#f0f0f2",
+          "#1b5d97"
+        ],
     "imagem": asset_santiago_cor_2.url
   },
   {
-    "nome": "Preto e branco",
-    "hex": "#2f2a26",
+    "nome": "Branco e preto",
+    "hex": "#f0f0f2",
     "hexes": [
-      "#2f2a26"
-    ],
+          "#f0f0f2",
+          "#2e2925"
+        ],
     "imagem": asset_santiago_cor_3.url
   },
   {
-    "nome": "Vermelho",
+    "nome": "Vermelho e branco",
     "hex": "#8b1428",
     "hexes": [
-      "#8b1428"
-    ],
+          "#8b1428",
+          "#f0f0f2"
+        ],
     "imagem": asset_santiago_cor_4.url
   },
   {
-    "nome": "Azul",
+    "nome": "Azul e branco",
     "hex": "#1b5d97",
     "hexes": [
-      "#1b5d97"
-    ],
+          "#1b5d97",
+          "#f0f0f2"
+        ],
     "imagem": asset_santiago_cor_5.url
   },
   {
-    "nome": "Preto",
+    "nome": "Preto e branco",
     "hex": "#2e2925",
     "hexes": [
-      "#2e2925"
-    ],
+          "#2e2925",
+          "#f0f0f2"
+        ],
     "imagem": asset_santiago_cor_6.url
   }
 ],
@@ -3126,19 +3330,19 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "69",
-        "72",
-        "75",
-        "78",
-        "81"
+        "69 cm",
+        "72 cm",
+        "75 cm",
+        "78 cm",
+        "81 cm"
       ],
       [
         "Largura",
-        "51",
-        "54",
-        "57",
-        "60",
-        "63"
+        "51 cm",
+        "54 cm",
+        "57 cm",
+        "60 cm",
+        "63 cm"
       ]
     ],
     "precos": [
@@ -3162,12 +3366,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "caracas",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Polo CARACAS",
     "referenciaNome": "CARACAS",
     "categoria": "polos",
     "subcategoria": "Polos",
     "genero": "homem",
-    "descricao": "Polo CARACAS disponível em 18 cores..",
+    "descricao": "A elegância de um polo com o conforto da manga comprida. O Polo CARACAS, em algodão de toque suave, tem gola clássica com botões e punhos canelados que lhe dão um acabamento cuidado. Uma peça versátil para as estações mais frescas, que transmite uma imagem profissional e acolhedora. Com 18 cores à escolha, é a forma ideal de vestir a sua equipa com a sua marca durante todo o ano.",
     "composicao": "100% Algodão, Densidade: 220 g/m²",
     "referencia": "#CAR-CAR",
     "lifestyle": caracasEditorial,
@@ -3175,146 +3383,146 @@ export const modelos: Modelo[] = [
     "cores": [
   {
     "nome": "Branco",
-    "hex": "#cacbcf",
+    "hex": "#eff0f4",
     "hexes": [
-      "#cacbcf"
-    ],
+          "#eff0f4"
+        ],
     "imagem": asset_caracas_cor_1.url
   },
   {
     "nome": "Cinza pedra",
-    "hex": "#918f83",
+    "hex": "#a9a698",
     "hexes": [
-      "#918f83"
-    ],
+          "#a9a698"
+        ],
     "imagem": asset_caracas_cor_2.url
   },
   {
     "nome": "Castanho",
-    "hex": "#5b4d40",
+    "hex": "#685547",
     "hexes": [
-      "#5b4d40"
-    ],
+          "#685547"
+        ],
     "imagem": asset_caracas_cor_3.url
   },
   {
     "nome": "Verde lima",
-    "hex": "#aeb555",
+    "hex": "#b1ba46",
     "hexes": [
-      "#aeb555"
-    ],
+          "#b1ba46"
+        ],
     "imagem": asset_caracas_cor_4.url
   },
   {
     "nome": "Verde",
-    "hex": "#346b4d",
+    "hex": "#166e4c",
     "hexes": [
-      "#346b4d"
-    ],
+          "#166e4c"
+        ],
     "imagem": asset_caracas_cor_5.url
   },
   {
     "nome": "Verde escuro",
-    "hex": "#1b4539",
+    "hex": "#004739",
     "hexes": [
-      "#1b4539"
-    ],
+          "#004739"
+        ],
     "imagem": asset_caracas_cor_6.url
   },
   {
     "nome": "Amarelo claro",
-    "hex": "#ecd965",
+    "hex": "#f1da4c",
     "hexes": [
-      "#ecd965"
-    ],
+          "#f1da4c"
+        ],
     "imagem": asset_caracas_cor_7.url
   },
   {
     "nome": "Amarelo",
-    "hex": "#dab843",
+    "hex": "#e3b716",
     "hexes": [
-      "#dab843"
-    ],
+          "#e3b716"
+        ],
     "imagem": asset_caracas_cor_8.url
   },
   {
     "nome": "Laranja",
-    "hex": "#b2552a",
+    "hex": "#c14e1a",
     "hexes": [
-      "#b2552a"
-    ],
+          "#c14e1a"
+        ],
     "imagem": asset_caracas_cor_9.url
   },
   {
     "nome": "Vermelho",
-    "hex": "#7c2128",
+    "hex": "#891524",
     "hexes": [
-      "#7c2128"
-    ],
+          "#891524"
+        ],
     "imagem": asset_caracas_cor_10.url
   },
   {
     "nome": "Bordô",
-    "hex": "#5c152f",
+    "hex": "#670a2f",
     "hexes": [
-      "#5c152f"
-    ],
+          "#670a2f"
+        ],
     "imagem": asset_caracas_cor_11.url
   },
   {
     "nome": "Azul claro",
-    "hex": "#91a8c8",
+    "hex": "#94b0d5",
     "hexes": [
-      "#91a8c8"
-    ],
+          "#94b0d5"
+        ],
     "imagem": asset_caracas_cor_12.url
   },
   {
     "nome": "Azul",
-    "hex": "#2f588e",
+    "hex": "#1e5b94",
     "hexes": [
-      "#2f588e"
-    ],
+          "#1e5b94"
+        ],
     "imagem": asset_caracas_cor_13.url
   },
   {
     "nome": "Azul marinho",
-    "hex": "#153250",
+    "hex": "#053553",
     "hexes": [
-      "#153250"
-    ],
+          "#053553"
+        ],
     "imagem": asset_caracas_cor_14.url
   },
   {
     "nome": "Cinzento claro",
-    "hex": "#8e8e98",
+    "hex": "#abaab6",
     "hexes": [
-      "#8e8e98"
-    ],
+          "#abaab6"
+        ],
     "imagem": asset_caracas_cor_15.url
   },
   {
     "nome": "Cinzento",
-    "hex": "#50555f",
+    "hex": "#626876",
     "hexes": [
-      "#50555f"
-    ],
+          "#626876"
+        ],
     "imagem": asset_caracas_cor_16.url
   },
   {
     "nome": "Cinzento escuro",
-    "hex": "#414046",
+    "hex": "#535259",
     "hexes": [
-      "#414046"
-    ],
+          "#535259"
+        ],
     "imagem": asset_caracas_cor_17.url
   },
   {
     "nome": "Preto",
-    "hex": "#110e03",
+    "hex": "#2f2a26",
     "hexes": [
-      "#110e03"
-    ],
+          "#2f2a26"
+        ],
     "imagem": asset_caracas_cor_18.url
   }
 ],
@@ -3335,31 +3543,31 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "46",
-        "51",
-        "55",
-        "60",
-        "65",
-        "69",
-        "73",
-        "77",
-        "81",
-        "84",
-        "87"
+        "46 cm",
+        "51 cm",
+        "55 cm",
+        "60 cm",
+        "65 cm",
+        "69 cm",
+        "73 cm",
+        "77 cm",
+        "81 cm",
+        "84 cm",
+        "87 cm"
       ],
       [
         "Largura",
-        "36",
-        "39",
-        "42",
-        "45",
-        "48",
-        "52",
-        "56",
-        "59",
-        "62",
-        "65",
-        "68"
+        "36 cm",
+        "39 cm",
+        "42 cm",
+        "45 cm",
+        "48 cm",
+        "52 cm",
+        "56 cm",
+        "59 cm",
+        "62 cm",
+        "65 cm",
+        "68 cm"
       ]
     ],
     "precos": [
@@ -3383,12 +3591,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "sucre",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Polo SUCRE",
     "referenciaNome": "SUCRE",
     "categoria": "polos",
     "subcategoria": "Polos",
     "genero": "mulher",
-    "descricao": "Polo SUCRE disponível em 5 cores..",
+    "descricao": "Pensado para a silhueta feminina, o Polo SUCRE alia a elegância de um clássico a um corte ajustado que valoriza sem apertar. O algodão macio e respirável garante conforto do início ao fim do dia, e a gola com botões dá-lhe um toque sempre cuidado. Em cinco cores essenciais, é a peça ideal para uma equipa que quer apresentar a sua marca com estilo.",
     "composicao": "100% Algodão, Densidade: 220 g/m²",
     "referencia": "#SUC-SUC",
     "lifestyle": sucreEditorial,
@@ -3396,42 +3608,42 @@ export const modelos: Modelo[] = [
     "cores": [
   {
     "nome": "Preto",
-    "hex": "#120f06",
+    "hex": "#332f2c",
     "hexes": [
-      "#120f06"
-    ],
+          "#332f2c"
+        ],
     "imagem": asset_sucre_cor_1.url
   },
   {
     "nome": "Azul marinho",
-    "hex": "#023554",
+    "hex": "#023453",
     "hexes": [
-      "#023554"
-    ],
+          "#023453"
+        ],
     "imagem": asset_sucre_cor_2.url
   },
   {
     "nome": "Azul claro",
-    "hex": "#8099b8",
+    "hex": "#8fa8c8",
     "hexes": [
-      "#8099b8"
-    ],
+          "#8fa8c8"
+        ],
     "imagem": asset_sucre_cor_3.url
   },
   {
     "nome": "Vermelho",
-    "hex": "#841426",
+    "hex": "#831425",
     "hexes": [
-      "#841426"
-    ],
+          "#831425"
+        ],
     "imagem": asset_sucre_cor_4.url
   },
   {
     "nome": "Branco",
-    "hex": "#d5d6da",
+    "hex": "#ebeced",
     "hexes": [
-      "#d5d6da"
-    ],
+          "#ebeced"
+        ],
     "imagem": asset_sucre_cor_5.url
   }
 ],
@@ -3447,30 +3659,30 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "58",
-        "59",
-        "62",
-        "65",
-        "68",
-        "71"
+        "58 cm",
+        "59 cm",
+        "62 cm",
+        "65 cm",
+        "68 cm",
+        "71 cm"
       ],
       [
         "Largura peito",
-        "46",
-        "48",
-        "50",
-        "52",
-        "55",
-        "58"
+        "46 cm",
+        "48 cm",
+        "50 cm",
+        "52 cm",
+        "55 cm",
+        "58 cm"
       ],
       [
         "Largura cintura",
-        "40",
-        "42",
-        "44",
-        "46",
-        "49",
-        "52"
+        "40 cm",
+        "42 cm",
+        "44 cm",
+        "46 cm",
+        "49 cm",
+        "52 cm"
       ]
     ],
     "precos": [
@@ -3493,291 +3705,18 @@ export const modelos: Modelo[] = [
     ]
   },
   {
-    "id": "patrol-crianca",
-    "nome": "Polo BOGOTÁ",
-    "referenciaNome": "BOGOTÁ",
-    "categoria": "polos",
-    "subcategoria": "Polos",
-    "genero": "crianca",
-    "descricao": "Polo BOGOTÁ disponível em 25 cores. 100% Algodão (tamanhos de criança)",
-    "composicao": "100% Algodão, Densidade: 220 g/m²",
-    "referencia": "#BOG-BOG-C",
-    "imagem": asset_bogota_1.url,
-    "lifestyle": pub("/lifestyle/bogota-new.jpg"),
-"cores": [
-      {
-        "nome": "Branco 1",
-        "hex": "#e4e4e4",
-        "hexes": [
-          "#e4e4e4"
-        ],
-        "imagem": asset_bogota_1.url
-      },
-      {
-        "nome": "Cinzento claro 1",
-        "hex": "#9c9c90",
-        "hexes": [
-          "#9c9c90"
-        ],
-        "imagem": asset_bogota_2.url
-      },
-      {
-        "nome": "Castanho",
-        "hex": "#54483c",
-        "hexes": [
-          "#54483c"
-        ],
-        "imagem": asset_bogota_3.url
-      },
-      {
-        "nome": "Amarelo 1",
-        "hex": "#a8b43c",
-        "hexes": [
-          "#a8b43c"
-        ],
-        "imagem": asset_bogota_4.url
-      },
-      {
-        "nome": "Turquesa",
-        "hex": "#308484",
-        "hexes": [
-          "#308484"
-        ],
-        "imagem": asset_bogota_5.url
-      },
-      {
-        "nome": "Verde",
-        "hex": "#0c603c",
-        "hexes": [
-          "#0c603c"
-        ],
-        "imagem": asset_bogota_6.url
-      },
-      {
-        "nome": "Verde escuro",
-        "hex": "#00483c",
-        "hexes": [
-          "#00483c"
-        ],
-        "imagem": asset_bogota_7.url
-      },
-      {
-        "nome": "Amarelo 2",
-        "hex": "#f0d848",
-        "hexes": [
-          "#f0d848"
-        ],
-        "imagem": asset_bogota_8.url
-      },
-      {
-        "nome": "Amarelo 3",
-        "hex": "#e4b40c",
-        "hexes": [
-          "#e4b40c"
-        ],
-        "imagem": asset_bogota_9.url
-      },
-      {
-        "nome": "Laranja",
-        "hex": "#b44818",
-        "hexes": [
-          "#b44818"
-        ],
-        "imagem": asset_bogota_10.url
-      },
-      {
-        "nome": "Bordô",
-        "hex": "#840c24",
-        "hexes": [
-          "#840c24"
-        ],
-        "imagem": asset_bogota_11.url
-      },
-      {
-        "nome": "Vinho",
-        "hex": "#540024",
-        "hexes": [
-          "#540024"
-        ],
-        "imagem": asset_bogota_12.url
-      },
-      {
-        "nome": "Rosa",
-        "hex": "#c03c78",
-        "hexes": [
-          "#c03c78"
-        ],
-        "imagem": asset_bogota_13.url
-      },
-      {
-        "nome": "Roxo",
-        "hex": "#300c48",
-        "hexes": [
-          "#300c48"
-        ],
-        "imagem": asset_bogota_14.url
-      },
-      {
-        "nome": "Azul claro",
-        "hex": "#90a8cc",
-        "hexes": [
-          "#90a8cc"
-        ],
-        "imagem": asset_bogota_15.url
-      },
-      {
-        "nome": "Azul 1",
-        "hex": "#185490",
-        "hexes": [
-          "#185490"
-        ],
-        "imagem": asset_bogota_16.url
-      },
-      {
-        "nome": "Azul 2",
-        "hex": "#486c9c",
-        "hexes": [
-          "#486c9c"
-        ],
-        "imagem": asset_bogota_17.url
-      },
-      {
-        "nome": "Azul petróleo 1",
-        "hex": "#184854",
-        "hexes": [
-          "#184854"
-        ],
-        "imagem": asset_bogota_18.url
-      },
-      {
-        "nome": "Azul marinho",
-        "hex": "#243054",
-        "hexes": [
-          "#243054"
-        ],
-        "imagem": asset_bogota_19.url
-      },
-      {
-        "nome": "Azul petróleo 2",
-        "hex": "#003048",
-        "hexes": [
-          "#003048"
-        ],
-        "imagem": asset_bogota_20.url
-      },
-      {
-        "nome": "Branco 2",
-        "hex": "#d8d8e4",
-        "hexes": [
-          "#d8d8e4"
-        ],
-        "imagem": asset_bogota_21.url
-      },
-      {
-        "nome": "Cinzento claro 2",
-        "hex": "#9c9ca8",
-        "hexes": [
-          "#9c9ca8"
-        ],
-        "imagem": asset_bogota_22.url
-      },
-      {
-        "nome": "Azul petróleo 3",
-        "hex": "#54606c",
-        "hexes": [
-          "#54606c"
-        ],
-        "imagem": asset_bogota_23.url
-      },
-      {
-        "nome": "Cinzento escuro",
-        "hex": "#484848",
-        "hexes": [
-          "#484848"
-        ],
-        "imagem": asset_bogota_24.url
-      },
-      {
-        "nome": "Preto",
-        "hex": "#242418",
-        "hexes": [
-          "#242418"
-        ],
-        "imagem": asset_bogota_25.url
-      }
-    ],
-    "tamanhos": [
-      [
-        "Tamanho",
-        "2",
-        "3",
-        "4/5",
-        "6/8",
-        "10/12",
-        "S",
-        "M",
-        "L",
-        "XL",
-        "XXL",
-        "3XL"
-      ],
-      [
-        "Comprimento",
-        "41",
-        "46",
-        "51",
-        "55",
-        "60",
-        "65",
-        "69",
-        "73",
-        "77",
-        "81",
-        "84"
-      ],
-      [
-        "Largura",
-        "33",
-        "36",
-        "39",
-        "42",
-        "45",
-        "48",
-        "52",
-        "56",
-        "59",
-        "62",
-        "66"
-      ]
-    ],
-    "precos": [
-      [
-        "0–49 unidades",
-        "15,00€"
-      ],
-      [
-        "50–249 unidades",
-        "14,00€"
-      ],
-      [
-        "Mais de 249 unidades",
-        "12,50€"
-      ]
-    ],
-    "caracteristicas": [
-      "100% Algodão",
-      "Densidade: 220 g/m²"
-    ]
-  },
-  {
     "id": "arizona",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "incluiCrianca": true,
     "nome": "Hoodie LIMA",
     "referenciaNome": "LIMA",
     "categoria": "sweats",
     "subcategoria": "Com Capuz",
     "genero": "unissexo",
-    "descricao": "Hoodie LIMA disponível em 20 cores. 100% Poliéster",
+    "descricao": "Aconchegante e cheio de cor, o Hoodie LIMA é o clássico que nunca falha. Capuz com cordões, bolso canguru e punhos e cintura em malha canelada dão-lhe um conforto descontraído para todos os dias. Com 20 cores à escolha e tamanhos desde os 3 anos até ao adulto, permite vestir a equipa, a escola ou a família inteira com a imagem da sua marca.",
     "composicao": "100% Poliéster, Densidade: 280 g/m²",
     "referencia": "#LIM-LIM",
     "imagem": "/__l5e/assets-v1/66db4335-a27f-4f27-bb32-a94d941e6b79/arizona-branco.webp",
@@ -3785,62 +3724,62 @@ export const modelos: Modelo[] = [
     "cores": [
       {
         "nome": "Branco",
-        "hex": "#ecedf1",
+        "hex": "#eaebef",
         "hexes": [
-          "#ecedf1"
+          "#eaebef"
         ],
         "imagem": "/__l5e/assets-v1/66db4335-a27f-4f27-bb32-a94d941e6b79/arizona-branco.webp"
       },
       {
         "nome": "Castanho",
-        "hex": "#9a8665",
+        "hex": "#9a8666",
         "hexes": [
-          "#9a8665"
+          "#9a8666"
         ],
         "imagem": "/__l5e/assets-v1/ccf01965-574e-4538-9b9b-ab0080b2ca46/arizona-castanho.webp"
       },
       {
-        "nome": "Verde 1",
-        "hex": "#91b654",
+        "nome": "Verde lima",
+        "hex": "#91b553",
         "hexes": [
-          "#91b654"
+          "#91b553"
         ],
         "imagem": "/__l5e/assets-v1/3038bec8-080f-4d88-b3f2-ecf6edf09e18/arizona-verde1.webp"
       },
       {
-        "nome": "Verde 2",
-        "hex": "#1e6e4d",
+        "nome": "Verde",
+        "hex": "#1d6d4d",
         "hexes": [
-          "#1e6e4d"
+          "#1d6d4d"
         ],
         "imagem": "/__l5e/assets-v1/f235c56e-e982-4b73-84c0-6f95101d2f18/arizona-verde2.webp"
       },
       {
-        "nome": "Verde 3",
-        "hex": "#0f5341",
+        "nome": "Verde escuro",
+        "hex": "#0e5341",
         "hexes": [
-          "#0f5341"
+          "#0e5341"
         ],
         "imagem": "/__l5e/assets-v1/0720b1d6-9f12-4d11-9c7d-a143b87c71f0/arizona-verde3.webp"
       },
       {
-        "nome": "Verde 4",
-        "hex": "#4c513b",
+        "nome": "Verde tropa",
+        "hex": "#4b513b",
         "hexes": [
-          "#4c513b"
+          "#4b513b"
         ],
         "imagem": "/__l5e/assets-v1/0500442f-429f-4657-90f0-ccee306fa2d4/arizona-verde4.webp"
       },
       {
         "nome": "Laranja",
-        "hex": "#be5020",
+        "hex": "#bd511e",
         "hexes": [
-          "#be5020"
+          "#bd511e"
         ],
         "imagem": "/__l5e/assets-v1/ba064205-6801-4f71-824b-3fb9d4b59a93/arizona-laranja.webp"
       },
       {
-        "nome": "Vermelho 1",
+        "nome": "Vermelho",
         "hex": "#881926",
         "hexes": [
           "#881926"
@@ -3848,98 +3787,98 @@ export const modelos: Modelo[] = [
         "imagem": "/__l5e/assets-v1/59b24b69-05aa-464e-ad05-b007a7480487/arizona-vermelho1.webp"
       },
       {
-        "nome": "Vermelho 2",
-        "hex": "#651132",
+        "nome": "Bordô",
+        "hex": "#661031",
         "hexes": [
-          "#651132"
+          "#661031"
         ],
         "imagem": "/__l5e/assets-v1/9fb93e12-7213-4ca5-a492-9f44c8228b6e/arizona-vermelho2.webp"
       },
       {
-        "nome": "Rosa 1",
-        "hex": "#dcbdcc",
+        "nome": "Rosa claro",
+        "hex": "#dcbccb",
         "hexes": [
-          "#dcbdcc"
+          "#dcbccb"
         ],
         "imagem": "/__l5e/assets-v1/25ab44f7-fdd4-4a65-8da4-2d176ffaa49d/arizona-rosa1.webp"
       },
       {
-        "nome": "Rosa 2",
-        "hex": "#bb447e",
+        "nome": "Rosa",
+        "hex": "#ba437e",
         "hexes": [
-          "#bb447e"
+          "#ba437e"
         ],
         "imagem": "/__l5e/assets-v1/147e2d48-e345-4ccf-80e5-f696f4171954/arizona-rosa2.webp"
       },
       {
-        "nome": "Roxo 1",
-        "hex": "#4d376e",
+        "nome": "Roxo",
+        "hex": "#4c376d",
         "hexes": [
-          "#4d376e"
+          "#4c376d"
         ],
         "imagem": "/__l5e/assets-v1/2e2045d7-7213-4bf3-8072-0354d76f8382/arizona-roxo1.webp"
       },
       {
-        "nome": "Roxo 2",
-        "hex": "#242658",
+        "nome": "Azul escuro",
+        "hex": "#222556",
         "hexes": [
-          "#242658"
+          "#222556"
         ],
         "imagem": "/__l5e/assets-v1/37039eb2-ccf7-4c07-8a77-96c05451ddc7/arizona-roxo2.webp"
       },
       {
-        "nome": "Azul 1",
-        "hex": "#94b1d3",
+        "nome": "Azul claro",
+        "hex": "#93b0d1",
         "hexes": [
-          "#94b1d3"
+          "#93b0d1"
         ],
         "imagem": "/__l5e/assets-v1/1a724bfb-0859-4667-ac38-1afc90e297b4/arizona-azul1.webp"
       },
       {
-        "nome": "Azul 2",
-        "hex": "#048bbd",
+        "nome": "Turquesa",
+        "hex": "#008bbc",
         "hexes": [
-          "#048bbd"
+          "#008bbc"
         ],
         "imagem": "/__l5e/assets-v1/d8adf478-46f7-4ab7-a8b7-b45d7e698cc5/arizona-azul2.webp"
       },
       {
-        "nome": "Azul 3",
-        "hex": "#245687",
+        "nome": "Azul",
+        "hex": "#235685",
         "hexes": [
-          "#245687"
+          "#235685"
         ],
         "imagem": "/__l5e/assets-v1/c8e9bf21-afd2-4d9e-996c-7fe2c18b8b67/arizona-azul3.webp"
       },
       {
-        "nome": "Azul 4",
-        "hex": "#11324b",
+        "nome": "Azul marinho",
+        "hex": "#10324b",
         "hexes": [
-          "#11324b"
+          "#10324b"
         ],
         "imagem": "/__l5e/assets-v1/b86fd0d1-d593-43ac-9d5c-640e64bca89e/arizona-azul4.webp"
       },
       {
-        "nome": "Cinzento 1",
-        "hex": "#9f9ea9",
+        "nome": "Cinzento claro",
+        "hex": "#9c9ca5",
         "hexes": [
-          "#9f9ea9"
+          "#9c9ca5"
         ],
         "imagem": "/__l5e/assets-v1/0ec9c474-f5be-467e-85b0-4c79c354e8cf/arizona-cinzento1.webp"
       },
       {
-        "nome": "Cinzento 2",
-        "hex": "#4d4e53",
+        "nome": "Cinzento escuro",
+        "hex": "#4c4e52",
         "hexes": [
-          "#4d4e53"
+          "#4c4e52"
         ],
         "imagem": "/__l5e/assets-v1/3a587b79-6a06-4d31-8b1c-0615b85350d0/arizona-cinzento2.webp"
       },
       {
         "nome": "Preto",
-        "hex": "#2d2a25",
+        "hex": "#2d2924",
         "hexes": [
-          "#2d2a25"
+          "#2d2924"
         ],
         "imagem": "/__l5e/assets-v1/55b85c44-b21f-49c1-b4ca-95240de78169/arizona-preto.webp"
       }
@@ -3960,29 +3899,29 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "46",
-        "51",
-        "53",
-        "61",
-        "66",
-        "69",
-        "72",
-        "75",
-        "78",
-        "81"
+        "46 cm",
+        "51 cm",
+        "53 cm",
+        "61 cm",
+        "66 cm",
+        "69 cm",
+        "72 cm",
+        "75 cm",
+        "78 cm",
+        "81 cm"
       ],
       [
         "Largura",
-        "35",
-        "39",
-        "43",
-        "47",
-        "52",
-        "55",
-        "58",
-        "61",
-        "64",
-        "67"
+        "35 cm",
+        "39 cm",
+        "43 cm",
+        "47 cm",
+        "52 cm",
+        "55 cm",
+        "58 cm",
+        "61 cm",
+        "64 cm",
+        "67 cm"
       ]
     ],
     "precos": [
@@ -4006,13 +3945,17 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "cairo",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "incluiCrianca": true,
     "nome": "Hoodie CAIRO",
     "referenciaNome": "CAIRO",
     "categoria": "sweats",
     "subcategoria": "Com Capuz",
     "genero": "unissexo",
-    "descricao": "Hoodie CAIRO disponível em 15 cores.",
+    "descricao": "O hoodie que toda a família vai querer vestir. O Hoodie CAIRO combina um capuz com cordões, um amplo bolso canguru e punhos e cintura em malha canelada num corte descontraído que nunca sai de moda. Macio e confortável, está disponível em 15 cores vivas e clássicas e em tamanhos de criança a adulto — ideal para equipas, escolas, eventos ou para levar a sua marca a todas as idades.",
     "composicao": "100% Poliéster, Densidade: 280 g/m²",
     "referencia": "#CAI-CAI",
     "lifestyle": cairoEditorial,
@@ -4033,27 +3976,27 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "46",
-        "53",
-        "58",
-        "62",
-        "65",
-        "68",
-        "71",
-        "73",
-        "75"
+        "46 cm",
+        "53 cm",
+        "58 cm",
+        "62 cm",
+        "65 cm",
+        "68 cm",
+        "71 cm",
+        "73 cm",
+        "75 cm"
       ],
       [
         "Largura",
-        "40",
-        "44",
-        "48",
-        "51",
-        "54",
-        "57",
-        "60",
-        "63",
-        "66"
+        "40 cm",
+        "44 cm",
+        "48 cm",
+        "51 cm",
+        "54 cm",
+        "57 cm",
+        "60 cm",
+        "63 cm",
+        "66 cm"
       ]
     ],
     "precos": [
@@ -4077,12 +4020,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "rabat",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Hoodie RABAT",
     "referenciaNome": "RABAT",
     "categoria": "sweats",
     "subcategoria": "Com Capuz",
     "genero": "unissexo",
-    "descricao": "Hoodie RABAT disponível em 6 cores.",
+    "descricao": "Confortável, prático e com um ar sempre atual, o Hoodie RABAT foi pensado para acompanhar o ritmo do seu dia. O fecho de correr integral facilita vestir e despir, o capuz amplo protege nos dias de vento e o bolso canguru mantém as mãos quentes. Os punhos e a cintura em malha canelada completam um corte que assenta bem a toda a equipa. Em seis cores intemporais, pronto a receber a sua marca.",
     "composicao": "100% Poliéster, Densidade: 280 g/m²",
     "referencia": "#RAB-RAB",
     "lifestyle": rabatEditorial,
@@ -4100,21 +4047,21 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "67",
-        "70",
-        "73",
-        "75",
-        "78",
-        "81"
+        "67 cm",
+        "70 cm",
+        "73 cm",
+        "75 cm",
+        "78 cm",
+        "81 cm"
       ],
       [
         "Largura",
-        "53",
-        "56",
-        "59",
-        "62",
-        "65",
-        "68"
+        "53 cm",
+        "56 cm",
+        "59 cm",
+        "62 cm",
+        "65 cm",
+        "68 cm"
       ]
     ],
     "precos": [
@@ -4138,12 +4085,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "luanda",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Hoodie LUANDA",
     "referenciaNome": "LUANDA",
     "categoria": "sweats",
     "subcategoria": "Com Capuz",
     "genero": "unissexo",
-    "descricao": "Hoodie LUANDA disponível em 6 cores..",
+    "descricao": "Descontraído e cheio de carácter, o Hoodie LUANDA junta o conforto de um clássico à praticidade do fecho de correr integral. O capuz com cordões ajustáveis, os bolsos frontais e os punhos e cintura em malha canelada fazem dele a peça ideal para os dias mais frescos, no trabalho ou fora dele. Em seis cores versáteis, é a tela perfeita para dar destaque à sua marca.",
     "composicao": "100% Poliéster, Densidade: 280 g/m²",
     "referencia": "#LUA-LUA",
     "lifestyle": luandaEditorial,
@@ -4183,9 +4134,9 @@ export const modelos: Modelo[] = [
   },
   {
     "nome": "Cinzento",
-    "hex": "#878994",
+    "hex": "#a7a8b4",
     "hexes": [
-      "#878994"
+      "#a7a8b4"
     ],
     "imagem": asset_luanda_cor_5.url
   },
@@ -4211,23 +4162,23 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "59",
-        "63",
-        "66",
-        "69",
-        "72",
-        "75",
-        "77"
+        "59 cm",
+        "63 cm",
+        "66 cm",
+        "69 cm",
+        "72 cm",
+        "75 cm",
+        "77 cm"
       ],
       [
         "Largura",
-        "48",
-        "51",
-        "54",
-        "57",
-        "60",
-        "63",
-        "66"
+        "48 cm",
+        "51 cm",
+        "54 cm",
+        "57 cm",
+        "60 cm",
+        "63 cm",
+        "66 cm"
       ]
     ],
     "precos": [
@@ -4251,12 +4202,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "bissau",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Sweatshirt BISSAU",
     "referenciaNome": "BISSAU",
     "categoria": "sweats",
     "subcategoria": "Sem Capuz",
     "genero": "unissexo",
-    "descricao": "Sweatshirt BISSAU disponível em 10 cores.",
+    "descricao": "Elegante sem esforço, a Sweatshirt BISSAU traz a gola subida com meio fecho que se ajusta ao seu gosto: fechada para os dias frescos, aberta para um visual mais descontraído. Os punhos e a cintura em malha canelada garantem um caimento cuidado, e o tecido macio e encorpado oferece conforto do primeiro ao último minuto. Em dez cores clássicas, é uma peça de bom gosto para vestir a sua equipa com a sua marca.",
     "composicao": "65% Poliéster, 35% Algodão, Densidade: 300 g/m²",
     "referencia": "#BIS-BIS",
     "lifestyle": bissauEditorial,
@@ -4264,81 +4219,81 @@ export const modelos: Modelo[] = [
 "cores": [
       {
         "nome": "Branco",
-        "hex": "#f0f0f0",
+        "hex": "#f0f1f4",
         "hexes": [
-          "#f0f0f0"
+          "#f0f1f4"
         ],
         "imagem": asset_bissau_1.url
       },
       {
-        "nome": "Preto",
-        "hex": "#302424",
+        "nome": "Verde",
+        "hex": "#005343",
         "hexes": [
-          "#302424"
+          "#005343"
         ],
         "imagem": asset_bissau_2.url
       },
       {
-        "nome": "Verde escuro",
-        "hex": "#18483c",
+        "nome": "Vermelho",
+        "hex": "#8d1527",
         "hexes": [
-          "#18483c"
+          "#8d1527"
         ],
         "imagem": asset_bissau_3.url
       },
       {
         "nome": "Bordô",
-        "hex": "#781824",
+        "hex": "#690b30",
         "hexes": [
-          "#781824"
+          "#690b30"
         ],
         "imagem": asset_bissau_4.url
       },
       {
-        "nome": "Vinho",
-        "hex": "#600c30",
+        "nome": "Azul",
+        "hex": "#1d5b94",
         "hexes": [
-          "#600c30"
+          "#1d5b94"
         ],
         "imagem": asset_bissau_5.url
       },
       {
-        "nome": "Azul marinho 1",
-        "hex": "#305490",
+        "nome": "Azul marinho",
+        "hex": "#053554",
         "hexes": [
-          "#305490"
+          "#053554"
         ],
         "imagem": asset_bissau_6.url
       },
       {
-        "nome": "Azul petróleo",
-        "hex": "#0c3048",
+        "nome": "Cinzento claro",
+        "hex": "#aaaab8",
         "hexes": [
-          "#0c3048"
+          "#aaaab8"
         ],
         "imagem": asset_bissau_7.url
       },
       {
-        "nome": "Cinzento claro",
-        "hex": "#a8a8b4",
+        "nome": "Cinzento",
+        "hex": "#626a77",
         "hexes": [
-          "#a8a8b4"
+          "#626a77"
         ],
         "imagem": asset_bissau_8.url
       },
       {
-        "nome": "Cinzento",
-        "hex": "#60606c",
+        "nome": "Cinzento escuro",
+        "hex": "#53525a",
         "hexes": [
-          "#60606c"
+          "#53525a"
         ],
         "imagem": asset_bissau_9.url
       },
       {
-        "nome": "Azul marinho 2",
-        "hex": "#484854",
+        "nome": "Preto",
+        "hex": "#322d29",
         "hexes": [
-          "#484854"
+          "#322d29"
         ],
         "imagem": asset_bissau_10.url
       }
@@ -4355,21 +4310,21 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "67",
-        "70",
-        "73",
-        "76",
-        "79",
-        "82"
+        "67 cm",
+        "70 cm",
+        "73 cm",
+        "76 cm",
+        "79 cm",
+        "82 cm"
       ],
       [
         "Largura",
-        "52",
-        "55",
-        "58",
-        "61",
-        "64",
-        "67"
+        "52 cm",
+        "55 cm",
+        "58 cm",
+        "61 cm",
+        "64 cm",
+        "67 cm"
       ]
     ],
     "precos": [
@@ -4393,12 +4348,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "dacar",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Sweatshirt DACAR",
     "referenciaNome": "DACAR",
     "categoria": "sweats",
     "subcategoria": "Sem Capuz",
     "genero": "unissexo",
-    "descricao": "Sweatshirt DACAR disponível em 9 cores..",
+    "descricao": "Prática e versátil, a Sweatshirt DACAR é o casaco de todos os dias para quem quer conforto sem perder a compostura. Fecho de correr integral, gola subida que aconchega o pescoço, bolsos laterais e cordão de ajuste na cintura conjugam-se num corte limpo que assenta bem em qualquer equipa. Em nove cores clássicas, é a escolha certa para levar a imagem da sua marca a todo o lado.",
     "composicao": "65% Poliéster, 35% Algodão, Densidade: 300 g/m²",
     "referencia": "#DAC-DAC",
     "lifestyle": dacarEditorial,
@@ -4454,17 +4413,17 @@ export const modelos: Modelo[] = [
   },
   {
     "nome": "Cinzento claro",
-    "hex": "#8a8c98",
+    "hex": "#aaaab7",
     "hexes": [
-      "#8a8c98"
+      "#aaaab7"
     ],
     "imagem": asset_dacar_cor_7.url
   },
   {
     "nome": "Cinzento",
-    "hex": "#535862",
+    "hex": "#656b79",
     "hexes": [
-      "#535862"
+      "#656b79"
     ],
     "imagem": asset_dacar_cor_8.url
   },
@@ -4489,21 +4448,21 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "66",
-        "69",
-        "72",
-        "75",
-        "78",
-        "81"
+        "66 cm",
+        "69 cm",
+        "72 cm",
+        "75 cm",
+        "78 cm",
+        "81 cm"
       ],
       [
         "Largura",
-        "53",
-        "56",
-        "59",
-        "62",
-        "65",
-        "68"
+        "53 cm",
+        "56 cm",
+        "59 cm",
+        "62 cm",
+        "65 cm",
+        "68 cm"
       ]
     ],
     "precos": [
@@ -4527,11 +4486,17 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "dublin",
+    "escolhaIdade": true,
+    "incluiCrianca": true,
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Sweatshirt MELODIAS",
     "referenciaNome": "MELODIAS",
     "categoria": "sweats",
     "subcategoria": "Sem Capuz",
-    "descricao": "Sweatshirt MELODIAS disponível em 25 cores. 65% Poliéster",
+    "descricao": "Um clássico intemporal que acompanha o seu dia com conforto e estilo. A Sweatshirt MELODIAS tem gola redonda, punhos e cintura em malha canelada e um tecido encorpado de toque macio, que mantém a forma e o aconchego lavagem após lavagem. Disponível em 25 cores e em tamanhos de criança a adulto, é a base perfeita para vestir toda a equipa — ou toda a família — com a sua marca.",
     "composicao": "65% Poliéster, 35% Algodão, Densidade: 300 g/m²",
     "referencia": "#MEL-MEL",
     "imagem": melodias1.url,
@@ -4551,7 +4516,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#aca99b"
         ],
-        "imagem": melodias2.url
+        "imagem": melodias2.url,
+        "soAdulto": true
       },
       {
         "nome": "Castanho",
@@ -4559,7 +4525,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#9d8966"
         ],
-        "imagem": melodias3.url
+        "imagem": melodias3.url,
+        "soAdulto": true
       },
       {
         "nome": "Verde lima",
@@ -4591,7 +4558,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#52563f"
         ],
-        "imagem": melodias7.url
+        "imagem": melodias7.url,
+        "soAdulto": true
       },
       {
         "nome": "Amarelo",
@@ -4607,7 +4575,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#d7ae16"
         ],
-        "imagem": melodias9.url
+        "imagem": melodias9.url,
+        "soAdulto": true
       },
       {
         "nome": "Laranja",
@@ -4631,7 +4600,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#680a2f"
         ],
-        "imagem": melodias12.url
+        "imagem": melodias12.url,
+        "soAdulto": true
       },
       {
         "nome": "Rosa",
@@ -4647,7 +4617,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#252762"
         ],
-        "imagem": melodias14.url
+        "imagem": melodias14.url,
+        "soAdulto": true
       },
       {
         "nome": "Azul claro",
@@ -4655,7 +4626,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#95b2d6"
         ],
-        "imagem": melodias15.url
+        "imagem": melodias15.url,
+        "soAdulto": true
       },
       {
         "nome": "Turquesa",
@@ -4711,7 +4683,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#626a78"
         ],
-        "imagem": melodias22.url
+        "imagem": melodias22.url,
+        "soAdulto": true
       },
       {
         "nome": "Cinzento escuro",
@@ -4719,7 +4692,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#54535a"
         ],
-        "imagem": melodias23.url
+        "imagem": melodias23.url,
+        "soAdulto": true
       },
       {
         "nome": "Antracite",
@@ -4727,7 +4701,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#484949"
         ],
-        "imagem": melodias24.url
+        "imagem": melodias24.url,
+        "soAdulto": true
       },
       {
         "nome": "Preto",
@@ -4735,7 +4710,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#312c28"
         ],
-        "imagem": melodias25.url
+        "imagem": melodias25.url,
+        "soAdulto": true
       }
     ],
     "tamanhos": [
@@ -4754,29 +4730,29 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "53",
-        "58",
-        "63",
-        "67",
-        "70",
-        "73",
-        "76",
-        "79",
-        "82",
-        "85"
+        "53 cm",
+        "58 cm",
+        "63 cm",
+        "67 cm",
+        "70 cm",
+        "73 cm",
+        "76 cm",
+        "79 cm",
+        "82 cm",
+        "85 cm"
       ],
       [
         "Largura",
-        "39",
-        "43",
-        "47",
-        "52",
-        "55",
-        "58",
-        "61",
-        "64",
-        "67",
-        "70"
+        "39 cm",
+        "43 cm",
+        "47 cm",
+        "52 cm",
+        "55 cm",
+        "58 cm",
+        "61 cm",
+        "64 cm",
+        "67 cm",
+        "70 cm"
       ]
     ],
     "precos": [
@@ -4801,11 +4777,15 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "manitoba",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Jaqueta NAIROBI",
     "referenciaNome": "NAIROBI",
     "categoria": "jaquetas",
     "subcategoria": "Com Capuz",
-    "descricao": "Jaqueta NAIROBI disponível em 8 cores. Interior: 100% Poliéster (225 g/m²)",
+    "descricao": "De linhas sóbrias e acabamento cuidado, a Jaqueta NAIROBI foi criada para quem não abdica de conforto nem de presença. O exterior resistente protege do vento e da chuva, enquanto o interior acolchoado garante calor nos dias mais frios. A gola alta, as platinas nos ombros e os punhos ajustáveis conferem-lhe um carácter distinto, ideal para equipas que querem vestir a sua marca com elegância. Disponível em oito cores.",
     "composicao": "Interior: 100% Poliéster (225 g/m²) · Exterior: 70% Poliéster, 30% PVC (200 g/m²)",
     "referencia": "#NAI-NAI",
     "imagem": asset_nairobi_cor_1.url,
@@ -4888,21 +4868,21 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "75",
-        "78",
-        "81",
-        "84",
-        "87",
-        "90"
+        "75 cm",
+        "78 cm",
+        "81 cm",
+        "84 cm",
+        "87 cm",
+        "90 cm"
       ],
       [
         "Largura",
-        "58",
-        "61",
-        "64",
-        "67",
-        "70",
-        "73"
+        "58 cm",
+        "61 cm",
+        "64 cm",
+        "67 cm",
+        "70 cm",
+        "73 cm"
       ]
     ],
     "precos": [
@@ -4926,11 +4906,15 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "ontario",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Jaqueta TÓQUIO",
     "referenciaNome": "TÓQUIO",
     "categoria": "jaquetas",
     "subcategoria": "Com Capuz",
-    "descricao": "Jaqueta TÓQUIO disponível em 4 cores. Interior: 100% Poliéster (200 g/m²)",
+    "descricao": "Pensada para enfrentar o tempo sem abdicar da elegância, a Jaqueta TÓQUIO combina um exterior resistente ao vento e à chuva com um interior acolchoado que preserva o calor. A gola alta protege o pescoço nos dias mais frios e o corte limpo assenta com naturalidade, seja na rua ou em serviço. Disponível em quatro cores intemporais, pronta a receber a identidade da sua marca.",
     "composicao": "Interior: 100% Poliéster (200 g/m²) · Exterior: 70% Poliéster, 30% PVC (200 g/m²)",
     "referencia": "#TOK-TOK",
     "imagem": asset_toquio_cor_1.url,
@@ -4981,21 +4965,21 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "69",
-        "72",
-        "75",
-        "77",
-        "80",
-        "83"
+        "69 cm",
+        "72 cm",
+        "75 cm",
+        "77 cm",
+        "80 cm",
+        "83 cm"
       ],
       [
         "Largura",
-        "57",
-        "60",
-        "63",
-        "66",
-        "69",
-        "72"
+        "57 cm",
+        "60 cm",
+        "63 cm",
+        "66 cm",
+        "69 cm",
+        "72 cm"
       ]
     ],
     "precos": [
@@ -5019,11 +5003,15 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "balak",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Jaqueta MAPUTO",
     "referenciaNome": "MAPUTO",
     "categoria": "jaquetas",
     "subcategoria": "Com Capuz",
-    "descricao": "Jaqueta MAPUTO disponível em 2 cores. Interior: 100% Poliéster (220 g/m²)",
+    "descricao": "Blusão acolchoado de gola alta, com fecho completo e punhos e cintura ajustados que guardam o calor nos dias frios. O exterior resistente protege do vento e da chuva miúda e o interior em poliéster acolchoado garante conforto durante todo o dia, no trabalho ou na cidade. Disponível em azul e preto, do S ao 3XL, é uma peça elegante para personalizar com o logótipo da sua empresa, ideal para equipas, fardas de inverno e ofertas corporativas.",
     "composicao": "Interior: 100% Poliéster (220 g/m²) · Exterior: 100% Poliéster (160 g/m²)",
     "referencia": "#MAP-MAP",
     "imagem": "/__l5e/assets-v1/dccb9ff8-49c8-485d-a2d7-9a2a6020b2be/balak-azul.webp",
@@ -5058,21 +5046,21 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "67",
-        "70",
-        "73",
-        "76",
-        "79",
-        "82"
+        "67 cm",
+        "70 cm",
+        "73 cm",
+        "76 cm",
+        "79 cm",
+        "82 cm"
       ],
       [
         "Largura",
-        "56",
-        "59",
-        "62",
-        "65",
-        "68",
-        "71"
+        "56 cm",
+        "59 cm",
+        "62 cm",
+        "65 cm",
+        "68 cm",
+        "71 cm"
       ]
     ],
     "precos": [
@@ -5095,228 +5083,17 @@ export const modelos: Modelo[] = [
     ]
   },
   {
-    "id": "resistance-mulher",
-    "nome": "T-shirt ZAGREB (Mulher)",
-    "referenciaNome": "ZAGREB",
-    "categoria": "tshirts",
-    "subcategoria": "Desportivas",
-    "genero": "mulher",
-    "descricao": "T-shirt ZAGREB disponível em 24 cores. 100% Poliéster",
-    "composicao": "100% Poliéster, Densidade: 145 g/m²",
-    "referencia": "#ZAG-MUL",
-    "imagem": "/__l5e/assets-v1/e7b6f801-7e45-41f5-8496-e5cfe4cc7d5e/zagreb-24.png",
-    "lifestyle": pub("/lifestyle/zagreb-new.jpg"),
-    "cores": [
-      {
-        "nome": "Branco",
-        "hex": "#efeff3",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/e7b6f801-7e45-41f5-8496-e5cfe4cc7d5e/zagreb-24.png"
-      },
-      {
-        "nome": "Bege",
-        "hex": "#aba89a",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/8472cb04-371b-414d-8617-c97ff1654620/zagreb-19.png"
-      },
-      {
-        "nome": "Castanho",
-        "hex": "#543d34",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/71f9b5a2-4635-4ed0-babf-cc8c9ead13aa/zagreb-20.png"
-      },
-      {
-        "nome": "Verde 1",
-        "hex": "#92b553",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/34ba5e0c-add4-4bd0-89f9-e10aeec0d8cc/zagreb-21.png"
-      },
-      {
-        "nome": "Verde 2",
-        "hex": "#1a704e",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/3efa9028-5646-4035-bf92-70ca1baa3227/zagreb-22.png"
-      },
-      {
-        "nome": "Verde 3",
-        "hex": "#025443",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/5bc0fbf1-cfe2-43d4-901a-767f377329cd/zagreb-14.png"
-      },
-      {
-        "nome": "Verde 4",
-        "hex": "#51553f",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/397a1b12-e9e9-4e58-9d4c-2f383b2b73c3/zagreb-13.png"
-      },
-      {
-        "nome": "Verde 5",
-        "hex": "#9fba37",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/d6cd94ab-13c5-4cc6-967d-cf1b7d203be7/zagreb-12.png"
-      },
-      {
-        "nome": "Amarelo 1",
-        "hex": "#dcd71e",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/cd9cc272-c81d-44f9-9146-20148abbf308/zagreb-11.png"
-      },
-      {
-        "nome": "Amarelo 2",
-        "hex": "#f1db4c",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/c43c474c-ec1f-4fb7-a58b-426083b2b241/zagreb-10.png"
-      },
-      {
-        "nome": "Amarelo 3",
-        "hex": "#f1b803",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/2cee2b29-66cb-45d2-b96b-def28bbd8f33/zagreb-5.png"
-      },
-      {
-        "nome": "Laranja 1",
-        "hex": "#c4521d",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/1129ca87-b5d7-4b91-8fb9-83b30f8d28e8/zagreb-4.png"
-      },
-      {
-        "nome": "Vermelho",
-        "hex": "#8b1727",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/c47425e8-67c9-4914-96d2-a1a4c31d3e9b/zagreb-3.png"
-      },
-      {
-        "nome": "Rosa 1",
-        "hex": "#eec3d4",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/2dd631aa-f87a-42c5-8f00-02c627a3fbd0/zagreb-2.png"
-      },
-      {
-        "nome": "Rosa 2",
-        "hex": "#c0437f",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/1c8dd78c-9f37-4588-8d06-64914d17cb44/zagreb-1.png"
-      },
-      {
-        "nome": "Rosa 3",
-        "hex": "#c46097",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/9ce57c33-2c45-44b7-b0d6-44ad8205ff2b/zagreb-23.png"
-      },
-      {
-        "nome": "Roxo 1",
-        "hex": "#503677",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/abcc5a44-7d9a-4600-946b-d17034d3af66/zagreb-18.png"
-      },
-      {
-        "nome": "Roxo 2",
-        "hex": "#272863",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/abfe831b-d352-4c75-962d-bf22b6d9b55d/zagreb-17.png"
-      },
-      {
-        "nome": "Azul 1",
-        "hex": "#7ca4d1",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/f709a41a-0f6d-436c-ba5a-29d1e763f4cd/zagreb-16.png"
-      },
-      {
-        "nome": "Azul 2",
-        "hex": "#047db7",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/3f41ad4c-d2a5-4f30-9ccd-f7e3df93e823/zagreb-15.png"
-      },
-      {
-        "nome": "Azul 3",
-        "hex": "#205c95",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/4bdc7d42-4c42-4eea-9ec7-c1fa1791f71e/zagreb-9.png"
-      },
-      {
-        "nome": "Azul 4",
-        "hex": "#11324f",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/fb3859c2-419d-4571-b487-829fa69d08fa/zagreb-7.png"
-      },
-      {
-        "nome": "Cinzento 1",
-        "hex": "#616976",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/a3202a03-1f22-4e9b-9d46-e02c3f55b872/zagreb-8.png"
-      },
-      {
-        "nome": "Preto",
-        "hex": "#342f2b",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/3dee18a7-2335-4999-9f2a-f5ab1bb2c0a6/zagreb-6.png"
-      }
-    ],
-    "tamanhos": [
-      [
-        "Tamanho",
-        "4/5",
-        "6/8",
-        "10/12",
-        "S",
-        "M",
-        "L",
-        "XL",
-        "XXL",
-        "3XL"
-      ],
-      [
-        "Comprimento",
-        "50",
-        "55",
-        "60",
-        "66",
-        "69",
-        "72",
-        "75",
-        "78",
-        "81"
-      ],
-      [
-        "Largura",
-        "37",
-        "41",
-        "45",
-        "48",
-        "51",
-        "54",
-        "57",
-        "60",
-        "63"
-      ]
-    ],
-    "precos": [
-      [
-        "0–99 unidades",
-        "10,00€"
-      ],
-      [
-        "100–499 unidades",
-        "9,50€"
-      ],
-      [
-        "Mais de 499 unidades",
-        "8,75€"
-      ]
-    ],
-    "caracteristicas": [
-      "100% Poliéster",
-      "Densidade: 145 g/m²"
-    ]
-  },
-  {
     "id": "atenas",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "T-shirt ATENAS",
     "referenciaNome": "ATENAS",
     "categoria": "tshirts",
     "subcategoria": "Desportivas",
     "genero": "mulher",
-    "descricao": "T-shirt ATENAS — modelo disponível em 4 cores.",
+    "descricao": "Top desportivo de mulher com alças e costas nadador, em tecido técnico mesclado leve e respirável que acompanha cada movimento sem apertar. Seca rapidamente e mantém a frescura do aquecimento ao último exercício, no ginásio, na corrida ou nas aulas de grupo. Disponível em quatro cores e em tamanhos do XS ao XXL, personaliza-se com o logótipo do seu ginásio, estúdio, clube ou evento desportivo.",
     "composicao": "100% Poliéster, Densidade: 180 g/m²",
     "referencia": "#ATE-ATE",
     "imagem": "/__l5e/assets-v1/698bee58-9fd3-45e3-a306-242bf2ff1965/atenas-1.png",
@@ -5359,21 +5136,21 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "51",
-        "53",
-        "55",
-        "58",
-        "60",
-        "63"
+        "51 cm",
+        "53 cm",
+        "55 cm",
+        "58 cm",
+        "60 cm",
+        "63 cm"
       ],
       [
         "Largura",
-        "37",
-        "40",
-        "42",
-        "45",
-        "47",
-        "50"
+        "37 cm",
+        "40 cm",
+        "42 cm",
+        "45 cm",
+        "47 cm",
+        "50 cm"
       ]
     ],
     "precos": [
@@ -5396,373 +5173,17 @@ export const modelos: Modelo[] = [
     ]
   },
   {
-    "id": "racing-crianca",
-    "nome": "T-shirt LISBOA",
-    "referenciaNome": "LISBOA",
-    "categoria": "tshirts",
-    "subcategoria": "Clássicas",
-    "genero": "crianca",
-    "descricao": "T-shirt LISBOA disponível em 35 cores. 100% Algodão",
-    "composicao": "100% Algodão, Densidade: 160 g/m²",
-    "referencia": "#LIS-LIS",
-    "imagem": "/__l5e/assets-v1/20ef2e18-6467-4bc7-a363-ba32dac9532f/racing-branco.webp",
-    "lifestyle": pub("/lifestyle/lisboa-new.jpg"),
-    "cores": [
-      {
-        "nome": "Branco",
-        "hex": "#eaedf1",
-        "hexes": [
-          "#eaedf1"
-        ],
-        "imagem": "/__l5e/assets-v1/20ef2e18-6467-4bc7-a363-ba32dac9532f/racing-branco.webp"
-      },
-      {
-        "nome": "Bege 1",
-        "hex": "#f0ebd8",
-        "hexes": [
-          "#f0ebd8"
-        ],
-        "imagem": "/__l5e/assets-v1/71e8bd2d-76e6-40cf-b511-2a37b7155046/racing-beje1.webp"
-      },
-      {
-        "nome": "Bege 2",
-        "hex": "#afac9d",
-        "hexes": [
-          "#afac9d"
-        ],
-        "imagem": "/__l5e/assets-v1/056a8b40-22cf-47a2-b8b2-6e75791700df/racing-beje2.webp"
-      },
-      {
-        "nome": "Castanho 1",
-        "hex": "#a18b67",
-        "hexes": [
-          "#a18b67"
-        ],
-        "imagem": "/__l5e/assets-v1/27bda301-3915-4f48-bc6e-11618848dca7/racing-castanho1.webp"
-      },
-      {
-        "nome": "Castanho 2",
-        "hex": "#6e594b",
-        "hexes": [
-          "#6e594b"
-        ],
-        "imagem": "/__l5e/assets-v1/fbd72b07-1c28-40c7-bc3b-f09dca4d8f5d/racing-castanho2.webp"
-      },
-      {
-        "nome": "Verde 1",
-        "hex": "#96bb54",
-        "hexes": [
-          "#96bb54"
-        ],
-        "imagem": "/__l5e/assets-v1/83b5cd67-70c2-47b1-bdc8-e102575dd54f/racing-verde1.webp"
-      },
-      {
-        "nome": "Verde 2",
-        "hex": "#5ca144",
-        "hexes": [
-          "#5ca144"
-        ],
-        "imagem": "/__l5e/assets-v1/7718ca9b-d79a-4978-8864-e4bddba8a4d1/racing-verde2.webp"
-      },
-      {
-        "nome": "Verde 3",
-        "hex": "#197351",
-        "hexes": [
-          "#197351"
-        ],
-        "imagem": "/__l5e/assets-v1/29736327-b078-459f-bde7-0dca0bcb6264/racing-verde3.webp"
-      },
-      {
-        "nome": "Verde 4",
-        "hex": "#024a3b",
-        "hexes": [
-          "#024a3b"
-        ],
-        "imagem": "/__l5e/assets-v1/7a65d595-2b13-4ebe-b476-90f512afa73f/racing-verde4.webp"
-      },
-      {
-        "nome": "Verde 5",
-        "hex": "#4e675d",
-        "hexes": [
-          "#4e675d"
-        ],
-        "imagem": "/__l5e/assets-v1/8462a1d0-f442-4f61-bc5b-3edf8b929152/racing-verde5.webp"
-      },
-      {
-        "nome": "Verde 6",
-        "hex": "#53573f",
-        "hexes": [
-          "#53573f"
-        ],
-        "imagem": "/__l5e/assets-v1/1a539b59-798a-44ed-8835-6d4c1f274f1b/racing-verde6.webp"
-      },
-      {
-        "nome": "Amarelo 1",
-        "hex": "#f9e24d",
-        "hexes": [
-          "#f9e24d"
-        ],
-        "imagem": "/__l5e/assets-v1/be54829b-5af0-4dbe-87a1-f8d58a566716/racing-amarelo1.webp"
-      },
-      {
-        "nome": "Amarelo 2",
-        "hex": "#e9bd19",
-        "hexes": [
-          "#e9bd19"
-        ],
-        "imagem": "/__l5e/assets-v1/5aa2b115-fac8-42e8-b13b-c04c37200713/racing-amarelo2.webp"
-      },
-      {
-        "nome": "Laranja 1",
-        "hex": "#df9f1d",
-        "hexes": [
-          "#df9f1d"
-        ],
-        "imagem": "/__l5e/assets-v1/e7e4dce1-58ad-4b70-b3aa-fb443282302d/racing-laranja1.webp"
-      },
-      {
-        "nome": "Laranja 2",
-        "hex": "#c9541d",
-        "hexes": [
-          "#c9541d"
-        ],
-        "imagem": "/__l5e/assets-v1/1ae4a0ca-678c-4b89-b8ec-846f8f518614/racing-laranja2.webp"
-      },
-      {
-        "nome": "Vermelho",
-        "hex": "#90162a",
-        "hexes": [
-          "#90162a"
-        ],
-        "imagem": "/__l5e/assets-v1/d1fd205e-7007-4906-9343-329e2cc2c699/racing-vermelho.webp"
-      },
-      {
-        "nome": "Rosa 1",
-        "hex": "#6d1034",
-        "hexes": [
-          "#6d1034"
-        ],
-        "imagem": "/__l5e/assets-v1/7c70e814-1130-4b3e-a90d-6edd9f94cb1a/racing-rosa1.webp"
-      },
-      {
-        "nome": "Rosa 2",
-        "hex": "#e9c8d8",
-        "hexes": [
-          "#e9c8d8"
-        ],
-        "imagem": "/__l5e/assets-v1/a110e02d-63cf-4c26-82bf-35f2e4c8e1a6/racing-rosa2.webp"
-      },
-      {
-        "nome": "Rosa 3",
-        "hex": "#c74283",
-        "hexes": [
-          "#c74283"
-        ],
-        "imagem": "/__l5e/assets-v1/ac8cb663-28ba-4265-8220-42dd81ac8234/racing-rosa3.webp"
-      },
-      {
-        "nome": "Roxo 1",
-        "hex": "#7d7fb2",
-        "hexes": [
-          "#7d7fb2"
-        ],
-        "imagem": "/__l5e/assets-v1/e8cb57b9-c1ab-40c9-b18d-74f3983a7ad8/racing-roxo1.webp"
-      },
-      {
-        "nome": "Roxo 2",
-        "hex": "#53387a",
-        "hexes": [
-          "#53387a"
-        ],
-        "imagem": "/__l5e/assets-v1/770a765f-9f01-4dde-b4e8-a477fdf270e7/racing-roxo2.webp"
-      },
-      {
-        "nome": "Roxo 3",
-        "hex": "#351a53",
-        "hexes": [
-          "#351a53"
-        ],
-        "imagem": "/__l5e/assets-v1/30c38497-368a-4d45-a9ec-f293440f294d/racing-roxo3.webp"
-      },
-      {
-        "nome": "Azul 1",
-        "hex": "#9ab7dc",
-        "hexes": [
-          "#9ab7dc"
-        ],
-        "imagem": "/__l5e/assets-v1/64bb4944-3656-4968-878b-c3d9aa94a7b7/racing-azul1.webp"
-      },
-      {
-        "nome": "Azul 2",
-        "hex": "#0490cb",
-        "hexes": [
-          "#0490cb"
-        ],
-        "imagem": "/__l5e/assets-v1/2f654ff9-85f0-4ef4-9873-442bf04f1e37/racing-azul2.webp"
-      },
-      {
-        "nome": "Azul 3",
-        "hex": "#215d98",
-        "hexes": [
-          "#215d98"
-        ],
-        "imagem": "/__l5e/assets-v1/f75d7a93-9770-47d9-abf4-268c691ca063/racing-azul3.webp"
-      },
-      {
-        "nome": "Azul 4",
-        "hex": "#5475a8",
-        "hexes": [
-          "#5475a8"
-        ],
-        "imagem": "/__l5e/assets-v1/6a088b68-cf11-4d82-920b-3eb5bc9f20ad/racing-azul4.webp"
-      },
-      {
-        "nome": "Azul 5",
-        "hex": "#263962",
-        "hexes": [
-          "#263962"
-        ],
-        "imagem": "/__l5e/assets-v1/7ec0cf6a-2031-44f6-a00c-a01c849409a8/racing-azul5.webp"
-      },
-      {
-        "nome": "Azul 6",
-        "hex": "#144267",
-        "hexes": [
-          "#144267"
-        ],
-        "imagem": "/__l5e/assets-v1/58aef014-f456-4cb8-85fb-ed235fe04a24/racing-azul6.webp"
-      },
-      {
-        "nome": "Azul 7",
-        "hex": "#0a3755",
-        "hexes": [
-          "#0a3755"
-        ],
-        "imagem": "/__l5e/assets-v1/2f8bf91c-9e8f-4781-9284-947d8faf6f4d/racing-azul7.webp"
-      },
-      {
-        "nome": "Cinzento 1",
-        "hex": "#777c90",
-        "hexes": [
-          "#777c90"
-        ],
-        "imagem": "/__l5e/assets-v1/480b58e1-29d4-40af-912f-cdd0d783ac96/racing-cinzento1.webp"
-      },
-      {
-        "nome": "Cinzento 2",
-        "hex": "#e6e5eb",
-        "hexes": [
-          "#e6e5eb"
-        ],
-        "imagem": "/__l5e/assets-v1/b5d848a0-d2c5-4582-8ac0-c974ce3d7a38/racing-cinzento2.webp"
-      },
-      {
-        "nome": "Cinzento 3",
-        "hex": "#b5b3bf",
-        "hexes": [
-          "#b5b3bf"
-        ],
-        "imagem": "/__l5e/assets-v1/950f0976-489a-4500-8054-625a51ab6e62/racing-cinzento3.webp"
-      },
-      {
-        "nome": "Cinzento 4",
-        "hex": "#646c79",
-        "hexes": [
-          "#646c79"
-        ],
-        "imagem": "/__l5e/assets-v1/6b13b4b1-5ecd-45d2-8786-51e353416df0/racing-cinzento4.webp"
-      },
-      {
-        "nome": "Cinzento 5",
-        "hex": "#58575d",
-        "hexes": [
-          "#58575d"
-        ],
-        "imagem": "/__l5e/assets-v1/e89190f6-ee31-4fe4-b839-9965640c7953/racing-cinzento5.webp"
-      },
-      {
-        "nome": "Preto",
-        "hex": "#332e2a",
-        "hexes": [
-          "#332e2a"
-        ],
-        "imagem": "/__l5e/assets-v1/e67c8533-10c0-4bed-bd3a-5bce4db9f23f/racing-preto.webp"
-      }
-    ],
-    "tamanhos": [
-      [
-        "Tamanho",
-        "2",
-        "4",
-        "6",
-        "8",
-        "10",
-        "12",
-        "14",
-        "S",
-        "M",
-        "L",
-        "XL",
-        "XXL"
-      ],
-      [
-        "Comprimento",
-        "40",
-        "45",
-        "49",
-        "53",
-        "57",
-        "61",
-        "65",
-        "67",
-        "68",
-        "72",
-        "76",
-        "80"
-      ],
-      [
-        "Largura",
-        "30",
-        "32",
-        "35",
-        "38",
-        "41",
-        "44",
-        "46",
-        "48",
-        "52",
-        "56",
-        "59",
-        "62"
-      ]
-    ],
-    "precos": [
-      [
-        "0–99 unidades",
-        "11,00€"
-      ],
-      [
-        "100–499 unidades",
-        "9,50€"
-      ],
-      [
-        "Mais de 499 unidades",
-        "8,75€"
-      ]
-    ],
-    "caracteristicas": [
-      "100% Algodão",
-      "Densidade: 160 g/m²"
-    ]
-  },
-  {
     "id": "bruxelas",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "T-shirt BRUXELAS",
     "referenciaNome": "BRUXELAS",
     "categoria": "tshirts",
     "subcategoria": "Clássicas",
     "genero": "crianca",
-    "descricao": "T-shirt BRUXELAS disponível em 15 cores..",
+    "descricao": "T-shirt clássica de criança em algodão macio, de manga curta e gola redonda, pensada para o conforto de todos os dias. Resistente às lavagens e fácil de combinar, acompanha a escola, os desportos e as brincadeiras ao ar livre. Disponível numa paleta de quinze cores e em tamanhos dos 2 aos 14 anos, é a escolha certa para personalizar com nomes, desenhos ou o logótipo de escolas, clubes, campos de férias e eventos.",
     "composicao": "100% Algodão, Densidade: 160 g/m²",
     "referencia": "#BRU",
     "lifestyle": bruxelasEditorial,
@@ -5903,25 +5324,25 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "38",
-        "42",
-        "45",
-        "49",
-        "52",
-        "56",
-        "59",
-        "63"
+        "38 cm",
+        "42 cm",
+        "45 cm",
+        "49 cm",
+        "52 cm",
+        "56 cm",
+        "59 cm",
+        "63 cm"
       ],
       [
         "Largura",
-        "30",
-        "32",
-        "33",
-        "36",
-        "38",
-        "41",
-        "43",
-        "46"
+        "30 cm",
+        "32 cm",
+        "33 cm",
+        "36 cm",
+        "38 cm",
+        "41 cm",
+        "43 cm",
+        "46 cm"
       ]
     ],
     "precos": [
@@ -5945,12 +5366,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "baku",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "T-shirt BAKU",
     "referenciaNome": "BAKU",
     "categoria": "tshirts",
     "subcategoria": "Clássicas",
     "genero": "crianca",
-    "descricao": "T-shirt BAKU — modelo de criança disponível em 7 cores.",
+    "descricao": "Camisola de alças de criança em algodão leve e respirável, com cava larga e corte descontraído que deixa os braços livres para correr e brincar. Fresca nos dias de calor, é ideal para o verão, campos de férias e atividades desportivas. Disponível em sete cores e em tamanhos dos 4 aos 14 anos, ganha identidade com um nome, um número ou o logótipo da sua escola, clube ou evento.",
     "composicao": "100% Algodão, Densidade: 160 g/m²",
     "referencia": "#BAK",
     "imagem": "/__l5e/assets-v1/780b9800-b5d8-4043-80e3-5b396b73ae98/baku-1.png",
@@ -6011,21 +5436,21 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "44",
-        "47",
-        "50",
-        "54",
-        "57",
-        "60"
+        "44 cm",
+        "47 cm",
+        "50 cm",
+        "54 cm",
+        "57 cm",
+        "60 cm"
       ],
       [
         "Largura",
-        "32",
-        "35",
-        "37",
-        "40",
-        "42",
-        "45"
+        "32 cm",
+        "35 cm",
+        "37 cm",
+        "40 cm",
+        "42 cm",
+        "45 cm"
       ]
     ],
     "precos": [
@@ -6049,12 +5474,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "oslo",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "T-shirt OSLO",
     "referenciaNome": "OSLO",
     "categoria": "tshirts",
     "subcategoria": "Clássicas",
     "genero": "crianca",
-    "descricao": "T-shirt OSLO — modelo de criança disponível em 5 cores.",
+    "descricao": "T-shirt de criança de manga comprida em algodão macio, com gola redonda e um corte confortável que acompanha os dias mais frescos. Prática para a escola, para as atividades ou para usar por baixo de um casaco, mantém a forma lavagem após lavagem. Disponível em cinco cores e em tamanhos dos 4 aos 14 anos, personaliza-se com um nome, um desenho ou o emblema da sua escola, clube ou evento.",
     "composicao": "100% Algodão, Densidade: 160 g/m²",
     "referencia": "#OSL",
     "imagem": "/__l5e/assets-v1/a9c7c0f2-9519-4eea-bd2c-55f4ec29833c/oslo-1.png",
@@ -6103,21 +5532,21 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "45",
-        "49",
-        "52",
-        "56",
-        "59",
-        "63"
+        "45 cm",
+        "49 cm",
+        "52 cm",
+        "56 cm",
+        "59 cm",
+        "63 cm"
       ],
       [
         "Largura",
-        "33",
-        "36",
-        "38",
-        "41",
-        "43",
-        "46"
+        "33 cm",
+        "36 cm",
+        "38 cm",
+        "41 cm",
+        "43 cm",
+        "46 cm"
       ]
     ],
     "precos": [
@@ -6141,12 +5570,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "saravejo",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "T-shirt SARAVEJO",
     "referenciaNome": "SARAVEJO",
     "categoria": "tshirts",
     "subcategoria": "Clássicas",
     "genero": "crianca",
-    "descricao": "T-shirt SARAVEJO — modelo de criança disponível em 5 cores.",
+    "descricao": "T-shirt de menina em algodão macio, de corte ajustado e manga curta, com um caimento delicado que acompanha cada brincadeira. Fresca e confortável, é perfeita para o dia a dia, a escola ou os passeios de fim de semana. Disponível em cinco cores, do branco ao rosa e ao preto, e em tamanhos dos 2 aos 14 anos, ganha um toque especial com um nome, um desenho ou o logótipo da sua escola ou evento.",
     "composicao": "100% Algodão, Densidade: 160 g/m²",
     "referencia": "#SAR",
     "imagem": "/__l5e/assets-v1/4b4f6f8b-ebed-4685-8e69-31ed71e22fae/saravejo-1.png",
@@ -6197,25 +5630,25 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "37",
-        "40",
-        "44",
-        "47",
-        "51",
-        "54",
-        "58",
-        "61"
+        "37 cm",
+        "40 cm",
+        "44 cm",
+        "47 cm",
+        "51 cm",
+        "54 cm",
+        "58 cm",
+        "61 cm"
       ],
       [
         "Largura",
-        "28",
-        "30",
-        "31",
-        "34",
-        "36",
-        "39",
-        "41",
-        "44"
+        "28 cm",
+        "30 cm",
+        "31 cm",
+        "34 cm",
+        "36 cm",
+        "39 cm",
+        "41 cm",
+        "44 cm"
       ]
     ],
     "precos": [
@@ -6239,12 +5672,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "sofia",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Body SÓFIA",
     "referenciaNome": "SÓFIA",
     "categoria": "crianca",
     "subcategoria": "Bodies",
     "genero": "crianca",
-    "descricao": "Body SÓFIA — modelo de criança disponível em 3 cores.",
+    "descricao": "Body de bebé de manga curta em algodão suave, com decote envelope que veste sem esforço e molas na base para trocas práticas. Leve e respirável, mantém o bebé confortável nos dias mais quentes, dos primeiros meses até aos dois anos. Disponível em branco, azul claro e rosa claro, ganha um toque único com o nome do bebé, uma data ou uma mensagem, ideal para nascimentos, batizados e ofertas.",
     "composicao": "100% Algodão, Densidade: 210 g/m²",
     "referencia": "#SOF-SOF",
     "imagem": "/__l5e/assets-v1/b5778fc0-9542-4b92-bd47-8c98af392777/sofia-3.png",
@@ -6279,17 +5716,17 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "35",
-        "40",
-        "45",
-        "50"
+        "35 cm",
+        "40 cm",
+        "45 cm",
+        "50 cm"
       ],
       [
         "Largura",
-        "21",
-        "23",
-        "25",
-        "27"
+        "21 cm",
+        "23 cm",
+        "25 cm",
+        "27 cm"
       ]
     ],
     "precos": [
@@ -6313,12 +5750,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "riga",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Body RIGA",
     "referenciaNome": "RIGA",
     "categoria": "crianca",
     "subcategoria": "Bodies",
     "genero": "crianca",
-    "descricao": "Body RIGA — modelo de criança disponível em 1 cor.",
+    "descricao": "Body de bebé de manga comprida em algodão macio, com decote envelope que facilita vestir e despir e molas na base para trocas rápidas. Confortável e delicado com a pele, acompanha o bebé dos primeiros dias até aos dois anos. Em branco intemporal, é a tela perfeita para um nome, uma data especial ou uma mensagem, um presente encantador para nascimentos, batizados e chás de bebé.",
     "composicao": "100% Algodão, Densidade: 210 g/m²",
     "referencia": "#RIG-RIG",
     "imagem": "/__l5e/assets-v1/76fa6a47-125a-427e-9589-c05a946c762b/riga-1.png",
@@ -6341,17 +5782,17 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "35",
-        "40",
-        "45",
-        "50"
+        "35 cm",
+        "40 cm",
+        "45 cm",
+        "50 cm"
       ],
       [
         "Largura",
-        "21",
-        "23",
-        "25",
-        "27"
+        "21 cm",
+        "23 cm",
+        "25 cm",
+        "27 cm"
       ]
     ],
     "precos": [
@@ -6374,430 +5815,17 @@ export const modelos: Modelo[] = [
     ]
   },
   {
-    "id": "resistance-crianca",
-    "nome": "T-shirt ZAGREB",
-    "referenciaNome": "ZAGREB",
-    "categoria": "tshirts",
-    "subcategoria": "Desportivas",
-    "genero": "crianca",
-    "descricao": "T-shirt ZAGREB disponível em 24 cores. 100% Poliéster",
-    "composicao": "100% Poliéster, Densidade: 145 g/m²",
-    "referencia": "#ZAG-ZAG",
-    "imagem": "/__l5e/assets-v1/e7b6f801-7e45-41f5-8496-e5cfe4cc7d5e/zagreb-24.png",
-    "lifestyle": pub("/lifestyle/zagreb-new.jpg"),
-    "cores": [
-      {
-        "nome": "Branco",
-        "hex": "#efeff3",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/e7b6f801-7e45-41f5-8496-e5cfe4cc7d5e/zagreb-24.png"
-      },
-      {
-        "nome": "Bege",
-        "hex": "#aba89a",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/8472cb04-371b-414d-8617-c97ff1654620/zagreb-19.png"
-      },
-      {
-        "nome": "Castanho",
-        "hex": "#543d34",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/71f9b5a2-4635-4ed0-babf-cc8c9ead13aa/zagreb-20.png"
-      },
-      {
-        "nome": "Verde 1",
-        "hex": "#92b553",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/34ba5e0c-add4-4bd0-89f9-e10aeec0d8cc/zagreb-21.png"
-      },
-      {
-        "nome": "Verde 2",
-        "hex": "#1a704e",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/3efa9028-5646-4035-bf92-70ca1baa3227/zagreb-22.png"
-      },
-      {
-        "nome": "Verde 3",
-        "hex": "#025443",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/5bc0fbf1-cfe2-43d4-901a-767f377329cd/zagreb-14.png"
-      },
-      {
-        "nome": "Verde 4",
-        "hex": "#51553f",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/397a1b12-e9e9-4e58-9d4c-2f383b2b73c3/zagreb-13.png"
-      },
-      {
-        "nome": "Verde 5",
-        "hex": "#9fba37",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/d6cd94ab-13c5-4cc6-967d-cf1b7d203be7/zagreb-12.png"
-      },
-      {
-        "nome": "Amarelo 1",
-        "hex": "#dcd71e",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/cd9cc272-c81d-44f9-9146-20148abbf308/zagreb-11.png"
-      },
-      {
-        "nome": "Amarelo 2",
-        "hex": "#f1db4c",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/c43c474c-ec1f-4fb7-a58b-426083b2b241/zagreb-10.png"
-      },
-      {
-        "nome": "Amarelo 3",
-        "hex": "#f1b803",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/2cee2b29-66cb-45d2-b96b-def28bbd8f33/zagreb-5.png"
-      },
-      {
-        "nome": "Laranja 1",
-        "hex": "#c4521d",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/1129ca87-b5d7-4b91-8fb9-83b30f8d28e8/zagreb-4.png"
-      },
-      {
-        "nome": "Vermelho",
-        "hex": "#8b1727",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/c47425e8-67c9-4914-96d2-a1a4c31d3e9b/zagreb-3.png"
-      },
-      {
-        "nome": "Rosa 1",
-        "hex": "#eec3d4",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/2dd631aa-f87a-42c5-8f00-02c627a3fbd0/zagreb-2.png"
-      },
-      {
-        "nome": "Rosa 2",
-        "hex": "#c0437f",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/1c8dd78c-9f37-4588-8d06-64914d17cb44/zagreb-1.png"
-      },
-      {
-        "nome": "Rosa 3",
-        "hex": "#c46097",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/9ce57c33-2c45-44b7-b0d6-44ad8205ff2b/zagreb-23.png"
-      },
-      {
-        "nome": "Roxo 1",
-        "hex": "#503677",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/abcc5a44-7d9a-4600-946b-d17034d3af66/zagreb-18.png"
-      },
-      {
-        "nome": "Roxo 2",
-        "hex": "#272863",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/abfe831b-d352-4c75-962d-bf22b6d9b55d/zagreb-17.png"
-      },
-      {
-        "nome": "Azul 1",
-        "hex": "#7ca4d1",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/f709a41a-0f6d-436c-ba5a-29d1e763f4cd/zagreb-16.png"
-      },
-      {
-        "nome": "Azul 2",
-        "hex": "#047db7",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/3f41ad4c-d2a5-4f30-9ccd-f7e3df93e823/zagreb-15.png"
-      },
-      {
-        "nome": "Azul 3",
-        "hex": "#205c95",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/4bdc7d42-4c42-4eea-9ec7-c1fa1791f71e/zagreb-9.png"
-      },
-      {
-        "nome": "Azul 4",
-        "hex": "#11324f",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/fb3859c2-419d-4571-b487-829fa69d08fa/zagreb-7.png"
-      },
-      {
-        "nome": "Cinzento 1",
-        "hex": "#616976",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/a3202a03-1f22-4e9b-9d46-e02c3f55b872/zagreb-8.png"
-      },
-      {
-        "nome": "Preto",
-        "hex": "#342f2b",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/3dee18a7-2335-4999-9f2a-f5ab1bb2c0a6/zagreb-6.png"
-      }
-    ],
-    "tamanhos": [
-      [
-        "Tamanho",
-        "4/5",
-        "6/8",
-        "10/12",
-        "S",
-        "M",
-        "L",
-        "XL",
-        "XXL",
-        "3XL"
-      ],
-      [
-        "Comprimento",
-        "50",
-        "55",
-        "60",
-        "66",
-        "69",
-        "72",
-        "75",
-        "78",
-        "81"
-      ],
-      [
-        "Largura",
-        "37",
-        "41",
-        "45",
-        "48",
-        "51",
-        "54",
-        "57",
-        "60",
-        "63"
-      ]
-    ],
-    "precos": [
-      [
-        "0–99 unidades",
-        "10,00€"
-      ],
-      [
-        "100–499 unidades",
-        "9,50€"
-      ],
-      [
-        "Mais de 499 unidades",
-        "8,75€"
-      ]
-    ],
-    "caracteristicas": [
-      "100% Poliéster",
-      "Densidade: 145 g/m²"
-    ]
-  },
-  {
-    "id": "leopard-crianca",
-    "nome": "T-shirt HELSÍNQUIA",
-    "referenciaNome": "HELSÍNQUIA",
-    "categoria": "tshirts",
-    "subcategoria": "Desportivas",
-    "genero": "crianca",
-    "descricao": "T-shirt HELSÍNQUIA disponível em 4 cores. 100% Poliéster",
-    "composicao": "100% Poliéster, Densidade: 145 g/m²",
-    "referencia": "#HEL-HEL",
-    "imagem": "/__l5e/assets-v1/c2d5f353-c871-4d26-9fca-3fbd34c0f428/helsinquia-4.png",
-    "lifestyle": pub("/lifestyle/helsinquia-new.jpg"),
-    "cores": [
-      {
-        "nome": "Verde",
-        "hex": "#f1f1f1",
-        "hexes": [
-          "#f1f1f1",
-          "#689838"
-        ],
-        "imagem": "/__l5e/assets-v1/c2d5f353-c871-4d26-9fca-3fbd34c0f428/helsinquia-4.png"
-      },
-      {
-        "nome": "Vermelho",
-        "hex": "#f1f1f1",
-        "hexes": [
-          "#f1f1f1",
-          "#980818"
-        ],
-        "imagem": "/__l5e/assets-v1/43962334-3136-4a1e-a791-688dca56f235/helsinquia-3.png"
-      },
-      {
-        "nome": "Azul",
-        "hex": "#f1f1f1",
-        "hexes": [
-          "#f1f1f1",
-          "#085898"
-        ],
-        "imagem": "/__l5e/assets-v1/9a046c16-f335-47b8-9893-a03e47f790ed/helsinquia-2.png"
-      },
-      {
-        "nome": "Preto",
-        "hex": "#f1f1f1",
-        "hexes": [
-          "#f1f1f1",
-          "#181818"
-        ],
-        "imagem": "/__l5e/assets-v1/047cb56f-ba31-4763-9e37-e37b9ab5600d/helsinquia-1.png"
-      }
-    ],
-    "tamanhos": [
-      [
-        "Tamanho",
-        "4/5",
-        "6/8",
-        "10/12",
-        "S",
-        "M",
-        "L",
-        "XL",
-        "XXL"
-      ],
-      [
-        "Comprimento",
-        "48",
-        "54",
-        "62",
-        "66",
-        "69",
-        "72",
-        "75",
-        "78"
-      ],
-      [
-        "Largura",
-        "35",
-        "40",
-        "46",
-        "49",
-        "53",
-        "56",
-        "59",
-        "62"
-      ]
-    ],
-    "precos": [
-      [
-        "0–99 unidades",
-        "10,00€"
-      ],
-      [
-        "100–499 unidades",
-        "9,50€"
-      ],
-      [
-        "Mais de 499 unidades",
-        "8,75€"
-      ]
-    ],
-    "caracteristicas": [
-      "100% Poliéster",
-      "Densidade: 145 g/m²"
-    ]
-  },
-  {
-    "id": "maurice-crianca",
-    "nome": "T-shirt MOSCOVO",
-    "referenciaNome": "MOSCOVO",
-    "categoria": "tshirts",
-    "subcategoria": "Desportivas",
-    "genero": "crianca",
-    "descricao": "T-shirt MOSCOVO disponível em 5 cores. 100% Poliéster",
-    "composicao": "100% Poliéster, Densidade: 145 g/m²",
-    "referencia": "#DUB-DUB",
-    "imagem": "/__l5e/assets-v1/3d4760fa-28ca-4c8e-8c66-9dbf04567f1e/moscovo-5.png",
-    "lifestyle": pub("/lifestyle/moscovo-new.jpg"),
-    "cores": [
-      {
-        "nome": "Verde",
-        "hex": "#98b858",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/3d4760fa-28ca-4c8e-8c66-9dbf04567f1e/moscovo-5.png"
-      },
-      {
-        "nome": "Laranja",
-        "hex": "#c85828",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/7c7b8ca2-46fc-4f97-a7e0-c5f924317f77/moscovo-4.png"
-      },
-      {
-        "nome": "Vermelho",
-        "hex": "#881828",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/74a94a6b-cb3e-4c4c-9de4-6a7e9b67c823/moscovo-3.png"
-      },
-      {
-        "nome": "Azul",
-        "hex": "#285898",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/96c0495a-7611-4215-8895-f6821b7556cd/moscovo-2.png"
-      },
-      {
-        "nome": "Cinzento",
-        "hex": "#585858",
-        "hexes": [],
-        "imagem": "/__l5e/assets-v1/e0550993-1bad-4316-8ed6-0d02c8572a32/moscovo-1.png"
-      }
-    ],
-    "tamanhos": [
-      [
-        "Tamanho",
-        "4/5",
-        "6/8",
-        "10/12",
-        "S",
-        "M",
-        "L",
-        "XL",
-        "XXL"
-      ],
-      [
-        "Comprimento",
-        "48",
-        "54",
-        "62",
-        "66",
-        "69",
-        "72",
-        "75",
-        "78"
-      ],
-      [
-        "Largura",
-        "35",
-        "41",
-        "46",
-        "50",
-        "53",
-        "56",
-        "59",
-        "62"
-      ]
-    ],
-    "precos": [
-      [
-        "0–99 unidades",
-        "10,00€"
-      ],
-      [
-        "100–499 unidades",
-        "9,50€"
-      ],
-      [
-        "Mais de 499 unidades",
-        "8,75€"
-      ]
-    ],
-    "caracteristicas": [
-      "100% Poliéster",
-      "Densidade: 145 g/m²"
-    ]
-  },
-  {
     "id": "pequim",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Conjunto PEQUIM",
     "referenciaNome": "PEQUIM",
     "categoria": "conjuntos",
     "subcategoria": "Conjuntos",
     "genero": "unissexo",
-    "descricao": "Conjunto PEQUIM em preparação, fotografias e detalhes a adicionar brevemente.",
+    "descricao": "Conjunto de inspiração militar com padrão camuflado, composto por t-shirt de algodão macio e calças resistentes com bolsos laterais, que se transformam em calções graças às pernas destacáveis com fecho, pensado para quem precisa de conforto e durabilidade no dia a dia. Uma farda prática e versátil para trabalho no exterior, atividades de aventura, paintball ou equipas que querem uma imagem forte e coesa. Disponível em quatro padrões, do caqui clássico ao azul e cinzento, personaliza-se com o logótipo ou o nome da sua empresa, clube ou grupo.",
     "composicao": "T-shirt: 100% Algodão (160 g/m²) · Calças: 65% Poliéster, 35% Algodão (220 g/m²)",
     "referencia": "#PEQ-PEQ",
     "lifestyle": pequimEditorial,
@@ -6852,19 +5880,19 @@ export const modelos: Modelo[] = [
           ],
           [
             "Comprimento",
-            "64",
-            "68",
-            "72",
-            "76",
-            "80"
+            "64 cm",
+            "68 cm",
+            "72 cm",
+            "76 cm",
+            "80 cm"
           ],
           [
             "Largura",
-            "49",
-            "52",
-            "55",
-            "58",
-            "61"
+            "49 cm",
+            "52 cm",
+            "55 cm",
+            "58 cm",
+            "61 cm"
           ]
         ],
         "precos": [
@@ -6932,12 +5960,12 @@ export const modelos: Modelo[] = [
           ],
           [
             "Comprimento",
-            "103",
-            "105",
-            "107",
-            "109",
-            "111",
-            "113"
+            "103 cm",
+            "105 cm",
+            "107 cm",
+            "109 cm",
+            "111 cm",
+            "113 cm"
           ],
           [
             "Equivalência",
@@ -7012,23 +6040,23 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "66",
-        "69",
-        "72",
-        "75",
-        "78",
-        "81",
-        "84"
+        "66 cm",
+        "69 cm",
+        "72 cm",
+        "75 cm",
+        "78 cm",
+        "81 cm",
+        "84 cm"
       ],
       [
         "Largura",
-        "49",
-        "52",
-        "55",
-        "58",
-        "61",
-        "64",
-        "67"
+        "49 cm",
+        "52 cm",
+        "55 cm",
+        "58 cm",
+        "61 cm",
+        "64 cm",
+        "67 cm"
       ]
     ],
     "precos": [
@@ -7052,19 +6080,23 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "jacarta",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Conjunto JACARTA",
     "referenciaNome": "JACARTA",
     "categoria": "conjuntos",
     "subcategoria": "Conjuntos",
     "genero": "unissexo",
-    "descricao": "Conjunto JACARTA em preparação, fotografias e detalhes a adicionar brevemente.",
+    "descricao": "Fato de treino clássico, com casaco de fecho completo e gola subida e calças de corte direito, pensado para acompanhar equipas e grupos do aquecimento à entrega de prémios. Em poliéster resistente e confortável, mantém a forma e a cor lavagem após lavagem e protege do frio sem pesar. Disponível em catorze cores e em tamanhos de criança a adulto, personaliza-se com o emblema, o nome ou o logótipo do seu clube, escola ou empresa, ideal para equipas desportivas, escolas, academias e eventos.",
     "composicao": "100% Poliéster, Densidade: 250 g/m²",
     "referencia": "#JAC-JAC",
     "lifestyle": jacartaEditorial,
     "imagem": asset_jacarta_casaco_1.url,
     "pecas": [
       {
-        "nome": "T-shirt",
+        "nome": "Casaco",
         "composicao": "100% Poliéster, Densidade: 250 g/m²",
         "imagem": asset_jacarta_casaco_1.url,
         "cores": [
@@ -7197,29 +6229,29 @@ export const modelos: Modelo[] = [
           ],
           [
             "Comprimento",
-            "46",
-            "51",
-            "56",
-            "61",
-            "65",
-            "68",
-            "71",
-            "74",
-            "77",
-            "80"
+            "46 cm",
+            "51 cm",
+            "56 cm",
+            "61 cm",
+            "65 cm",
+            "68 cm",
+            "71 cm",
+            "74 cm",
+            "77 cm",
+            "80 cm"
           ],
           [
             "Largura",
-            "36",
-            "40",
-            "44",
-            "46",
-            "53",
-            "56",
-            "59",
-            "62",
-            "65",
-            "68"
+            "36 cm",
+            "40 cm",
+            "44 cm",
+            "46 cm",
+            "53 cm",
+            "56 cm",
+            "59 cm",
+            "62 cm",
+            "65 cm",
+            "68 cm"
           ]
         ],
         "precos": [
@@ -7371,16 +6403,16 @@ export const modelos: Modelo[] = [
           ],
           [
             "Comprimento",
-            "58",
-            "69",
-            "81",
-            "92",
-            "103",
-            "106",
-            "109",
-            "112",
-            "115",
-            "118"
+            "58 cm",
+            "69 cm",
+            "81 cm",
+            "92 cm",
+            "103 cm",
+            "106 cm",
+            "109 cm",
+            "112 cm",
+            "115 cm",
+            "118 cm"
           ],
           [
             "Equivalência",
@@ -7539,23 +6571,23 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "66",
-        "69",
-        "72",
-        "75",
-        "78",
-        "81",
-        "84"
+        "66 cm",
+        "69 cm",
+        "72 cm",
+        "75 cm",
+        "78 cm",
+        "81 cm",
+        "84 cm"
       ],
       [
         "Largura",
-        "49",
-        "52",
-        "55",
-        "58",
-        "61",
-        "64",
-        "67"
+        "49 cm",
+        "52 cm",
+        "55 cm",
+        "58 cm",
+        "61 cm",
+        "64 cm",
+        "67 cm"
       ]
     ],
     "precos": [
@@ -7579,121 +6611,37 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "manila",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Conjunto MANILA",
     "referenciaNome": "MANILA",
     "categoria": "conjuntos",
     "subcategoria": "Conjuntos",
     "genero": "unissexo",
-    "descricao": "Conjunto MANILA disponível em 11 cores.",
+    "descricao": "Equipamento de futebol de duas cores, com camisola de corte raglan e calções a condizer, desenhado com faixas de contraste que acompanham as costuras e dão ritmo e identidade à equipa. Em tecido técnico leve e respirável, seca rapidamente e deixa o corpo mover-se à vontade em cada corrida, passe e remate. Disponível em onze combinações de cores e em tamanhos de criança e adulto, personaliza-se com números, nomes e o emblema do seu clube, escola ou empresa, ideal para equipas, torneios e escolinhas de futebol.",
     "composicao": "100% Poliéster, Densidade: 150 g/m²",
     "referencia": "#MAN-MAN",
     "lifestyle": manilaEditorial,
     "imagem": manila1.url,
     "pecas": [
       {
-        "nome": "T-shirt",
+        "nome": "Camisola",
         "composicao": "Composição a confirmar",
         "imagem": manila1.url,
         "cores": [
-          {
-            "nome": "Branco e preto",
-            "hex": "#cacccf",
-            "hexes": [
-              "#cacccf",
-              "#383330"
-            ],
-            "imagem": manila1.url
-          },
-          {
-            "nome": "Azul e branco",
-            "hex": "#315e95",
-            "hexes": [
-              "#315e95",
-              "#f1f1ef"
-            ],
-            "imagem": manila2.url
-          },
-          {
-            "nome": "Preto e branco",
-            "hex": "#383330",
-            "hexes": [
-              "#383330",
-              "#f1f1ef"
-            ],
-            "imagem": manila3.url
-          },
-          {
-            "nome": "Verde lima e branco",
-            "hex": "#94ba5f",
-            "hexes": [
-              "#94ba5f",
-              "#f1f1ef"
-            ],
-            "imagem": manila4.url
-          },
-          {
-            "nome": "Verde lima e preto",
-            "hex": "#9fb865",
-            "hexes": [
-              "#9fb865",
-              "#383330"
-            ],
-            "imagem": manila5.url
-          },
-          {
-            "nome": "Verde e branco",
-            "hex": "#366f53",
-            "hexes": [
-              "#366f53",
-              "#f1f1ef"
-            ],
-            "imagem": manila6.url
-          },
-          {
-            "nome": "Amarelo e preto",
-            "hex": "#eede6d",
-            "hexes": [
-              "#eede6d",
-              "#383330"
-            ],
-            "imagem": manila7.url
-          },
-          {
-            "nome": "Laranja e branco",
-            "hex": "#b95e2d",
-            "hexes": [
-              "#b95e2d",
-              "#f1f1ef"
-            ],
-            "imagem": manila8.url
-          },
-          {
-            "nome": "Laranja e preto",
-            "hex": "#ba6134",
-            "hexes": [
-              "#ba6134",
-              "#383330"
-            ],
-            "imagem": manila9.url
-          },
-          {
-            "nome": "Bordô e branco",
-            "hex": "#81222c",
-            "hexes": [
-              "#81222c",
-              "#f1f1ef"
-            ],
-            "imagem": manila10.url
-          },
-          {
-            "nome": "Rosa e preto",
-            "hex": "#b65283",
-            "hexes": [
-              "#b65283",
-              "#383330"
-            ],
-            "imagem": manila11.url
-          }
+          { "nome": "Branco e preto", "hex": "#ededef", "hexes": [ "#ededef", "#383330" ], "imagem": manila1.url },
+          { "nome": "Azul e branco", "hex": "#1c5d99", "hexes": [ "#1c5d99", "#f1f1ef" ], "imagem": manila10.url },
+          { "nome": "Preto e branco", "hex": "#37322e", "hexes": [ "#37322e", "#f1f1ef" ], "imagem": manila11.url },
+          { "nome": "Verde lima e branco", "hex": "#88bb4c", "hexes": [ "#88bb4c", "#f1f1ef" ], "imagem": manila2.url },
+          { "nome": "Verde lima e preto", "hex": "#98bb57", "hexes": [ "#98bb57", "#383330" ], "imagem": manila3.url },
+          { "nome": "Verde e branco", "hex": "#157152", "hexes": [ "#157152", "#f1f1ef" ], "imagem": manila4.url },
+          { "nome": "Amarelo e preto", "hex": "#f4de53", "hexes": [ "#f4de53", "#383330" ], "imagem": manila5.url },
+          { "nome": "Laranja e branco", "hex": "#c6581b", "hexes": [ "#c6581b", "#f1f1ef" ], "imagem": manila6.url },
+          { "nome": "Laranja e preto", "hex": "#c95a24", "hexes": [ "#c95a24", "#383330" ], "imagem": manila7.url },
+          { "nome": "Bordô e branco", "hex": "#8e1428", "hexes": [ "#8e1428", "#f1f1ef" ], "imagem": manila8.url },
+          { "nome": "Rosa e preto", "hex": "#c54984", "hexes": [ "#c54984", "#383330" ], "imagem": manila9.url }
         ],
         "tamanhos": [
           [
@@ -7708,23 +6656,23 @@ export const modelos: Modelo[] = [
           ],
           [
             "Comprimento",
-            "66",
-            "69",
-            "72",
-            "75",
-            "78",
-            "81",
-            "84"
+            "66 cm",
+            "69 cm",
+            "72 cm",
+            "75 cm",
+            "78 cm",
+            "81 cm",
+            "84 cm"
           ],
           [
             "Largura",
-            "49",
-            "52",
-            "55",
-            "58",
-            "61",
-            "64",
-            "67"
+            "49 cm",
+            "52 cm",
+            "55 cm",
+            "58 cm",
+            "61 cm",
+            "64 cm",
+            "67 cm"
           ]
         ],
         "precos": [
@@ -7743,109 +6691,21 @@ export const modelos: Modelo[] = [
         ]
       },
       {
-        "nome": "Calças",
+        "nome": "Calções",
         "composicao": "Composição a confirmar",
         "imagem": manila1.url,
         "cores": [
-          {
-            "nome": "Branco e preto",
-            "hex": "#cacccf",
-            "hexes": [
-              "#cacccf",
-              "#383330"
-            ],
-            "imagem": manila1.url
-          },
-          {
-            "nome": "Azul e branco",
-            "hex": "#315e95",
-            "hexes": [
-              "#315e95",
-              "#f1f1ef"
-            ],
-            "imagem": manila2.url
-          },
-          {
-            "nome": "Preto e branco",
-            "hex": "#383330",
-            "hexes": [
-              "#383330",
-              "#f1f1ef"
-            ],
-            "imagem": manila3.url
-          },
-          {
-            "nome": "Verde lima e branco",
-            "hex": "#94ba5f",
-            "hexes": [
-              "#94ba5f",
-              "#f1f1ef"
-            ],
-            "imagem": manila4.url
-          },
-          {
-            "nome": "Verde lima e preto",
-            "hex": "#9fb865",
-            "hexes": [
-              "#9fb865",
-              "#383330"
-            ],
-            "imagem": manila5.url
-          },
-          {
-            "nome": "Verde e branco",
-            "hex": "#366f53",
-            "hexes": [
-              "#366f53",
-              "#f1f1ef"
-            ],
-            "imagem": manila6.url
-          },
-          {
-            "nome": "Amarelo e preto",
-            "hex": "#eede6d",
-            "hexes": [
-              "#eede6d",
-              "#383330"
-            ],
-            "imagem": manila7.url
-          },
-          {
-            "nome": "Laranja e branco",
-            "hex": "#b95e2d",
-            "hexes": [
-              "#b95e2d",
-              "#f1f1ef"
-            ],
-            "imagem": manila8.url
-          },
-          {
-            "nome": "Laranja e preto",
-            "hex": "#ba6134",
-            "hexes": [
-              "#ba6134",
-              "#383330"
-            ],
-            "imagem": manila9.url
-          },
-          {
-            "nome": "Bordô e branco",
-            "hex": "#81222c",
-            "hexes": [
-              "#81222c",
-              "#f1f1ef"
-            ],
-            "imagem": manila10.url
-          },
-          {
-            "nome": "Rosa e preto",
-            "hex": "#b65283",
-            "hexes": [
-              "#b65283",
-              "#383330"
-            ],
-            "imagem": manila11.url
-          }
+          { "nome": "Branco e preto", "hex": "#ededef", "hexes": [ "#ededef", "#383330" ], "imagem": manila1.url },
+          { "nome": "Azul e branco", "hex": "#1c5d99", "hexes": [ "#1c5d99", "#f1f1ef" ], "imagem": manila10.url },
+          { "nome": "Preto e branco", "hex": "#37322e", "hexes": [ "#37322e", "#f1f1ef" ], "imagem": manila11.url },
+          { "nome": "Verde lima e branco", "hex": "#88bb4c", "hexes": [ "#88bb4c", "#f1f1ef" ], "imagem": manila2.url },
+          { "nome": "Verde lima e preto", "hex": "#98bb57", "hexes": [ "#98bb57", "#383330" ], "imagem": manila3.url },
+          { "nome": "Verde e branco", "hex": "#157152", "hexes": [ "#157152", "#f1f1ef" ], "imagem": manila4.url },
+          { "nome": "Amarelo e preto", "hex": "#f4de53", "hexes": [ "#f4de53", "#383330" ], "imagem": manila5.url },
+          { "nome": "Laranja e branco", "hex": "#c6581b", "hexes": [ "#c6581b", "#f1f1ef" ], "imagem": manila6.url },
+          { "nome": "Laranja e preto", "hex": "#c95a24", "hexes": [ "#c95a24", "#383330" ], "imagem": manila7.url },
+          { "nome": "Bordô e branco", "hex": "#8e1428", "hexes": [ "#8e1428", "#f1f1ef" ], "imagem": manila8.url },
+          { "nome": "Rosa e preto", "hex": "#c54984", "hexes": [ "#c54984", "#383330" ], "imagem": manila9.url }
         ],
         "tamanhos": [
           [
@@ -7860,23 +6720,23 @@ export const modelos: Modelo[] = [
           ],
           [
             "Comprimento",
-            "96",
-            "99",
-            "102",
-            "105",
-            "108",
-            "111",
-            "114"
+            "96 cm",
+            "99 cm",
+            "102 cm",
+            "105 cm",
+            "108 cm",
+            "111 cm",
+            "114 cm"
           ],
           [
             "Cintura",
-            "34",
-            "37",
-            "40",
-            "43",
-            "46",
-            "49",
-            "52"
+            "34 cm",
+            "37 cm",
+            "40 cm",
+            "43 cm",
+            "46 cm",
+            "49 cm",
+            "52 cm"
           ]
         ],
         "precos": [
@@ -7896,105 +6756,17 @@ export const modelos: Modelo[] = [
       }
     ],
     "cores": [
-      {
-        "nome": "Branco e preto",
-        "hex": "#cacccf",
-        "hexes": [
-          "#cacccf",
-          "#383330"
-        ],
-        "imagem": manila1.url
-      },
-      {
-        "nome": "Azul e branco",
-        "hex": "#315e95",
-        "hexes": [
-          "#315e95",
-          "#f1f1ef"
-        ],
-        "imagem": manila2.url
-      },
-      {
-        "nome": "Preto e branco",
-        "hex": "#383330",
-        "hexes": [
-          "#383330",
-          "#f1f1ef"
-        ],
-        "imagem": manila3.url
-      },
-      {
-        "nome": "Verde lima e branco",
-        "hex": "#94ba5f",
-        "hexes": [
-          "#94ba5f",
-          "#f1f1ef"
-        ],
-        "imagem": manila4.url
-      },
-      {
-        "nome": "Verde lima e preto",
-        "hex": "#9fb865",
-        "hexes": [
-          "#9fb865",
-          "#383330"
-        ],
-        "imagem": manila5.url
-      },
-      {
-        "nome": "Verde e branco",
-        "hex": "#366f53",
-        "hexes": [
-          "#366f53",
-          "#f1f1ef"
-        ],
-        "imagem": manila6.url
-      },
-      {
-        "nome": "Amarelo e preto",
-        "hex": "#eede6d",
-        "hexes": [
-          "#eede6d",
-          "#383330"
-        ],
-        "imagem": manila7.url
-      },
-      {
-        "nome": "Laranja e branco",
-        "hex": "#b95e2d",
-        "hexes": [
-          "#b95e2d",
-          "#f1f1ef"
-        ],
-        "imagem": manila8.url
-      },
-      {
-        "nome": "Laranja e preto",
-        "hex": "#ba6134",
-        "hexes": [
-          "#ba6134",
-          "#383330"
-        ],
-        "imagem": manila9.url
-      },
-      {
-        "nome": "Bordô e branco",
-        "hex": "#81222c",
-        "hexes": [
-          "#81222c",
-          "#f1f1ef"
-        ],
-        "imagem": manila10.url
-      },
-      {
-        "nome": "Rosa e preto",
-        "hex": "#b65283",
-        "hexes": [
-          "#b65283",
-          "#383330"
-        ],
-        "imagem": manila11.url
-      }
+      { "nome": "Branco e preto", "hex": "#ededef", "hexes": [ "#ededef", "#383330" ], "imagem": manila1.url },
+      { "nome": "Azul e branco", "hex": "#1c5d99", "hexes": [ "#1c5d99", "#f1f1ef" ], "imagem": manila10.url },
+      { "nome": "Preto e branco", "hex": "#37322e", "hexes": [ "#37322e", "#f1f1ef" ], "imagem": manila11.url },
+      { "nome": "Verde lima e branco", "hex": "#88bb4c", "hexes": [ "#88bb4c", "#f1f1ef" ], "imagem": manila2.url },
+      { "nome": "Verde lima e preto", "hex": "#98bb57", "hexes": [ "#98bb57", "#383330" ], "imagem": manila3.url },
+      { "nome": "Verde e branco", "hex": "#157152", "hexes": [ "#157152", "#f1f1ef" ], "imagem": manila4.url },
+      { "nome": "Amarelo e preto", "hex": "#f4de53", "hexes": [ "#f4de53", "#383330" ], "imagem": manila5.url },
+      { "nome": "Laranja e branco", "hex": "#c6581b", "hexes": [ "#c6581b", "#f1f1ef" ], "imagem": manila6.url },
+      { "nome": "Laranja e preto", "hex": "#c95a24", "hexes": [ "#c95a24", "#383330" ], "imagem": manila7.url },
+      { "nome": "Bordô e branco", "hex": "#8e1428", "hexes": [ "#8e1428", "#f1f1ef" ], "imagem": manila8.url },
+      { "nome": "Rosa e preto", "hex": "#c54984", "hexes": [ "#c54984", "#383330" ], "imagem": manila9.url }
     ],
     "tamanhos": [
       [
@@ -8009,37 +6781,37 @@ export const modelos: Modelo[] = [
         "XXL"
       ],
       [
-        "Comprimento t-shirt",
-        "48",
-        "53",
-        "57",
-        "66",
-        "67",
-        "70",
-        "73",
-        "76"
+        "Comprimento camisola",
+        "48 cm",
+        "53 cm",
+        "57 cm",
+        "66 cm",
+        "67 cm",
+        "70 cm",
+        "73 cm",
+        "76 cm"
       ],
       [
-        "Largura t-shirt",
-        "34",
-        "40",
-        "46",
-        "50",
-        "53",
-        "56",
-        "59",
-        "63"
+        "Largura camisola",
+        "34 cm",
+        "40 cm",
+        "46 cm",
+        "50 cm",
+        "53 cm",
+        "56 cm",
+        "59 cm",
+        "63 cm"
       ],
       [
-        "Comprimento calças",
-        "29",
-        "33",
-        "36",
-        "44",
-        "46",
-        "47",
-        "48",
-        "49"
+        "Comprimento calções",
+        "29 cm",
+        "33 cm",
+        "36 cm",
+        "44 cm",
+        "46 cm",
+        "47 cm",
+        "48 cm",
+        "49 cm"
       ],
       [
         "Equivalência",
@@ -8074,19 +6846,23 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "singapura",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Conjunto SINGAPURA",
     "referenciaNome": "SINGAPURA",
     "categoria": "conjuntos",
     "subcategoria": "Conjuntos",
     "genero": "unissexo",
-    "descricao": "Conjunto SINGAPURA em preparação, fotografias e detalhes a adicionar brevemente.",
+    "descricao": "Equipamento de futebol leve e confortável, composto por camisola de manga curta com gola redonda e calções soltos, pensado para acompanhar cada corrida, passe e remate com total liberdade. O tecido técnico em poliéster é respirável e seca rapidamente, do treino ao jogo decisivo. Disponível em treze cores e em tamanhos de criança e adulto, ganha identidade com números, nomes e o emblema do seu clube, escola ou empresa, ideal para equipas, torneios, escolinhas e eventos desportivos.",
     "composicao": "100% Poliéster, Densidade: 150 g/m²",
     "referencia": "#SIN-SIN",
     "lifestyle": singapuraEditorial,
     "imagem": asset_singapura_cor_1.url,
     "pecas": [
       {
-        "nome": "T-shirt",
+        "nome": "Camisola",
         "composicao": "Composição a confirmar",
         "imagem": asset_singapura_cor_1.url,
         "cores": [
@@ -8208,23 +6984,23 @@ export const modelos: Modelo[] = [
           ],
           [
             "Comprimento",
-            "66",
-            "69",
-            "72",
-            "75",
-            "78",
-            "81",
-            "84"
+            "66 cm",
+            "69 cm",
+            "72 cm",
+            "75 cm",
+            "78 cm",
+            "81 cm",
+            "84 cm"
           ],
           [
             "Largura",
-            "49",
-            "52",
-            "55",
-            "58",
-            "61",
-            "64",
-            "67"
+            "49 cm",
+            "52 cm",
+            "55 cm",
+            "58 cm",
+            "61 cm",
+            "64 cm",
+            "67 cm"
           ]
         ],
         "precos": [
@@ -8243,7 +7019,7 @@ export const modelos: Modelo[] = [
         ]
       },
       {
-        "nome": "Calças",
+        "nome": "Calções",
         "composicao": "Composição a confirmar",
         "imagem": asset_singapura_cor_1.url,
         "cores": [
@@ -8365,23 +7141,23 @@ export const modelos: Modelo[] = [
           ],
           [
             "Comprimento",
-            "96",
-            "99",
-            "102",
-            "105",
-            "108",
-            "111",
-            "114"
+            "96 cm",
+            "99 cm",
+            "102 cm",
+            "105 cm",
+            "108 cm",
+            "111 cm",
+            "114 cm"
           ],
           [
             "Cintura",
-            "34",
-            "37",
-            "40",
-            "43",
-            "46",
-            "49",
-            "52"
+            "34 cm",
+            "37 cm",
+            "40 cm",
+            "43 cm",
+            "46 cm",
+            "49 cm",
+            "52 cm"
           ]
         ],
         "precos": [
@@ -8523,49 +7299,49 @@ export const modelos: Modelo[] = [
         "3XL"
       ],
       [
-        "Comprimento t-shirt",
-        "46",
-        "49",
-        "52",
-        "55",
-        "59",
-        "62",
-        "65",
-        "68",
-        "72",
-        "75",
-        "78",
-        "81"
+        "Comprimento camisola",
+        "46 cm",
+        "49 cm",
+        "52 cm",
+        "55 cm",
+        "59 cm",
+        "62 cm",
+        "65 cm",
+        "68 cm",
+        "72 cm",
+        "75 cm",
+        "78 cm",
+        "81 cm"
       ],
       [
-        "Largura t-shirt",
-        "38",
-        "40",
-        "42",
-        "44",
-        "46",
-        "48",
-        "50",
-        "53",
-        "56",
-        "59",
-        "62",
-        "65"
+        "Largura camisola",
+        "38 cm",
+        "40 cm",
+        "42 cm",
+        "44 cm",
+        "46 cm",
+        "48 cm",
+        "50 cm",
+        "53 cm",
+        "56 cm",
+        "59 cm",
+        "62 cm",
+        "65 cm"
       ],
       [
-        "Comprimento calças",
-        "36",
-        "37",
-        "39",
-        "40",
-        "42",
-        "43",
-        "44",
-        "46",
-        "48",
-        "49",
-        "50",
-        "51"
+        "Comprimento calções",
+        "36 cm",
+        "37 cm",
+        "39 cm",
+        "40 cm",
+        "42 cm",
+        "43 cm",
+        "44 cm",
+        "46 cm",
+        "48 cm",
+        "49 cm",
+        "50 cm",
+        "51 cm"
       ],
       [
         "Equivalência",
@@ -8604,19 +7380,23 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "colombo",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Conjunto COLOMBO",
     "referenciaNome": "COLOMBO",
     "categoria": "conjuntos",
     "subcategoria": "Conjuntos",
     "genero": "unissexo",
-    "descricao": "Conjunto COLOMBO disponível em 5 cores.",
+    "descricao": "Equipamento de basquetebol leve e respirável, composto por camisola de alças com decote em V e calções largos, pensado para dar total liberdade de movimento em cada lançamento. O tecido técnico em poliéster seca rapidamente e mantém a frescura do aquecimento ao último segundo do jogo. Disponível em cinco cores, ganha identidade com números, nomes e o emblema do seu clube ou escola, ideal para equipas, torneios e campos de férias.",
     "composicao": "100% Poliéster, Densidade: 150 g/m²",
     "referencia": "#COL-COL",
     "lifestyle": colomboEditorial,
     "imagem": colomboNew1.url,
     "pecas": [
       {
-        "nome": "T-shirt",
+        "nome": "Camisola",
         "composicao": "Composição a confirmar",
         "imagem": colomboNew1.url,
         "cores": [
@@ -8674,23 +7454,23 @@ export const modelos: Modelo[] = [
           ],
           [
             "Comprimento",
-            "66",
-            "69",
-            "72",
-            "75",
-            "78",
-            "81",
-            "84"
+            "66 cm",
+            "69 cm",
+            "72 cm",
+            "75 cm",
+            "78 cm",
+            "81 cm",
+            "84 cm"
           ],
           [
             "Largura",
-            "49",
-            "52",
-            "55",
-            "58",
-            "61",
-            "64",
-            "67"
+            "49 cm",
+            "52 cm",
+            "55 cm",
+            "58 cm",
+            "61 cm",
+            "64 cm",
+            "67 cm"
           ]
         ],
         "precos": [
@@ -8709,7 +7489,7 @@ export const modelos: Modelo[] = [
         ]
       },
       {
-        "nome": "Calças",
+        "nome": "Calções",
         "composicao": "Composição a confirmar",
         "imagem": colomboNew1.url,
         "cores": [
@@ -8767,23 +7547,23 @@ export const modelos: Modelo[] = [
           ],
           [
             "Comprimento",
-            "96",
-            "99",
-            "102",
-            "105",
-            "108",
-            "111",
-            "114"
+            "96 cm",
+            "99 cm",
+            "102 cm",
+            "105 cm",
+            "108 cm",
+            "111 cm",
+            "114 cm"
           ],
           [
             "Cintura",
-            "34",
-            "37",
-            "40",
-            "43",
-            "46",
-            "49",
-            "52"
+            "34 cm",
+            "37 cm",
+            "40 cm",
+            "43 cm",
+            "46 cm",
+            "49 cm",
+            "52 cm"
           ]
         ],
         "precos": [
@@ -8861,49 +7641,49 @@ export const modelos: Modelo[] = [
         "3XL"
       ],
       [
-        "Comprimento t-shirt",
-        "47",
-        "50",
-        "53",
-        "56",
-        "60",
-        "63",
-        "68",
-        "71",
-        "74",
-        "77",
-        "80",
-        "83"
+        "Comprimento camisola",
+        "47 cm",
+        "50 cm",
+        "53 cm",
+        "56 cm",
+        "60 cm",
+        "63 cm",
+        "68 cm",
+        "71 cm",
+        "74 cm",
+        "77 cm",
+        "80 cm",
+        "83 cm"
       ],
       [
-        "Largura t-shirt",
-        "38",
-        "40",
-        "42",
-        "44",
-        "46",
-        "48",
-        "50",
-        "53",
-        "56",
-        "59",
-        "62",
-        "65"
+        "Largura camisola",
+        "38 cm",
+        "40 cm",
+        "42 cm",
+        "44 cm",
+        "46 cm",
+        "48 cm",
+        "50 cm",
+        "53 cm",
+        "56 cm",
+        "59 cm",
+        "62 cm",
+        "65 cm"
       ],
       [
-        "Comprimento calças",
-        "37",
-        "39",
-        "40",
-        "42",
-        "43",
-        "45",
-        "47",
-        "49",
-        "50",
-        "51",
-        "52",
-        "53"
+        "Comprimento calções",
+        "37 cm",
+        "39 cm",
+        "40 cm",
+        "42 cm",
+        "43 cm",
+        "45 cm",
+        "47 cm",
+        "49 cm",
+        "50 cm",
+        "51 cm",
+        "52 cm",
+        "53 cm"
       ],
       [
         "Equivalência",
@@ -8942,12 +7722,16 @@ export const modelos: Modelo[] = [
   },
   {
         "id": "abu-dhabi",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
         "nome": "Conjunto ABU DHABI",
         "referenciaNome": "ABU DHABI",
         "categoria": "conjuntos",
         "subcategoria": "Conjuntos",
         "genero": "unissexo",
-        "descricao": "Conjunto ABU DHABI em preparação, fotografias e detalhes a adicionar brevemente.",
+        "descricao": "Farda de trabalho resistente e versátil, pensada para equipas que precisam de conforto, durabilidade e uma imagem profissional todos os dias. O conjunto ABU DHABI reúne t-shirt, polo de manga curta, polo de manga comprida, sweat com fecho e calças com bolsos laterais, em tecidos robustos e fáceis de cuidar, com recortes em cor de contraste que dão identidade à equipa. Combine as peças à medida de cada função e personalize-as com o logótipo da sua empresa, para uma farda coerente, prática e feita para durar.",
         "composicao": "Composição por peça (ver cada modelo)",
         "referencia": "#ABU-ABU",
         "lifestyle": abuDhabiEditorial,
@@ -9151,21 +7935,21 @@ export const modelos: Modelo[] = [
                     ],
                     [
                         "Comprimento",
-                        "64",
-                        "68",
-                        "72",
-                        "76",
-                        "80",
-                        "84"
+                        "64 cm",
+                        "68 cm",
+                        "72 cm",
+                        "76 cm",
+                        "80 cm",
+                        "84 cm"
                     ],
                     [
                         "Largura",
-                        "48",
-                        "52",
-                        "56",
-                        "59",
-                        "62",
-                        "66"
+                        "48 cm",
+                        "52 cm",
+                        "56 cm",
+                        "59 cm",
+                        "62 cm",
+                        "66 cm"
                     ]
                 ],
                 "precos": [
@@ -9381,21 +8165,21 @@ export const modelos: Modelo[] = [
                     ],
                     [
                         "Comprimento",
-                        "69",
-                        "72",
-                        "75",
-                        "78",
-                        "81",
-                        "84"
+                        "69 cm",
+                        "72 cm",
+                        "75 cm",
+                        "78 cm",
+                        "81 cm",
+                        "84 cm"
                     ],
                     [
                         "Largura",
-                        "51",
-                        "54",
-                        "57",
-                        "60",
-                        "63",
-                        "66"
+                        "51 cm",
+                        "54 cm",
+                        "57 cm",
+                        "60 cm",
+                        "63 cm",
+                        "66 cm"
                     ]
                 ],
                 "precos": [
@@ -9602,21 +8386,21 @@ export const modelos: Modelo[] = [
                     ],
                     [
                         "Comprimento",
-                        "70",
-                        "73",
-                        "76",
-                        "79",
-                        "82",
-                        "85"
+                        "70 cm",
+                        "73 cm",
+                        "76 cm",
+                        "79 cm",
+                        "82 cm",
+                        "85 cm"
                     ],
                     [
                         "Largura",
-                        "50",
-                        "53",
-                        "56",
-                        "59",
-                        "62",
-                        "65"
+                        "50 cm",
+                        "53 cm",
+                        "56 cm",
+                        "59 cm",
+                        "62 cm",
+                        "65 cm"
                     ]
                 ],
                 "precos": [
@@ -9832,21 +8616,21 @@ export const modelos: Modelo[] = [
                     ],
                     [
                         "Comprimento",
-                        "63",
-                        "67",
-                        "70",
-                        "73",
-                        "76",
-                        "79"
+                        "63 cm",
+                        "67 cm",
+                        "70 cm",
+                        "73 cm",
+                        "76 cm",
+                        "79 cm"
                     ],
                     [
                         "Largura",
-                        "53",
-                        "56",
-                        "59",
-                        "62",
-                        "65",
-                        "68"
+                        "53 cm",
+                        "56 cm",
+                        "59 cm",
+                        "62 cm",
+                        "65 cm",
+                        "68 cm"
                     ]
                 ],
                 "precos": [
@@ -10044,12 +8828,12 @@ export const modelos: Modelo[] = [
                     ],
                     [
                         "Comprimento",
-                        "104",
-                        "106",
-                        "108",
-                        "110",
-                        "112",
-                        "114"
+                        "104 cm",
+                        "106 cm",
+                        "108 cm",
+                        "110 cm",
+                        "112 cm",
+                        "114 cm"
                     ],
                     [
                         "Equivalência",
@@ -10100,23 +8884,23 @@ export const modelos: Modelo[] = [
             ],
             [
                 "Comprimento",
-                "66",
-                "69",
-                "72",
-                "75",
-                "78",
-                "81",
-                "84"
+                "66 cm",
+                "69 cm",
+                "72 cm",
+                "75 cm",
+                "78 cm",
+                "81 cm",
+                "84 cm"
             ],
             [
                 "Largura",
-                "49",
-                "52",
-                "55",
-                "58",
-                "61",
-                "64",
-                "67"
+                "49 cm",
+                "52 cm",
+                "55 cm",
+                "58 cm",
+                "61 cm",
+                "64 cm",
+                "67 cm"
             ]
         ],
         "precos": [
@@ -10140,12 +8924,16 @@ export const modelos: Modelo[] = [
     },
   {
     "id": "camberra",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Babete CAMBERRA",
     "referenciaNome": "CAMBERRA",
     "categoria": "crianca",
     "subcategoria": "Babetes",
     "genero": "crianca",
-    "descricao": "Babete de bebé em tamanho único, com interior em poliéster e exterior em poliéster e algodão.",
+    "descricao": "Babete de bebé pequeno e delicado, com fitas longas que se atam com suavidade atrás do pescoço e um debrum que contorna toda a peça. O exterior macio em algodão e o interior em poliéster protegem a roupa nas primeiras refeições, com leveza e conforto. Disponível em branco, rosa, azul claro e preto, ganha um encanto único com o nome do bebé ou uma mensagem especial, ideal para nascimentos, batizados, creches e kits de oferta.",
     "composicao": "Interior: 100% Poliéster (170 g/m²) · Exterior: 65% Poliéster, 35% Algodão (115 g/m²)",
     "referencia": "#CAM-CAM",
     "imagem": camberra1.url,
@@ -10183,11 +8971,11 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "22"
+        "22 cm"
       ],
       [
         "Largura",
-        "19"
+        "19 cm"
       ]
     ],
     "precos": [
@@ -10211,12 +8999,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "fiji",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Babete FIJI",
     "referenciaNome": "FIJI",
     "categoria": "crianca",
     "subcategoria": "Babetes",
     "genero": "crianca",
-    "descricao": "Babete de bebé em tamanho único, em algodão com poliéster e poliuretano.",
+    "descricao": "Babete de bebé amplo e acolchoado, em tecido felpudo de algodão com forro impermeável, que absorve sem deixar passar e mantém a roupa seca. O recorte generoso protege peito e ombros, e o debrum colorido dá-lhe um acabamento delicado. Em branco puro ou com debrum bordô, rosa, azul ou preto, personaliza-se com o nome do bebé ou uma mensagem especial, um presente encantador para nascimentos, batizados e creches.",
     "composicao": "70% Algodão, 20% Poliéster, 10% Poliuretano, Densidade: 230 g/m²",
     "referencia": "#FIJ-FIJ",
     "imagem": fiji1.url,
@@ -10260,11 +9052,11 @@ export const modelos: Modelo[] = [
       ],
       [
         "Altura",
-        "30"
+        "30 cm"
       ],
       [
         "Largura",
-        "22"
+        "22 cm"
       ]
     ],
     "precos": [
@@ -10288,12 +9080,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "palau",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Babete PALAU",
     "referenciaNome": "PALAU",
     "categoria": "crianca",
     "subcategoria": "Babetes",
     "genero": "crianca",
-    "descricao": "Babete de bebé em tamanho único.",
+    "descricao": "Babete de bebé em tecido suave e absorvente, com debrum colorido e fecho de abas que se ajusta com delicadeza ao pescoço. Confortável e fácil de lavar, acompanha as primeiras papas com ternura e sem nódoas. Em branco puro ou com debrum bordô, rosa, azul ou preto, ganha um encanto especial com o nome do bebé, um desenho ou uma mensagem, um presente perfeito para nascimentos, batizados e creches.",
     "composicao": "Composição a confirmar",
     "referencia": "#PAL-PAL",
     "imagem": palau1.url,
@@ -10337,11 +9133,11 @@ export const modelos: Modelo[] = [
       ],
       [
         "Altura",
-        "29"
+        "29 cm"
       ],
       [
         "Largura",
-        "19"
+        "19 cm"
       ]
     ],
     "precos": [
@@ -10365,12 +9161,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "samoa",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Babete SAMOA",
     "referenciaNome": "SAMOA",
     "categoria": "crianca",
     "subcategoria": "Babetes",
     "genero": "crianca",
-    "descricao": "Babete em tamanho adulto, em tecido leve.",
+    "descricao": "Babete leve e macio, de cantos arredondados e fitas para atar ao pescoço, pensado para tornar cada refeição mais tranquila e sem nódoas. Prático de usar e fácil de lavar, protege a roupa com conforto do primeiro ao último prato. Disponível em branco, verde lima, azul e preto, ganha um toque especial com um nome, um desenho ou o seu logótipo, ideal para creches, escolas, restaurantes e ofertas personalizadas.",
     "composicao": "Densidade: 70 g/m²",
     "referencia": "#SAM-SAM",
     "imagem": samoa1.url,
@@ -10408,11 +9208,11 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "43"
+        "43 cm"
       ],
       [
         "Largura",
-        "31"
+        "31 cm"
       ]
     ],
     "precos": [
@@ -10436,12 +9236,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "tonga",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Avental TONGA",
     "referenciaNome": "TONGA",
     "categoria": "brindes",
     "subcategoria": "Cozinha",
     "genero": "unissexo",
-    "descricao": "Avental curto de cintura em tamanho único.",
+    "descricao": "Avental curto de cintura, leve e discreto, que dá um toque profissional à farda sem pesar no serviço. Os bolsos frontais guardam blocos, canetas e trocos ao alcance da mão, e as fitas longas ajustam-se com conforto a qualquer silhueta. Disponível em quinze cores, dos tons naturais aos mais vibrantes, ganha identidade com o logótipo do seu café, restaurante ou loja. Ideal para equipas de sala, baristas e pastelarias.",
     "composicao": "Composição a confirmar",
     "referencia": "#TON-TON",
     "imagem": tonga1.url,
@@ -10545,11 +9349,11 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "31"
+        "31 cm"
       ],
       [
         "Largura",
-        "58"
+        "58 cm"
       ]
     ],
     "precos": [
@@ -10573,12 +9377,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "bangkok",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Avental BANGUECOQUE",
     "referenciaNome": "BANGKOK",
     "categoria": "brindes",
     "subcategoria": "Cozinha",
     "genero": "unissexo",
-    "descricao": "Avental com peitilho e bolso triplo, em tamanho único.",
+    "descricao": "Avental de cintura de corte direito e caimento impecável, com bolso triplo à frente para ter blocos, canetas e utensílios sempre à mão. Ata-se com facilidade e acompanha o movimento durante todo o serviço, com um ar cuidado e profissional. Disponível em treze cores, dos tons neutros aos mais intensos, ganha personalidade com o logótipo do seu restaurante, café ou bar. Ideal para empregados de mesa, baristas e equipas de sala.",
     "composicao": "65% Poliéster, 35% Algodão, Densidade: 200 g/m²",
     "referencia": "#BAN-BAN",
     "imagem": banguecoque1.url,
@@ -10670,19 +9478,19 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "70"
+        "70 cm"
       ],
       [
         "Largura",
-        "65"
+        "65 cm"
       ],
       [
         "Comprimento bolso",
-        "17"
+        "17 cm"
       ],
       [
         "Largura bolso",
-        "23+24+22"
+        "23 + 24 + 22 cm"
       ]
     ],
     "precos": [
@@ -10706,12 +9514,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "otava",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Avental OTAVA",
     "referenciaNome": "OTAVA",
     "categoria": "brindes",
     "subcategoria": "Cozinha",
     "genero": "unissexo",
-    "descricao": "Avental comprido com peitilho e bolso frontal, em tamanho único.",
+    "descricao": "Avental comprido de linhas simples, com peitilho, alça ao pescoço e um bolso frontal amplo que deixa tudo à mão. Protege da bancada à mesa com conforto e elegância e mantém um aspeto cuidado em cada serviço. Disponível numa paleta de vinte e duas cores, dos neutros intemporais aos tons mais vivos, ganha identidade com o logótipo do seu restaurante, café ou marca. Ideal para cozinhas, cafetarias, workshops e eventos.",
     "composicao": "Composição a confirmar",
     "referencia": "#OTA-OTA",
     "imagem": otava1.url,
@@ -10857,19 +9669,19 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "96"
+        "96 cm"
       ],
       [
         "Largura",
-        "73"
+        "73 cm"
       ],
       [
         "Comprimento bolso",
-        "19"
+        "19 cm"
       ],
       [
         "Largura bolso",
-        "26"
+        "26 cm"
       ]
     ],
     "precos": [
@@ -10893,12 +9705,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "doa",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Jaleca DOA",
     "referenciaNome": "DOA",
     "categoria": "brindes",
     "subcategoria": "Cozinha",
     "genero": "unissexo",
-    "descricao": "Jaleca de trabalho disponível de S a 3XL.",
+    "descricao": "Jaleca de cozinha de corte clássico, com gola mandarim, abotoamento duplo e manga curta, pensada para o calor e o ritmo intenso do serviço. Confortável e fácil de cuidar, mantém um aspeto impecável do primeiro ao último prato. Disponível em branco e preto, de S a 3XL, ganha personalidade com o nome do chef ou o logótipo do seu restaurante, ideal para cozinhas profissionais, escolas de hotelaria e eventos gastronómicos.",
     "composicao": "Composição a confirmar",
     "referencia": "#DOA-DOA",
     "imagem": asset_doa_cor_1.url,
@@ -10933,21 +9749,21 @@ export const modelos: Modelo[] = [
       ],
       [
         "Altura",
-        "69",
-        "72",
-        "75",
-        "78",
-        "81",
-        "84"
+        "69 cm",
+        "72 cm",
+        "75 cm",
+        "78 cm",
+        "81 cm",
+        "84 cm"
       ],
       [
         "Largura",
-        "54",
-        "57",
-        "60",
-        "63",
-        "66",
-        "69"
+        "54 cm",
+        "57 cm",
+        "60 cm",
+        "63 cm",
+        "66 cm",
+        "69 cm"
       ]
     ],
     "precos": [
@@ -10971,12 +9787,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "jamena",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Colete JAMENA",
     "referenciaNome": "JAMENA",
     "categoria": "brindes",
     "subcategoria": "Coletes desportivos",
     "genero": "unissexo",
-    "descricao": "Colete desportivo em poliéster, disponível em criança, júnior e adulto.",
+    "descricao": "Colete desportivo de corte simples e ajuste confortável, que acompanha cada sprint, passe e remate sem prender o movimento. Em poliéster resistente, mantém a forma treino após treino e está disponível em dez cores intensas que tornam cada equipa inconfundível em campo. Em tamanhos criança, júnior e adulto, personaliza-se com números, o nome do clube ou o seu logótipo, ideal para clubes, escolas, academias e torneios.",
     "composicao": "100% Poliéster, Densidade: 150 g/m²",
     "referencia": "#JAM-JAM",
     "imagem": asset_jamena_cor_1.url,
@@ -11072,15 +9892,15 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "50",
-        "60",
-        "69"
+        "50 cm",
+        "60 cm",
+        "69 cm"
       ],
       [
         "Largura",
-        "44",
-        "56",
-        "66"
+        "44 cm",
+        "56 cm",
+        "66 cm"
       ]
     ],
     "precos": [
@@ -11104,12 +9924,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "moroni",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Colete MORONI",
     "referenciaNome": "MORONI",
     "categoria": "brindes",
     "subcategoria": "Coletes desportivos",
     "genero": "unissexo",
-    "descricao": "Colete desportivo leve em poliéster, disponível em criança, júnior e adulto.",
+    "descricao": "Colete desportivo leve e fresco, feito para acompanhar o ritmo do treino sem limitar o movimento. Em poliéster de secagem rápida, veste-se num instante por cima de qualquer equipamento e distingue as equipas à primeira vista, em seis cores vivas. Disponível em tamanhos criança, júnior e adulto, ganha identidade com o nome do clube, um número ou o seu logótipo, perfeito para escolas, clubes, torneios e eventos desportivos.",
     "composicao": "100% Poliéster, Densidade: 75 g/m²",
     "referencia": "#MOR-MOR",
     "imagem": asset_moroni_cor_1.url,
@@ -11173,15 +9997,15 @@ export const modelos: Modelo[] = [
       ],
       [
         "Comprimento",
-        "45",
-        "54",
-        "63"
+        "45 cm",
+        "54 cm",
+        "63 cm"
       ],
       [
         "Largura",
-        "38",
-        "46",
-        "54"
+        "38 cm",
+        "46 cm",
+        "54 cm"
       ]
     ],
     "precos": [
@@ -11205,12 +10029,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "seul",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Saco SEUL",
     "referenciaNome": "SEUL",
     "categoria": "brindes",
     "subcategoria": "Sacos",
     "genero": "unissexo",
-    "descricao": "Saco de cordas em poliéster, em tamanho criança e adulto.",
+    "descricao": "Saco de cordas leve e prático, que se usa às costas com toda a naturalidade. Em poliéster macio e resistente, fecha num gesto com os cordões e está disponível em tamanho criança e adulto, numa paleta de catorze cores, das mais suaves às mais intensas. Personalizado com o seu logótipo, é o companheiro ideal para escolas, ginásios, eventos desportivos e ações promocionais.",
     "composicao": "100% Poliéster, Densidade: 65 g/m²",
     "referencia": "#SEU-SEU",
     "imagem": seul12.url,
@@ -11239,13 +10067,13 @@ export const modelos: Modelo[] = [
       ],
       [
         "Altura",
-        "35",
-        "45"
+        "35 cm",
+        "45 cm"
       ],
       [
         "Largura",
-        "27",
-        "38"
+        "27 cm",
+        "38 cm"
       ]
     ],
     "precos": [
@@ -11269,12 +10097,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "havana",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Saco HAVANA",
     "referenciaNome": "HAVANA",
     "categoria": "brindes",
     "subcategoria": "Sacos",
     "genero": "unissexo",
-    "descricao": "Saco estreito em polipropileno, em tamanho único.",
+    "descricao": "Saco esguio e elegante, com pega recortada e silhueta alongada, pensado para apresentar uma garrafa ou uma oferta especial com requinte. Leve e resistente, em tons profundos de preto, azul marinho e bordô, dá destaque ao seu logótipo e transforma cada entrega num gesto cuidado. Ideal para vinhos, provas, eventos e ofertas de empresa.",
     "composicao": "100% Polipropileno, Densidade: 75 g/m²",
     "referencia": "#HAV-HAV",
     "imagem": havana2.url,
@@ -11291,11 +10123,11 @@ export const modelos: Modelo[] = [
       ],
       [
         "Altura",
-        "40"
+        "40 cm"
       ],
       [
         "Largura",
-        "16"
+        "16 cm"
       ]
     ],
     "precos": [
@@ -11319,12 +10151,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "quito",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Saco QUITO",
     "referenciaNome": "QUITO",
     "categoria": "brindes",
     "subcategoria": "Sacos",
     "genero": "unissexo",
-    "descricao": "Saco em poliéster e algodão, disponível em quatro tamanhos com preço próprio.",
+    "descricao": "Saco de cordão em mistura de algodão e poliéster, de toque suave e fecho prático que se ajusta num só gesto. Disponível em quatro tamanhos e doze cores, do branco intemporal aos tons mais vivos, adapta-se a tudo: embalar uma oferta, guardar pequenos objetos ou acompanhar um evento. Personalizado com o seu logótipo, transforma qualquer entrega num gesto cuidado.",
     "composicao": "65% Poliéster, 35% Algodão, Densidade: 120 g/m²",
     "referencia": "#QUI-QUI",
     "imagem": quito2.url,
@@ -11353,17 +10189,17 @@ export const modelos: Modelo[] = [
       ],
       [
         "Altura",
-        "16",
-        "25",
-        "32",
-        "39"
+        "16 cm",
+        "25 cm",
+        "32 cm",
+        "39 cm"
       ],
       [
         "Largura",
-        "13",
-        "20",
-        "27",
-        "35"
+        "13 cm",
+        "20 cm",
+        "27 cm",
+        "35 cm"
       ]
     ],
     "precos": [
@@ -11391,12 +10227,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "washington",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Saco WASHINGTON",
     "referenciaNome": "WASHINGTON",
     "categoria": "brindes",
     "subcategoria": "Sacos",
     "genero": "unissexo",
-    "descricao": "Saco de compras em poliéster resistente, com asas de 70 cm.",
+    "descricao": "Saco branco de linhas puras e acabamento suave, leve na mão e resistente no uso diário. As asas longas assentam com conforto no ombro e a superfície lisa realça cada detalhe da personalização, das cores mais vivas aos logótipos mais finos. Prático e elegante, é o companheiro ideal para levar a sua marca a feiras, eventos e ao dia a dia.",
     "composicao": "100% Poliéster, Densidade: 175 g/m²",
     "referencia": "#WAS-WAS",
     "imagem": washingtonEditorial2,
@@ -11418,15 +10258,15 @@ export const modelos: Modelo[] = [
       ],
       [
         "Altura",
-        "42"
+        "42 cm"
       ],
       [
         "Largura",
-        "38"
+        "38 cm"
       ],
       [
         "Asas",
-        "70"
+        "70 cm"
       ]
     ],
     "precos": [
@@ -11450,12 +10290,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "suva",
+    "semFicha": true,
+    "semLegenda": true,
+    "semNotaTamanhos": true,
+    "fotosCheias": true,
     "nome": "Saco SUVA",
     "referenciaNome": "SUVA",
     "categoria": "brindes",
     "subcategoria": "Sacos",
     "genero": "unissexo",
-    "descricao": "Saco de compras em algodão, com asas de 71 cm.",
+    "descricao": "Saco em algodão natural, de toque macio e linhas simples, pensado para acompanhar o dia a dia com leveza. Espaçoso e resistente, com asas longas que se usam confortavelmente ao ombro, é a tela perfeita para o seu logótipo ou mensagem. Um brinde útil, sustentável e intemporal, que leva a sua marca a todo o lado.",
     "composicao": "Algodão",
     "referencia": "#SUV-SUV",
     "imagem": suvaEditorial2,
@@ -11477,15 +10321,15 @@ export const modelos: Modelo[] = [
       ],
       [
         "Altura",
-        "42"
+        "42 cm"
       ],
       [
         "Largura",
-        "37"
+        "37 cm"
       ],
       [
         "Asas",
-        "71"
+        "71 cm"
       ]
     ],
     "precos": [
@@ -11509,12 +10353,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "motu-nui",
+    "soFotoPrincipal": true,
+    "semFicha": true,
+    "semLegenda": true,
+    "semTamanhos": true,
     "nome": "Caneca MOTU NUI",
     "referenciaNome": "MOTU NUI",
     "categoria": "brindes",
     "subcategoria": "Canecas",
     "genero": "unissexo",
-    "descricao": "Caneca mágica preta que revela a imagem com o calor da bebida.",
+    "descricao": "Caneca mágica em cerâmica preta, com um segredo à espera de ser descoberto. Fria, é discreta e elegante; basta servir uma bebida quente para que o calor revele, pouco a pouco, a sua imagem, logótipo ou mensagem. Uma surpresa que se repete a cada café e um brinde que ninguém esquece.",
     "composicao": "Cerâmica com revestimento termossensível",
     "referencia": "#MOT-MOT",
     "lifestyle": motuNuiEditorial,
@@ -11552,12 +10400,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "vaduz",
+    "soFotoPrincipal": true,
+    "semFicha": true,
+    "semLegenda": true,
+    "semTamanhos": true,
     "nome": "Caneca VADUZ",
     "referenciaNome": "VADUZ",
     "categoria": "brindes",
     "subcategoria": "Canecas",
     "genero": "unissexo",
-    "descricao": "Caneca branca para sublimação, personalizada com a sua imagem.",
+    "descricao": "Caneca clássica em cerâmica branca, de formas suaves e brilho discreto. Personalizada a toda a volta com a sua imagem, logótipo ou mensagem, em cores vivas e duradouras, faz de cada café um momento com a sua marca. Um presente intemporal para clientes, equipas e ocasiões especiais.",
     "composicao": "Cerâmica para sublimação",
     "referencia": "#VAD-VAD",
     "lifestyle": vaduzEditorial,
@@ -11595,12 +10447,15 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "abuja",
+    "soFotoPrincipal": true,
+    "semFicha": true,
+    "semLegenda": true,
     "nome": "Base ABUJA",
     "referenciaNome": "ABUJA",
     "categoria": "brindes",
     "subcategoria": "Bases",
     "genero": "unissexo",
-    "descricao": "Base para canecas personalizável.",
+    "descricao": "Base para copos e canecas de linhas simples e cantos arredondados, com acabamento branco liso. Uma superfície limpa, pronta a receber o seu logótipo, uma imagem ou uma mensagem, que transforma um objeto do dia a dia num detalhe com a sua marca, ideal para escritórios, eventos e ofertas.",
     "composicao": "Material a confirmar",
     "referencia": "#ABU-ABU",
     "lifestyle": abujaEditorial,
@@ -11638,12 +10493,16 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "torre-de-madeira",
+    "soFotoPrincipal": true,
+    "semFicha": true,
+    "semLegenda": true,
+    "semTamanhos": true,
     "nome": "TORRE DE MADEIRA",
     "referenciaNome": "TORRE DE MADEIRA",
     "categoria": "brindes",
     "subcategoria": "Jogos",
     "genero": "unissexo",
-    "descricao": "Artigo TORRE DE MADEIRA da coleção Jogos em preparação, fotografias e detalhes a adicionar brevemente.",
+    "descricao": "Jogo clássico de torre em madeira, composto por X peças. Todas as peças são personalizáveis ao gosto do comprador, tornando-o um brinde original e divertido para empresas, eventos ou ofertas.",
     "composicao": "Composição a confirmar",
     "referencia": "#TOR-TOR",
     "imagem": pub("/lifestyle/torre-de-madeira.jpg"),
@@ -11712,6 +10571,17 @@ export function getModelosPorCategoria(categoria: CategoriaId): Modelo[] {
   });
 }
 
+// Endereços antigos de modelos duplicados que foram removidos
+const ALIASES_MODELOS: Record<string, string> = {
+  "resistance-crianca": "resistance",
+  "leopard-crianca": "leopard",
+  "maurice-crianca": "maurice",
+  "resistance-mulher": "resistance",
+  "racing-crianca": "racing",
+  "patrol-crianca": "patrol",
+};
+
 export function getModelo(id: string): Modelo | undefined {
-  return modelos.find((m) => m.id === id);
+  const real = ALIASES_MODELOS[id] ?? id;
+  return modelos.find((m) => m.id === real);
 }

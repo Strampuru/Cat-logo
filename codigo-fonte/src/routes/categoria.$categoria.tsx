@@ -159,7 +159,7 @@ function CategoriaPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 sm:gap-x-6 gap-y-8 sm:gap-y-12">
 
             {visiveis.map((m) => (
-              <ModelCard key={m.id} modelo={m} />
+              <ModelCard key={m.id} modelo={m} faixa={categoria.id === "crianca" ? "crianca" : undefined} />
             ))}
           </div>
         )}

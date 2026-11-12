@@ -1,9 +1,12 @@
 import { Link } from "@tanstack/react-router";
 import { useState, type MouseEvent } from "react";
 import { useSwipe } from "@/hooks/use-swipe";
-import type { Modelo } from "@/lib/catalogo";
+import { coresDaFaixa } from "@/lib/catalogo";
+import type { FaixaEtaria, Modelo } from "@/lib/catalogo";
 
-export function ModelCard({ modelo }: { modelo: Modelo }) {
+export function ModelCard({ modelo, faixa }: { modelo: Modelo; faixa?: FaixaEtaria }) {
+  // Na secção Criança, os modelos com escolhaIdade só mostram as cores de criança
+  const faixaCartao = modelo.escolhaIdade && faixa ? faixa : undefined;
   const [ativa, setAtiva] = useState<number | null>(null);
   const pecas = modelo.pecas;
   const mostraPecas =
@@ -12,7 +15,9 @@ export function ModelCard({ modelo }: { modelo: Modelo }) {
   const coresBase =
     mostraPecas && (pecas![0]?.cores.length ?? 0) > modelo.cores.length
       ? pecas![0]!.cores
-      : modelo.cores;
+      : faixaCartao
+        ? coresDaFaixa(modelo.cores, faixaCartao)
+        : modelo.cores;
   const visiveis = coresBase.slice(0, 6);
   const extra = coresBase.length - visiveis.length;
   const corAtiva = ativa === null ? undefined : coresBase[ativa];
@@ -28,6 +33,15 @@ export function ModelCard({ modelo }: { modelo: Modelo }) {
 
   const src = corAtiva?.imagem ?? modelo.lifestyle ?? modelo.imagem;
   const emUso = !corAtiva && Boolean(modelo.lifestyle) && !mostraPecas;
+
+  // Há setas sempre que existe mais do que uma imagem diferente para ver
+  // (várias cores, ou uma só cor com uma foto «em uso» diferente).
+  const podeNavegar =
+    coresBase.length > 1 ||
+    (coresBase.length === 1 &&
+      Boolean(modelo.lifestyle) &&
+      !mostraPecas &&
+      modelo.lifestyle !== coresBase[0]?.imagem);
 
   const navegar = (e: MouseEvent, dir: 1 | -1) => {
     e.preventDefault();
@@ -57,11 +71,12 @@ export function ModelCard({ modelo }: { modelo: Modelo }) {
     <Link
       to="/modelo/$id"
       params={{ id: modelo.id }}
+      search={faixaCartao === "crianca" ? ({ idade: "crianca" } as never) : undefined}
       className="group block animate-fade-up"
     >
       <div
         className="relative overflow-hidden rounded-sm bg-card ring-1 ring-black/5 aspect-[3/4] shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-shadow duration-500 group-hover:shadow-[0_18px_40px_-18px_rgba(0,0,0,0.28)] touch-pan-y"
-        {...(coresBase.length > 1 ? swipe : {})}
+        {...(podeNavegar ? swipe : {})}
       >
         <div className="absolute inset-0 bg-gradient-to-b from-secondary/60 to-background" />
         {imagensPecas ? (
@@ -109,7 +124,7 @@ export function ModelCard({ modelo }: { modelo: Modelo }) {
         <span className="absolute right-3 bottom-3 rounded-full bg-foreground/85 px-2.5 py-1 text-[9px] uppercase tracking-[0.15em] text-background opacity-0 translate-y-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">
           Ver modelo
         </span>
-        {coresBase.length > 1 && (
+        {podeNavegar && (
           <>
             <button
               type="button"

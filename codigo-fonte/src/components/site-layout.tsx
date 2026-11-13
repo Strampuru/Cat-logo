@@ -1,9 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
-import { categorias } from "@/lib/catalogo";
 import { CatalogoSidebar } from "@/components/catalogo-sidebar";
 import { PesquisaModelos } from "@/components/pesquisa-modelos";
 import logo from "@/assets/strampuru-logo.png.asset.json";
+import { AvisoEncomenda } from "@/components/aviso-encomenda";
 
 export function SiteLayout({ children }: { children: ReactNode }) {
   const [menuAberto, setMenuAberto] = useState(false);
@@ -66,7 +66,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
 
       <footer className="border-t border-border py-14 md:py-20 bg-secondary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row justify-between items-start gap-10 md:gap-12">
-          <div className="space-y-5 md:space-y-6">
+          <div className="space-y-5 md:space-y-6 w-full">
             <img
               src={logo.url}
               alt="Logótipo Stram Puru"
@@ -75,10 +75,38 @@ export function SiteLayout({ children }: { children: ReactNode }) {
               loading="lazy"
               className="h-16 md:h-24 w-auto"
             />
-            <p className="text-[11px] text-muted-foreground uppercase tracking-widest max-w-xs leading-loose">
-              Catálogo de vestuário para personalização: t-shirts, polos, sweats
-              e jaquetas.
-            </p>
+            <div className="flex w-full items-start justify-between gap-8 sm:gap-16">
+              <div className="max-w-xs space-y-2">
+                <p className="font-display text-2xl italic leading-none text-accent">Personaliza-me.</p>
+                <p className="text-[11px] text-muted-foreground uppercase tracking-widest leading-loose">
+                  Peças pensadas ao pormenor, prontas a ganhar a sua marca.
+                </p>
+              </div>
+              <div className="space-y-4">
+                <h4 className="text-[11px] uppercase tracking-widest font-bold">
+                  Informação
+                </h4>
+                <ul className="text-[11px] uppercase tracking-[0.15em] space-y-2 text-muted-foreground">
+                  <li>
+                    <Link
+                      to="/"
+                      hash="sobre-nos"
+                      className="hover:text-foreground transition-colors"
+                    >
+                      Sobre nós
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/contactos"
+                      className="hover:text-foreground transition-colors"
+                    >
+                      Contactos
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+            </div>
             <div className="flex items-center gap-3">
               <a
                 href="https://www.instagram.com/strampuru_"
@@ -132,56 +160,13 @@ export function SiteLayout({ children }: { children: ReactNode }) {
               </a>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-8 sm:gap-12 md:gap-20 w-full md:w-auto">
-            <div className="space-y-4">
-              <h4 className="text-[11px] uppercase tracking-widest font-bold">
-                Produtos
-              </h4>
-              <ul className="text-[11px] uppercase tracking-[0.15em] space-y-2 text-muted-foreground">
-                {categorias.map((c) => (
-                  <li key={c.id}>
-                    <Link
-                      to="/categoria/$categoria"
-                      params={{ categoria: c.id }}
-                      className="hover:text-foreground transition-colors"
-                    >
-                      {c.nome}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="space-y-4">
-              <h4 className="text-[11px] uppercase tracking-widest font-bold">
-                Informação
-              </h4>
-              <ul className="text-[11px] uppercase tracking-[0.15em] space-y-2 text-muted-foreground">
-                <li>
-                  <Link
-                    to="/"
-                    hash="sobre-nos"
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Sobre nós
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/contactos"
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Contactos
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-12 md:mt-20 text-[10px] uppercase tracking-widest text-muted-foreground">
           &copy; {new Date().getFullYear()} Strampuru. Todos os direitos
           reservados.
         </div>
       </footer>
+      <AvisoEncomenda />
     </div>
   );
 }

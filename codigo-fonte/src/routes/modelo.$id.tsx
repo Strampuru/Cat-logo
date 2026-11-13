@@ -2,6 +2,35 @@ import { createFileRoute, notFound, Link, useNavigate } from "@tanstack/react-ro
 import { useState } from "react";
 import { SiteLayout } from "@/components/site-layout";
 import { useSwipe } from "@/hooks/use-swipe";
+import { TabelaDeslizante } from "@/components/tabela-deslizante";
+import { DESCONTO, emPromocao, precoComDesconto } from "@/lib/promocoes";
+
+function Preco({ modeloId, preco, className = "" }: { modeloId: string; preco: string; className?: string }) {
+  if (!emPromocao(modeloId) || !/\d/.test(preco)) return <span className={className}>{preco}</span>;
+  return (
+    <span className={`inline-flex items-baseline gap-2 ${className}`}>
+      <span className="line-through text-muted-foreground font-normal">{preco}</span>
+      <span className="text-accent font-semibold">{precoComDesconto(preco)}</span>
+    </span>
+  );
+}
+
+function SeloPromocao({ modeloId }: { modeloId: string }) {
+  if (!emPromocao(modeloId)) return null;
+  return (
+    <Link
+      to="/destaque/$id"
+      params={{ id: "promocoes" }}
+      className="inline-flex items-center gap-2 rounded-full bg-accent text-accent-foreground px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-widest shadow-sm hover:bg-foreground hover:text-background transition-colors"
+    >
+      <span className="relative flex size-2">
+        <span className="absolute inline-flex h-full w-full rounded-full bg-accent-foreground opacity-75 animate-ping" />
+        <span className="relative inline-flex size-2 rounded-full bg-accent-foreground" />
+      </span>
+      −{Math.round(DESCONTO * 100)}% esta semana
+    </Link>
+  );
+}
 import { getModelo, getCategoria, coresDaFaixa, tamanhosDaFaixa } from "@/lib/catalogo";
 import type { Categoria, Cor, FaixaEtaria, Modelo, Peca } from "@/lib/catalogo";
 
@@ -61,9 +90,15 @@ function VoltarPaginaAnterior() {
     <button
       type="button"
       onClick={voltar}
-      className="inline-flex items-center text-[11px] uppercase tracking-widest text-muted-foreground hover:text-accent transition-colors"
+      className="group inline-flex items-center gap-3 rounded-full border border-accent bg-accent py-1.5 pl-1.5 pr-5 text-[11px] font-medium uppercase tracking-widest text-accent-foreground shadow-sm transition-colors hover:border-accent/50 hover:bg-accent/10 hover:text-foreground"
     >
-      ← Voltar
+      <span
+        aria-hidden="true"
+        className="flex size-8 items-center justify-center rounded-full bg-accent-foreground text-sm text-accent transition-all group-hover:-translate-x-0.5 group-hover:bg-accent group-hover:text-accent-foreground"
+      >
+        ←
+      </span>
+      Voltar
     </button>
   );
 }
@@ -206,7 +241,7 @@ function PecaCard({
               Tamanhos — {peca.nome}
               <span className="transition-transform group-open:rotate-180">⌄</span>
             </summary>
-            <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 pt-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <TabelaDeslizante className="-mx-4 px-4 sm:mx-0 sm:px-0 pt-3">
               <table className="min-w-full text-[12px] sm:text-[13px] border-collapse">
                 <thead>
                   <tr>
@@ -237,7 +272,7 @@ function PecaCard({
                   ))}
                 </tbody>
               </table>
-            </div>
+            </TabelaDeslizante>
           </details>
         )}
       </div>
@@ -275,11 +310,10 @@ function DetalheConjunto({
                 >
                   {categoria.nome}
                 </Link>
-                <span>/</span>
               </>
             )}
-            <span>{modelo.subcategoria}</span>
           </nav>
+          <SeloPromocao modeloId={modelo.id} />
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-display leading-tight">
             {modelo.nome}
           </h1>
@@ -348,7 +382,7 @@ function DetalheConjunto({
               {modelo.precos.map(([qtd, preco]) => (
                 <div key={qtd} className="flex justify-between py-3">
                   <span className="text-sm text-muted-foreground">{qtd}</span>
-                  <span className="text-sm font-medium">{preco}</span>
+                  <Preco modeloId={modelo.id} preco={preco} className="text-sm font-medium" />
                 </div>
               ))}
             </div>
@@ -419,7 +453,6 @@ function ConfiguradorAbuDhabi({ modelo, categoria, pecas }: {
           <header className="space-y-3">
             <nav className="text-[10px] uppercase tracking-[0.3em] text-accent font-semibold italic flex gap-3">
               {categoria && <Link to="/categoria/$categoria" params={{ categoria: categoria.id }}>{categoria.nome}</Link>}
-              <span>/</span><span>{modelo.subcategoria}</span>
             </nav>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-display italic leading-tight">{modelo.nome}</h1>
             {modelo.semFicha && modelo.descricao && (
@@ -481,7 +514,7 @@ function ConfiguradorAbuDhabi({ modelo, categoria, pecas }: {
           {cabecalho && (
             <div className="space-y-5">
               <span className="text-[10px] tracking-[0.2em] uppercase font-bold text-accent block">Tamanhos — {peca.nome}</span>
-              <div className="border border-border bg-card overflow-x-auto">
+              <TabelaDeslizante className="border border-border bg-card">
                 <table className="w-full min-w-max text-center text-[11px] border-collapse">
                   <thead className="bg-secondary border-b border-border">
                     <tr>{cabecalho.map((item) => <th key={item} className="py-3 px-4 font-bold text-muted-foreground border-r border-border last:border-r-0 whitespace-nowrap">{item}</th>)}</tr>
@@ -496,7 +529,7 @@ function ConfiguradorAbuDhabi({ modelo, categoria, pecas }: {
                     ))}
                   </tbody>
                 </table>
-              </div>
+              </TabelaDeslizante>
               {!modelo.semNotaTamanhos && <p className="text-[10px] text-muted-foreground italic">Medidas em centímetros.</p>}
             </div>
           )}
@@ -708,11 +741,10 @@ function DetalheModelo({
                   >
                     {categoria.nome}
                   </Link>
-                  <span>/</span>
                 </>
               )}
-              <span>{modelo.subcategoria}</span>
             </nav>
+            <SeloPromocao modeloId={modelo.id} />
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-display leading-tight">
               {modelo.nome}
               {vista.titulo && (
@@ -754,14 +786,28 @@ function DetalheModelo({
             <div className="space-y-4">
               <div className="flex items-baseline justify-between">
                 <span className="text-[11px] uppercase tracking-widest font-semibold">
-                  Cores Disponíveis ({coresV.length})
+                  {modelo.opcoesModelos ? "Modelos disponíveis" : "Cores Disponíveis"} ({coresV.length})
                 </span>
                 <span className="text-[11px] uppercase tracking-widest text-muted-foreground">
                   {cor.nome}
                 </span>
               </div>
               <div className="flex flex-wrap gap-3">
-                {coresV.map((c, i) => (
+                {modelo.opcoesModelos && coresV.map((c, i) => (
+                  <button
+                    key={c.nome}
+                    onClick={() => irParaCor(i)}
+                    aria-pressed={i === ativa}
+                    className={`px-4 py-2 rounded-full text-[11px] uppercase tracking-widest border transition-colors ${
+                      i === ativa
+                        ? "bg-foreground text-background border-foreground"
+                        : "border-border text-muted-foreground hover:text-foreground hover:border-foreground/40"
+                    }`}
+                  >
+                    {c.nome}
+                  </button>
+                ))}
+                {!modelo.opcoesModelos && coresV.map((c, i) => (
                   <button
                     key={c.nome}
                     onClick={() => irParaCor(i)}
@@ -826,7 +872,7 @@ function DetalheModelo({
                 {vista.precos.map(([qtd, preco]) => (
                   <div key={qtd} className="flex justify-between py-3">
                     <span className="text-sm text-muted-foreground">{qtd}</span>
-                    <span className="text-sm font-medium">{preco}</span>
+                    <Preco modeloId={modelo.id} preco={preco} className="text-sm font-medium" />
                   </div>
                 ))}
               </div>
@@ -854,7 +900,7 @@ function DetalheModelo({
                 Medidas em centímetros — desliza para ver toda a tabela
               </p>
             )}
-            <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <TabelaDeslizante className="-mx-4 px-4 sm:mx-0 sm:px-0">
               <table className="min-w-full text-[13px] sm:text-sm border-collapse">
                 <thead>
                   <tr>
@@ -885,7 +931,7 @@ function DetalheModelo({
                   ))}
                 </tbody>
               </table>
-            </div>
+            </TabelaDeslizante>
           </div>
         </section>
       )}

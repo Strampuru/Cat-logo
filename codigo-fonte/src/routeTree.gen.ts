@@ -14,6 +14,7 @@ import { Route as CatalogoRouteImport } from './routes/catalogo'
 import { Route as ContactosRouteImport } from './routes/contactos'
 import { Route as CategoriaCategoriaRouteImport } from './routes/categoria.$categoria'
 import { Route as ModeloIdRouteImport } from './routes/modelo.$id'
+import { Route as DestaqueIdRouteImport } from './routes/destaque.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,6 +41,11 @@ const ModeloIdRoute = ModeloIdRouteImport.update({
   path: '/modelo/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DestaqueIdRoute = DestaqueIdRouteImport.update({
+  id: '/destaque/$id',
+  path: '/destaque/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +53,7 @@ export interface FileRoutesByFullPath {
   '/contactos': typeof ContactosRoute
   '/categoria/$categoria': typeof CategoriaCategoriaRoute
   '/modelo/$id': typeof ModeloIdRoute
+  '/destaque/$id': typeof DestaqueIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +61,7 @@ export interface FileRoutesByTo {
   '/contactos': typeof ContactosRoute
   '/categoria/$categoria': typeof CategoriaCategoriaRoute
   '/modelo/$id': typeof ModeloIdRoute
+  '/destaque/$id': typeof DestaqueIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,13 +70,14 @@ export interface FileRoutesById {
   '/contactos': typeof ContactosRoute
   '/categoria/$categoria': typeof CategoriaCategoriaRoute
   '/modelo/$id': typeof ModeloIdRoute
+  '/destaque/$id': typeof DestaqueIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/catalogo' | '/contactos' | '/categoria/$categoria' | '/modelo/$id'
+    '/' | '/catalogo' | '/contactos' | '/categoria/$categoria' | '/modelo/$id' | '/destaque/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/catalogo' | '/contactos' | '/categoria/$categoria' | '/modelo/$id'
+  to: '/' | '/catalogo' | '/contactos' | '/categoria/$categoria' | '/modelo/$id' | '/destaque/$id'
   id:
     | '__root__'
     | '/'
@@ -76,6 +85,7 @@ export interface FileRouteTypes {
     | '/contactos'
     | '/categoria/$categoria'
     | '/modelo/$id'
+    | '/destaque/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -84,6 +94,7 @@ export interface RootRouteChildren {
   ContactosRoute: typeof ContactosRoute
   CategoriaCategoriaRoute: typeof CategoriaCategoriaRoute
   ModeloIdRoute: typeof ModeloIdRoute
+  DestaqueIdRoute: typeof DestaqueIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -123,6 +134,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ModeloIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/destaque/$id': {
+      id: '/destaque/$id'
+      path: '/destaque/$id'
+      fullPath: '/destaque/$id'
+      preLoaderRoute: typeof DestaqueIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -132,6 +150,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactosRoute: ContactosRoute,
   CategoriaCategoriaRoute: CategoriaCategoriaRoute,
   ModeloIdRoute: ModeloIdRoute,
+  DestaqueIdRoute: DestaqueIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

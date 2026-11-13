@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { categorias, getFamiliaPorSubcategoria } from "@/lib/catalogo";
+import { destaques } from "@/lib/destaques";
 
 
 /**
@@ -16,9 +17,8 @@ export function CatalogoSidebar({
   aberta: boolean;
   onFechar: () => void;
 }) {
-  const [expandida, setExpandida] = useState<string | null>(
-    categorias[0]?.id ?? null,
-  );
+  const [expandida, setExpandida] = useState<string | null>(null);
+  const [catalogoAberto, setCatalogoAberto] = useState(false);
   const [subExpandidas, setSubExpandidas] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -49,7 +49,7 @@ export function CatalogoSidebar({
       >
         <div className="flex items-center justify-between px-6 h-16 md:h-20 border-b border-border shrink-0">
           <span className="text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
-            Catálogo
+            Menu
           </span>
           <button
             onClick={onFechar}
@@ -63,123 +63,163 @@ export function CatalogoSidebar({
         </div>
 
         <nav className="flex-1 overflow-y-auto px-6 py-6 space-y-1">
-          {categorias.map((c) => {
-            const aberto = expandida === c.id;
-            return (
-              <div key={c.id} className="border-b border-border/60 last:border-0">
-                <div className="flex items-center justify-between gap-2">
+          {/* Catálogo (retrátil) */}
+          <div className="border-b border-border">
+            <button
+              type="button"
+              onClick={() => setCatalogoAberto((v) => !v)}
+              aria-expanded={catalogoAberto}
+              className="w-full flex items-center justify-between py-4 font-display text-2xl hover:text-accent transition-colors"
+            >
+              Catálogo
+              <svg viewBox="0 0 24 24" className={`w-4 h-4 transition-transform duration-300 ${catalogoAberto ? "rotate-180" : ""}`} fill="none" stroke="currentColor">
+                <path strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
+            <div className={`grid transition-[grid-template-rows] duration-300 ease-out ${catalogoAberto ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
+              <div className="overflow-hidden">
+                <div className="pl-3 pb-3">
+              {categorias.map((c) => {
+                const aberto = expandida === c.id;
+                return (
+                  <div key={c.id} className="border-b border-border/60 last:border-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <Link
+                        to="/categoria/$categoria"
+                        params={{ categoria: c.id }}
+                        onClick={onFechar}
+                        className="flex-1 min-w-0 py-3 font-display text-xl hover:text-accent transition-colors"
+                        activeProps={{ className: "text-accent" }}
+                      >
+                        {c.nome}
+                      </Link>
+                      {c.subcategorias.length > 0 && (
+                        <button
+                          onClick={() => setExpandida(aberto ? null : c.id)}
+                          aria-label={`${aberto ? "Fechar" : "Abrir"} subcategorias de ${c.nome}`}
+                          aria-expanded={aberto}
+                          className="shrink-0 min-h-11 min-w-11 flex items-center justify-center text-muted-foreground hover:text-accent transition-colors"
+                        >
+                          <svg
+                            viewBox="0 0 24 24"
+                            className={`w-4 h-4 transition-transform duration-300 ${aberto ? "rotate-180" : ""}`}
+                            fill="none"
+                            stroke="currentColor"
+                          >
+                            <path strokeWidth="1.5" strokeLinecap="round" d="M6 9l6 6 6-6" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+
+                    <div
+                      className={`grid transition-all duration-300 ${
+                        aberto ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                      }`}
+                    >
+                      <ul className="overflow-hidden pl-1 pb-4 space-y-1 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+                        {c.subcategorias.map((sub) => {
+                          const familia = getFamiliaPorSubcategoria(sub);
+                          const temTipos = familia && familia.subcategorias.length > 0;
+                          const chaveSub = `${c.id}::${sub}`;
+                          const subAberta = subExpandidas.has(chaveSub);
+
+                          const toggleSub = () => {
+                            setSubExpandidas((prev) => {
+                              const next = new Set(prev);
+                              if (next.has(chaveSub)) next.delete(chaveSub);
+                              else next.add(chaveSub);
+                              return next;
+                            });
+                          };
+
+                          return (
+                            <li key={sub}>
+                              <div className="flex items-center justify-between gap-2">
+                                <Link
+                                  to="/categoria/$categoria"
+                                  params={{ categoria: c.id }}
+                                  search={{ sub }}
+                                  onClick={onFechar}
+                                  className="flex-1 min-w-0 py-2 hover:text-accent transition-colors"
+                                >
+                                  {sub}
+                                </Link>
+                                {temTipos && (
+                                  <button
+                                    onClick={toggleSub}
+                                    aria-label={`${subAberta ? "Fechar" : "Abrir"} subdivisões de ${sub}`}
+                                    aria-expanded={subAberta}
+                                    className="shrink-0 min-h-9 min-w-9 -mr-2 flex items-center justify-center text-muted-foreground hover:text-accent transition-colors"
+                                  >
+                                    <svg
+                                      viewBox="0 0 24 24"
+                                      className={`w-3.5 h-3.5 transition-transform duration-300 ${subAberta ? "rotate-180" : ""}`}
+                                      fill="none"
+                                      stroke="currentColor"
+                                    >
+                                      <path strokeWidth="1.5" strokeLinecap="round" d="M6 9l6 6 6-6" />
+                                    </svg>
+                                  </button>
+                                )}
+                              </div>
+
+                              {temTipos && (
+                                <div
+                                  className={`grid transition-all duration-300 ${
+                                    subAberta ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                                  }`}
+                                >
+                                  <ul className="overflow-hidden pl-4 mt-1 space-y-0.5 text-[10px] uppercase tracking-[0.18em] text-muted-foreground/80">
+                                    {familia.subcategorias.map((tipo) => (
+                                      <li key={tipo}>
+                                        <Link
+                                          to="/categoria/$categoria"
+                                          params={{ categoria: c.id }}
+                                          search={{ sub, tipo }}
+                                          onClick={onFechar}
+                                          className="block py-1.5 hover:text-accent transition-colors"
+                                        >
+                                          {tipo}
+                                        </Link>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+
+                  </div>
+                );
+              })}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Destaques */}
+          <div className="pt-6">
+            <p className="text-[10px] uppercase tracking-[0.3em] text-accent font-semibold mb-3">Destaques</p>
+            <ul className="space-y-2.5">
+              {destaques.map((d) => (
+                <li key={d.id}>
                   <Link
-                    to="/categoria/$categoria"
-                    params={{ categoria: c.id }}
+                    to="/destaque/$id"
+                    params={{ id: d.id }}
                     onClick={onFechar}
-                    className="flex-1 min-w-0 py-4 font-display text-2xl hover:text-accent transition-colors"
+                    className="text-[12px] uppercase tracking-[0.18em] text-foreground hover:text-accent transition-colors"
                     activeProps={{ className: "text-accent" }}
                   >
-                    {c.nome}
+                    {d.nome}
                   </Link>
-                  {c.subcategorias.length > 0 && (
-                    <button
-                      onClick={() => setExpandida(aberto ? null : c.id)}
-                      aria-label={`${aberto ? "Fechar" : "Abrir"} subcategorias de ${c.nome}`}
-                      aria-expanded={aberto}
-                      className="shrink-0 min-h-11 min-w-11 flex items-center justify-center text-muted-foreground hover:text-accent transition-colors"
-                    >
-                      <svg
-                        viewBox="0 0 24 24"
-                        className={`w-4 h-4 transition-transform duration-300 ${aberto ? "rotate-180" : ""}`}
-                        fill="none"
-                        stroke="currentColor"
-                      >
-                        <path strokeWidth="1.5" strokeLinecap="round" d="M6 9l6 6 6-6" />
-                      </svg>
-                    </button>
-                  )}
-                </div>
-
-                <div
-                  className={`grid transition-all duration-300 ${
-                    aberto ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-                  }`}
-                >
-                  <ul className="overflow-hidden pl-1 pb-4 space-y-1 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-                    {c.subcategorias.map((sub) => {
-                      const familia = getFamiliaPorSubcategoria(sub);
-                      const temTipos = familia && familia.subcategorias.length > 0;
-                      const chaveSub = `${c.id}::${sub}`;
-                      const subAberta = subExpandidas.has(chaveSub);
-
-                      const toggleSub = () => {
-                        setSubExpandidas((prev) => {
-                          const next = new Set(prev);
-                          if (next.has(chaveSub)) next.delete(chaveSub);
-                          else next.add(chaveSub);
-                          return next;
-                        });
-                      };
-
-                      return (
-                        <li key={sub}>
-                          <div className="flex items-center justify-between gap-2">
-                            <Link
-                              to="/categoria/$categoria"
-                              params={{ categoria: c.id }}
-                              search={{ sub }}
-                              onClick={onFechar}
-                              className="flex-1 min-w-0 py-2 hover:text-accent transition-colors"
-                            >
-                              {sub}
-                            </Link>
-                            {temTipos && (
-                              <button
-                                onClick={toggleSub}
-                                aria-label={`${subAberta ? "Fechar" : "Abrir"} subdivisões de ${sub}`}
-                                aria-expanded={subAberta}
-                                className="shrink-0 min-h-9 min-w-9 -mr-2 flex items-center justify-center text-muted-foreground hover:text-accent transition-colors"
-                              >
-                                <svg
-                                  viewBox="0 0 24 24"
-                                  className={`w-3.5 h-3.5 transition-transform duration-300 ${subAberta ? "rotate-180" : ""}`}
-                                  fill="none"
-                                  stroke="currentColor"
-                                >
-                                  <path strokeWidth="1.5" strokeLinecap="round" d="M6 9l6 6 6-6" />
-                                </svg>
-                              </button>
-                            )}
-                          </div>
-
-                          {temTipos && (
-                            <div
-                              className={`grid transition-all duration-300 ${
-                                subAberta ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-                              }`}
-                            >
-                              <ul className="overflow-hidden pl-4 mt-1 space-y-0.5 text-[10px] uppercase tracking-[0.18em] text-muted-foreground/80">
-                                {familia.subcategorias.map((tipo) => (
-                                  <li key={tipo}>
-                                    <Link
-                                      to="/categoria/$categoria"
-                                      params={{ categoria: c.id }}
-                                      search={{ sub, tipo }}
-                                      onClick={onFechar}
-                                      className="block py-1.5 hover:text-accent transition-colors"
-                                    >
-                                      {tipo}
-                                    </Link>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
-
-              </div>
-            );
-          })}
+                </li>
+              ))}
+            </ul>
+          </div>
         </nav>
 
         <div className="px-6 py-6 border-t border-border shrink-0 space-y-3 text-[11px] uppercase tracking-[0.2em]">

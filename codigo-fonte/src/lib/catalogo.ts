@@ -611,6 +611,8 @@ export type Modelo = {
    * (tudo o que não seja XS, S, M, L, XL, XXL, 3XL…).
    */
   escolhaIdade?: boolean;
+  /** true = a lista «cores» representa modelos/versões (mostra botões com o nome em vez de círculos de cor). */
+  opcoesModelos?: boolean;
 };
 
 export type FaixaEtaria = "adulto" | "crianca";
@@ -649,22 +651,23 @@ export const familias: Categoria[] = [
     "titulo": "T-shirts",
     "descricao": "Malhas de algodão e técnicas, em corte clássico ou desportivo.",
     "imagem": "/__l5e/assets-v1/20ef2e18-6467-4bc7-a363-ba32dac9532f/racing-branco.webp",
-    "subcategorias": [
-      "Clássicas",
-      "Desportivas"
-    ]
+    "subcategorias": []
   },
   {
-
+    "id": "polos",
+    "nome": "Polos",
+    "titulo": "Polos",
+    "descricao": "Polos em algodão e malhas técnicas, para uma imagem cuidada.",
+    "imagem": "",
+    "subcategorias": []
+  },
+  {
     "id": "sweats",
     "nome": "Sweats",
     "titulo": "Sweats e Hoodies",
     "descricao": "Camisolas de moletão de gramagem alta, com e sem capuz.",
     "imagem": "/__l5e/assets-v1/66db4335-a27f-4f27-bb32-a94d941e6b79/arizona-branco.webp",
-    "subcategorias": [
-      "Com Capuz",
-      "Sem Capuz"
-    ]
+    "subcategorias": []
   },
   {
     "id": "jaquetas",
@@ -672,9 +675,7 @@ export const familias: Categoria[] = [
     "titulo": "Jaquetas",
     "descricao": "Peças de exterior forradas, resistentes ao vento e à chuva.",
     "imagem": "/__l5e/assets-v1/0c0569d8-29f2-43d4-ae16-09e7749880cb/manitoba-branco.webp",
-    "subcategorias": [
-      "Com Capuz"
-    ]
+    "subcategorias": []
   }
 ];
 
@@ -699,12 +700,12 @@ export function getFamiliaPorSubcategoria(nome: string | undefined): Categoria |
 
 const coresCairo: Cor[] = [
   { nome: "Branco", hex: "#dfe0e4", hexes: ["#dfe0e4"], imagem: asset_cairo_1.url },
-  { nome: "Caqui", hex: "#9b8866", hexes: ["#9b8866"], imagem: asset_cairo_2.url },
+  { nome: "Caqui", hex: "#9b8866", hexes: ["#9b8866"], imagem: asset_cairo_2.url, soAdulto: true },
   { nome: "Verde lima", hex: "#9bb550", hexes: ["#9bb550"], imagem: asset_cairo_3.url },
-  { nome: "Verde escuro", hex: "#005142", hexes: ["#005142"], imagem: asset_cairo_4.url },
+  { nome: "Verde escuro", hex: "#005142", hexes: ["#005142"], imagem: asset_cairo_4.url, soAdulto: true },
   { nome: "Laranja", hex: "#c1541a", hexes: ["#c1541a"], imagem: asset_cairo_5.url },
   { nome: "Vermelho", hex: "#871526", hexes: ["#871526"], imagem: asset_cairo_6.url },
-  { nome: "Bordô", hex: "#680a2f", hexes: ["#680a2f"], imagem: asset_cairo_7.url },
+  { nome: "Bordô", hex: "#680a2f", hexes: ["#680a2f"], imagem: asset_cairo_7.url, soAdulto: true },
   { nome: "Rosa", hex: "#bf4580", hexes: ["#bf4580"], imagem: asset_cairo_8.url },
   { nome: "Azul escuro", hex: "#24265f", hexes: ["#24265f"], imagem: asset_cairo_9.url },
   { nome: "Azul claro", hex: "#93adce", hexes: ["#93adce"], imagem: asset_cairo_10.url },
@@ -728,6 +729,7 @@ const coresRabat: Cor[] = [
 export const modelos: Modelo[] = [
   {
     "id": "racing",
+    "escolhaIdade": true,
     "semFicha": true,
     "semLegenda": true,
     "semNotaTamanhos": true,
@@ -766,7 +768,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#b3b1a1"
         ],
-        "imagem": "/__l5e/assets-v1/50808463-8b17-4363-8b44-de2e9cad131c/lisboa-3.png"
+        "imagem": "/__l5e/assets-v1/50808463-8b17-4363-8b44-de2e9cad131c/lisboa-3.png",
+        "soAdulto": true
       },
       {
         "nome": "Castanho claro",
@@ -774,7 +777,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#a58d6a"
         ],
-        "imagem": "/__l5e/assets-v1/c701edf5-edae-43a8-9a06-2629a3a838a8/lisboa-4.png"
+        "imagem": "/__l5e/assets-v1/c701edf5-edae-43a8-9a06-2629a3a838a8/lisboa-4.png",
+        "soAdulto": true
       },
       {
         "nome": "Castanho",
@@ -782,7 +786,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#725c4c"
         ],
-        "imagem": "/__l5e/assets-v1/d4af67e1-7e09-4e3a-a631-7c7635ac92e6/lisboa-5.png"
+        "imagem": "/__l5e/assets-v1/d4af67e1-7e09-4e3a-a631-7c7635ac92e6/lisboa-5.png",
+        "soAdulto": true
       },
       {
         "nome": "Verde lima",
@@ -822,7 +827,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#405c53"
         ],
-        "imagem": "/__l5e/assets-v1/7f3275f9-360c-4ed7-8df8-cd8b18be99c5/lisboa-10.png"
+        "imagem": "/__l5e/assets-v1/7f3275f9-360c-4ed7-8df8-cd8b18be99c5/lisboa-10.png",
+        "soAdulto": true
       },
       {
         "nome": "Verde tropa",
@@ -830,7 +836,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#54553a"
         ],
-        "imagem": "/__l5e/assets-v1/30663fed-ec27-4c60-983a-659ed767a894/lisboa-11.png"
+        "imagem": "/__l5e/assets-v1/30663fed-ec27-4c60-983a-659ed767a894/lisboa-11.png",
+        "soAdulto": true
       },
       {
         "nome": "Amarelo",
@@ -878,7 +885,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#65142d"
         ],
-        "imagem": "/__l5e/assets-v1/38798ae1-0c57-482f-86c4-ce8d7d46f385/lisboa-17.png"
+        "imagem": "/__l5e/assets-v1/38798ae1-0c57-482f-86c4-ce8d7d46f385/lisboa-17.png",
+        "soAdulto": true
       },
       {
         "nome": "Rosa claro",
@@ -910,7 +918,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#513678"
         ],
-        "imagem": "/__l5e/assets-v1/3244b508-0677-4505-a125-ba907d3c3140/lisboa-21.png"
+        "imagem": "/__l5e/assets-v1/3244b508-0677-4505-a125-ba907d3c3140/lisboa-21.png",
+        "soAdulto": true
       },
       {
         "nome": "Roxo escuro",
@@ -918,7 +927,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#331751"
         ],
-        "imagem": "/__l5e/assets-v1/4b9f9674-0cee-4cea-9737-ec7fcf0f112e/lisboa-22.png"
+        "imagem": "/__l5e/assets-v1/4b9f9674-0cee-4cea-9737-ec7fcf0f112e/lisboa-22.png",
+        "soAdulto": true
       },
       {
         "nome": "Azul claro",
@@ -958,7 +968,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#233861"
         ],
-        "imagem": "/__l5e/assets-v1/71320613-4697-4377-ac51-08c49d5203ed/lisboa-27.png"
+        "imagem": "/__l5e/assets-v1/71320613-4697-4377-ac51-08c49d5203ed/lisboa-27.png",
+        "soAdulto": true
       },
       {
         "nome": "Azul oceano",
@@ -998,7 +1009,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#afadba"
         ],
-        "imagem": "/__l5e/assets-v1/b1d9317e-e588-4430-9611-7f1d193a892d/lisboa-32.png"
+        "imagem": "/__l5e/assets-v1/b1d9317e-e588-4430-9611-7f1d193a892d/lisboa-32.png",
+        "soAdulto": true
       },
       {
         "nome": "Cinzento chumbo",
@@ -1006,7 +1018,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#626b78"
         ],
-        "imagem": "/__l5e/assets-v1/d8744c6b-92a3-485c-9cdb-5af67b6c593a/lisboa-33.png"
+        "imagem": "/__l5e/assets-v1/d8744c6b-92a3-485c-9cdb-5af67b6c593a/lisboa-33.png",
+        "soAdulto": true
       },
       {
         "nome": "Cinzento escuro",
@@ -1014,7 +1027,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#57565b"
         ],
-        "imagem": "/__l5e/assets-v1/bf246fec-8d02-4e27-b592-484d6ddb7d48/lisboa-34.png"
+        "imagem": "/__l5e/assets-v1/bf246fec-8d02-4e27-b592-484d6ddb7d48/lisboa-34.png",
+        "soAdulto": true
       },
       {
         "nome": "Preto",
@@ -1416,6 +1430,7 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "viena",
+    "escolhaIdade": true,
     "semFicha": true,
     "semLegenda": true,
     "semNotaTamanhos": true,
@@ -1446,7 +1461,8 @@ export const modelos: Modelo[] = [
     "hexes": [
           "#e3e2e8"
         ],
-    "imagem": asset_viena_cor_2.url
+    "imagem": asset_viena_cor_2.url,
+    "soAdulto": true
   },
   {
     "nome": "Preto",
@@ -1454,7 +1470,8 @@ export const modelos: Modelo[] = [
     "hexes": [
           "#322e2b"
         ],
-    "imagem": asset_viena_cor_3.url
+    "imagem": asset_viena_cor_3.url,
+    "soAdulto": true
   },
   {
     "nome": "Verde",
@@ -1462,7 +1479,8 @@ export const modelos: Modelo[] = [
     "hexes": [
           "#005445"
         ],
-    "imagem": asset_viena_cor_4.url
+    "imagem": asset_viena_cor_4.url,
+    "soAdulto": true
   },
   {
     "nome": "Vermelho",
@@ -1470,7 +1488,8 @@ export const modelos: Modelo[] = [
     "hexes": [
           "#8d1524"
         ],
-    "imagem": asset_viena_cor_5.url
+    "imagem": asset_viena_cor_5.url,
+    "soAdulto": true
   },
   {
     "nome": "Azul",
@@ -1478,7 +1497,8 @@ export const modelos: Modelo[] = [
     "hexes": [
           "#1e528e"
         ],
-    "imagem": asset_viena_cor_6.url
+    "imagem": asset_viena_cor_6.url,
+    "soAdulto": true
   },
   {
     "nome": "Azul marinho",
@@ -1826,6 +1846,7 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "resistance",
+    "escolhaIdade": true,
     "semFicha": true,
     "semLegenda": true,
     "semNotaTamanhos": true,
@@ -1856,7 +1877,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#acaa9a"
         ],
-        "imagem": "/__l5e/assets-v1/8472cb04-371b-414d-8617-c97ff1654620/zagreb-19.png"
+        "imagem": "/__l5e/assets-v1/8472cb04-371b-414d-8617-c97ff1654620/zagreb-19.png",
+        "soAdulto": true
       },
       {
         "nome": "Castanho",
@@ -1864,7 +1886,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#533b31"
         ],
-        "imagem": "/__l5e/assets-v1/71f9b5a2-4635-4ed0-babf-cc8c9ead13aa/zagreb-20.png"
+        "imagem": "/__l5e/assets-v1/71f9b5a2-4635-4ed0-babf-cc8c9ead13aa/zagreb-20.png",
+        "soAdulto": true
       },
       {
         "nome": "Verde claro",
@@ -1880,7 +1903,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#006f47"
         ],
-        "imagem": "/__l5e/assets-v1/3efa9028-5646-4035-bf92-70ca1baa3227/zagreb-22.png"
+        "imagem": "/__l5e/assets-v1/3efa9028-5646-4035-bf92-70ca1baa3227/zagreb-22.png",
+        "soAdulto": true
       },
       {
         "nome": "Verde escuro",
@@ -1888,7 +1912,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#00523d"
         ],
-        "imagem": "/__l5e/assets-v1/5bc0fbf1-cfe2-43d4-901a-767f377329cd/zagreb-14.png"
+        "imagem": "/__l5e/assets-v1/5bc0fbf1-cfe2-43d4-901a-767f377329cd/zagreb-14.png",
+        "soAdulto": true
       },
       {
         "nome": "Verde tropa",
@@ -1896,7 +1921,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#4c5338"
         ],
-        "imagem": "/__l5e/assets-v1/397a1b12-e9e9-4e58-9d4c-2f383b2b73c3/zagreb-13.png"
+        "imagem": "/__l5e/assets-v1/397a1b12-e9e9-4e58-9d4c-2f383b2b73c3/zagreb-13.png",
+        "soAdulto": true
       },
       {
         "nome": "Verde lima",
@@ -1904,7 +1930,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#94bc1d"
         ],
-        "imagem": "/__l5e/assets-v1/d6cd94ab-13c5-4cc6-967d-cf1b7d203be7/zagreb-12.png"
+        "imagem": "/__l5e/assets-v1/d6cd94ab-13c5-4cc6-967d-cf1b7d203be7/zagreb-12.png",
+        "soAdulto": true
       },
       {
         "nome": "Amarelo limão",
@@ -1920,7 +1947,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#f9dc3a"
         ],
-        "imagem": "/__l5e/assets-v1/c43c474c-ec1f-4fb7-a58b-426083b2b241/zagreb-10.png"
+        "imagem": "/__l5e/assets-v1/c43c474c-ec1f-4fb7-a58b-426083b2b241/zagreb-10.png",
+        "soAdulto": true
       },
       {
         "nome": "Amarelo ouro",
@@ -1928,7 +1956,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#f3b801"
         ],
-        "imagem": "/__l5e/assets-v1/2cee2b29-66cb-45d2-b96b-def28bbd8f33/zagreb-5.png"
+        "imagem": "/__l5e/assets-v1/2cee2b29-66cb-45d2-b96b-def28bbd8f33/zagreb-5.png",
+        "soAdulto": true
       },
       {
         "nome": "Laranja",
@@ -1936,7 +1965,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#e4500e"
         ],
-        "imagem": "/__l5e/assets-v1/1129ca87-b5d7-4b91-8fb9-83b30f8d28e8/zagreb-4.png"
+        "imagem": "/__l5e/assets-v1/1129ca87-b5d7-4b91-8fb9-83b30f8d28e8/zagreb-4.png",
+        "soAdulto": true
       },
       {
         "nome": "Vermelho",
@@ -1960,7 +1990,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#e03f81"
         ],
-        "imagem": "/__l5e/assets-v1/1c8dd78c-9f37-4588-8d06-64914d17cb44/zagreb-1.png"
+        "imagem": "/__l5e/assets-v1/1c8dd78c-9f37-4588-8d06-64914d17cb44/zagreb-1.png",
+        "soAdulto": true
       },
       {
         "nome": "Rosa",
@@ -1984,7 +2015,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#212165"
         ],
-        "imagem": "/__l5e/assets-v1/abfe831b-d352-4c75-962d-bf22b6d9b55d/zagreb-17.png"
+        "imagem": "/__l5e/assets-v1/abfe831b-d352-4c75-962d-bf22b6d9b55d/zagreb-17.png",
+        "soAdulto": true
       },
       {
         "nome": "Azul claro",
@@ -2016,7 +2048,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#002a4e"
         ],
-        "imagem": "/__l5e/assets-v1/fb3859c2-419d-4571-b487-829fa69d08fa/zagreb-7.png"
+        "imagem": "/__l5e/assets-v1/fb3859c2-419d-4571-b487-829fa69d08fa/zagreb-7.png",
+        "soAdulto": true
       },
       {
         "nome": "Cinzento",
@@ -2024,7 +2057,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#5c6876"
         ],
-        "imagem": "/__l5e/assets-v1/a3202a03-1f22-4e9b-9d46-e02c3f55b872/zagreb-8.png"
+        "imagem": "/__l5e/assets-v1/a3202a03-1f22-4e9b-9d46-e02c3f55b872/zagreb-8.png",
+        "soAdulto": true
       },
       {
         "nome": "Preto",
@@ -2032,7 +2066,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#302824"
         ],
-        "imagem": "/__l5e/assets-v1/3dee18a7-2335-4999-9f2a-f5ab1bb2c0a6/zagreb-6.png"
+        "imagem": "/__l5e/assets-v1/3dee18a7-2335-4999-9f2a-f5ab1bb2c0a6/zagreb-6.png",
+        "soAdulto": true
       }
     ],
     "tamanhos": [
@@ -2306,6 +2341,7 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "leopard",
+    "escolhaIdade": true,
     "semFicha": true,
     "semLegenda": true,
     "semNotaTamanhos": true,
@@ -2415,6 +2451,7 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "maurice",
+    "escolhaIdade": true,
     "semFicha": true,
     "semLegenda": true,
     "semNotaTamanhos": true,
@@ -2730,6 +2767,7 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "patrol",
+    "escolhaIdade": true,
     "semFicha": true,
     "semLegenda": true,
     "semNotaTamanhos": true,
@@ -2760,7 +2798,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#aaa899"
         ],
-        "imagem": asset_bogota_2.url
+        "imagem": asset_bogota_2.url,
+        "soAdulto": true
       },
       {
         "nome": "Castanho",
@@ -2768,7 +2807,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#695749"
         ],
-        "imagem": asset_bogota_3.url
+        "imagem": asset_bogota_3.url,
+        "soAdulto": true
       },
       {
         "nome": "Verde lima",
@@ -2776,7 +2816,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#b2bb46"
         ],
-        "imagem": asset_bogota_4.url
+        "imagem": asset_bogota_4.url,
+        "soAdulto": true
       },
       {
         "nome": "Verde-água",
@@ -2784,7 +2825,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#3a9088"
         ],
-        "imagem": asset_bogota_5.url
+        "imagem": asset_bogota_5.url,
+        "soAdulto": true
       },
       {
         "nome": "Verde",
@@ -2800,7 +2842,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#005141"
         ],
-        "imagem": asset_bogota_7.url
+        "imagem": asset_bogota_7.url,
+        "soAdulto": true
       },
       {
         "nome": "Amarelo",
@@ -2808,7 +2851,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#f0da4b"
         ],
-        "imagem": asset_bogota_8.url
+        "imagem": asset_bogota_8.url,
+        "soAdulto": true
       },
       {
         "nome": "Mostarda",
@@ -2840,7 +2884,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#680a2e"
         ],
-        "imagem": asset_bogota_12.url
+        "imagem": asset_bogota_12.url,
+        "soAdulto": true
       },
       {
         "nome": "Rosa",
@@ -2856,7 +2901,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#321750"
         ],
-        "imagem": asset_bogota_14.url
+        "imagem": asset_bogota_14.url,
+        "soAdulto": true
       },
       {
         "nome": "Azul claro",
@@ -2880,7 +2926,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#5273a3"
         ],
-        "imagem": asset_bogota_17.url
+        "imagem": asset_bogota_17.url,
+        "soAdulto": true
       },
       {
         "nome": "Verde petróleo",
@@ -2888,7 +2935,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#174c5c"
         ],
-        "imagem": asset_bogota_18.url
+        "imagem": asset_bogota_18.url,
+        "soAdulto": true
       },
       {
         "nome": "Azul marinho",
@@ -2896,7 +2944,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#25385f"
         ],
-        "imagem": asset_bogota_19.url
+        "imagem": asset_bogota_19.url,
+        "soAdulto": true
       },
       {
         "nome": "Azul petróleo",
@@ -2912,7 +2961,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#e1e1e7"
         ],
-        "imagem": asset_bogota_21.url
+        "imagem": asset_bogota_21.url,
+        "soAdulto": true
       },
       {
         "nome": "Cinzento mesclado",
@@ -2928,7 +2978,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#626977"
         ],
-        "imagem": asset_bogota_23.url
+        "imagem": asset_bogota_23.url,
+        "soAdulto": true
       },
       {
         "nome": "Cinzento escuro",
@@ -2936,7 +2987,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#545359"
         ],
-        "imagem": asset_bogota_24.url
+        "imagem": asset_bogota_24.url,
+        "soAdulto": true
       },
       {
         "nome": "Preto",
@@ -2944,7 +2996,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#2f2c26"
         ],
-        "imagem": asset_bogota_25.url
+        "imagem": asset_bogota_25.url,
+        "soAdulto": true
       }
     ],
     "tamanhos": [
@@ -3366,6 +3419,8 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "caracas",
+    "escolhaIdade": true,
+    "incluiCrianca": true,
     "semFicha": true,
     "semLegenda": true,
     "semNotaTamanhos": true,
@@ -3378,7 +3433,7 @@ export const modelos: Modelo[] = [
     "descricao": "A elegância de um polo com o conforto da manga comprida. O Polo CARACAS, em algodão de toque suave, tem gola clássica com botões e punhos canelados que lhe dão um acabamento cuidado. Uma peça versátil para as estações mais frescas, que transmite uma imagem profissional e acolhedora. Com 18 cores à escolha, é a forma ideal de vestir a sua equipa com a sua marca durante todo o ano.",
     "composicao": "100% Algodão, Densidade: 220 g/m²",
     "referencia": "#CAR-CAR",
-    "lifestyle": caracasEditorial,
+    "lifestyle": pub("/lifestyle/caracas-gemini.jpg"),
     "imagem": asset_caracas_cor_1.url,
     "cores": [
   {
@@ -3395,7 +3450,8 @@ export const modelos: Modelo[] = [
     "hexes": [
           "#a9a698"
         ],
-    "imagem": asset_caracas_cor_2.url
+    "imagem": asset_caracas_cor_2.url,
+    "soAdulto": true
   },
   {
     "nome": "Castanho",
@@ -3403,7 +3459,8 @@ export const modelos: Modelo[] = [
     "hexes": [
           "#685547"
         ],
-    "imagem": asset_caracas_cor_3.url
+    "imagem": asset_caracas_cor_3.url,
+    "soAdulto": true
   },
   {
     "nome": "Verde lima",
@@ -3411,7 +3468,8 @@ export const modelos: Modelo[] = [
     "hexes": [
           "#b1ba46"
         ],
-    "imagem": asset_caracas_cor_4.url
+    "imagem": asset_caracas_cor_4.url,
+    "soAdulto": true
   },
   {
     "nome": "Verde",
@@ -3419,7 +3477,8 @@ export const modelos: Modelo[] = [
     "hexes": [
           "#166e4c"
         ],
-    "imagem": asset_caracas_cor_5.url
+    "imagem": asset_caracas_cor_5.url,
+    "soAdulto": true
   },
   {
     "nome": "Verde escuro",
@@ -3427,7 +3486,8 @@ export const modelos: Modelo[] = [
     "hexes": [
           "#004739"
         ],
-    "imagem": asset_caracas_cor_6.url
+    "imagem": asset_caracas_cor_6.url,
+    "soAdulto": true
   },
   {
     "nome": "Amarelo claro",
@@ -3435,7 +3495,8 @@ export const modelos: Modelo[] = [
     "hexes": [
           "#f1da4c"
         ],
-    "imagem": asset_caracas_cor_7.url
+    "imagem": asset_caracas_cor_7.url,
+    "soAdulto": true
   },
   {
     "nome": "Amarelo",
@@ -3443,7 +3504,8 @@ export const modelos: Modelo[] = [
     "hexes": [
           "#e3b716"
         ],
-    "imagem": asset_caracas_cor_8.url
+    "imagem": asset_caracas_cor_8.url,
+    "soAdulto": true
   },
   {
     "nome": "Laranja",
@@ -3451,7 +3513,8 @@ export const modelos: Modelo[] = [
     "hexes": [
           "#c14e1a"
         ],
-    "imagem": asset_caracas_cor_9.url
+    "imagem": asset_caracas_cor_9.url,
+    "soAdulto": true
   },
   {
     "nome": "Vermelho",
@@ -3459,7 +3522,8 @@ export const modelos: Modelo[] = [
     "hexes": [
           "#891524"
         ],
-    "imagem": asset_caracas_cor_10.url
+    "imagem": asset_caracas_cor_10.url,
+    "soAdulto": true
   },
   {
     "nome": "Bordô",
@@ -3467,7 +3531,8 @@ export const modelos: Modelo[] = [
     "hexes": [
           "#670a2f"
         ],
-    "imagem": asset_caracas_cor_11.url
+    "imagem": asset_caracas_cor_11.url,
+    "soAdulto": true
   },
   {
     "nome": "Azul claro",
@@ -3475,7 +3540,8 @@ export const modelos: Modelo[] = [
     "hexes": [
           "#94b0d5"
         ],
-    "imagem": asset_caracas_cor_12.url
+    "imagem": asset_caracas_cor_12.url,
+    "soAdulto": true
   },
   {
     "nome": "Azul",
@@ -3491,7 +3557,8 @@ export const modelos: Modelo[] = [
     "hexes": [
           "#053553"
         ],
-    "imagem": asset_caracas_cor_14.url
+    "imagem": asset_caracas_cor_14.url,
+    "soAdulto": true
   },
   {
     "nome": "Cinzento claro",
@@ -3507,7 +3574,8 @@ export const modelos: Modelo[] = [
     "hexes": [
           "#626876"
         ],
-    "imagem": asset_caracas_cor_16.url
+    "imagem": asset_caracas_cor_16.url,
+    "soAdulto": true
   },
   {
     "nome": "Cinzento escuro",
@@ -3515,7 +3583,8 @@ export const modelos: Modelo[] = [
     "hexes": [
           "#535259"
         ],
-    "imagem": asset_caracas_cor_17.url
+    "imagem": asset_caracas_cor_17.url,
+    "soAdulto": true
   },
   {
     "nome": "Preto",
@@ -3523,7 +3592,8 @@ export const modelos: Modelo[] = [
     "hexes": [
           "#2f2a26"
         ],
-    "imagem": asset_caracas_cor_18.url
+    "imagem": asset_caracas_cor_18.url,
+    "soAdulto": true
   }
 ],
     "tamanhos": [
@@ -3706,6 +3776,7 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "arizona",
+    "escolhaIdade": true,
     "semFicha": true,
     "semLegenda": true,
     "semNotaTamanhos": true,
@@ -3736,7 +3807,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#9a8666"
         ],
-        "imagem": "/__l5e/assets-v1/ccf01965-574e-4538-9b9b-ab0080b2ca46/arizona-castanho.webp"
+        "imagem": "/__l5e/assets-v1/ccf01965-574e-4538-9b9b-ab0080b2ca46/arizona-castanho.webp",
+        "soAdulto": true
       },
       {
         "nome": "Verde lima",
@@ -3752,7 +3824,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#1d6d4d"
         ],
-        "imagem": "/__l5e/assets-v1/f235c56e-e982-4b73-84c0-6f95101d2f18/arizona-verde2.webp"
+        "imagem": "/__l5e/assets-v1/f235c56e-e982-4b73-84c0-6f95101d2f18/arizona-verde2.webp",
+        "soAdulto": true
       },
       {
         "nome": "Verde escuro",
@@ -3760,7 +3833,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#0e5341"
         ],
-        "imagem": "/__l5e/assets-v1/0720b1d6-9f12-4d11-9c7d-a143b87c71f0/arizona-verde3.webp"
+        "imagem": "/__l5e/assets-v1/0720b1d6-9f12-4d11-9c7d-a143b87c71f0/arizona-verde3.webp",
+        "soAdulto": true
       },
       {
         "nome": "Verde tropa",
@@ -3768,7 +3842,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#4b513b"
         ],
-        "imagem": "/__l5e/assets-v1/0500442f-429f-4657-90f0-ccee306fa2d4/arizona-verde4.webp"
+        "imagem": "/__l5e/assets-v1/0500442f-429f-4657-90f0-ccee306fa2d4/arizona-verde4.webp",
+        "soAdulto": true
       },
       {
         "nome": "Laranja",
@@ -3792,7 +3867,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#661031"
         ],
-        "imagem": "/__l5e/assets-v1/9fb93e12-7213-4ca5-a492-9f44c8228b6e/arizona-vermelho2.webp"
+        "imagem": "/__l5e/assets-v1/9fb93e12-7213-4ca5-a492-9f44c8228b6e/arizona-vermelho2.webp",
+        "soAdulto": true
       },
       {
         "nome": "Rosa claro",
@@ -3816,7 +3892,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#4c376d"
         ],
-        "imagem": "/__l5e/assets-v1/2e2045d7-7213-4bf3-8072-0354d76f8382/arizona-roxo1.webp"
+        "imagem": "/__l5e/assets-v1/2e2045d7-7213-4bf3-8072-0354d76f8382/arizona-roxo1.webp",
+        "soAdulto": true
       },
       {
         "nome": "Azul escuro",
@@ -3824,7 +3901,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#222556"
         ],
-        "imagem": "/__l5e/assets-v1/37039eb2-ccf7-4c07-8a77-96c05451ddc7/arizona-roxo2.webp"
+        "imagem": "/__l5e/assets-v1/37039eb2-ccf7-4c07-8a77-96c05451ddc7/arizona-roxo2.webp",
+        "soAdulto": true
       },
       {
         "nome": "Azul claro",
@@ -3864,7 +3942,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#9c9ca5"
         ],
-        "imagem": "/__l5e/assets-v1/0ec9c474-f5be-467e-85b0-4c79c354e8cf/arizona-cinzento1.webp"
+        "imagem": "/__l5e/assets-v1/0ec9c474-f5be-467e-85b0-4c79c354e8cf/arizona-cinzento1.webp",
+        "soAdulto": true
       },
       {
         "nome": "Cinzento escuro",
@@ -3872,7 +3951,8 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#4c4e52"
         ],
-        "imagem": "/__l5e/assets-v1/3a587b79-6a06-4d31-8b1c-0615b85350d0/arizona-cinzento2.webp"
+        "imagem": "/__l5e/assets-v1/3a587b79-6a06-4d31-8b1c-0615b85350d0/arizona-cinzento2.webp",
+        "soAdulto": true
       },
       {
         "nome": "Preto",
@@ -3945,6 +4025,7 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "cairo",
+    "escolhaIdade": true,
     "semFicha": true,
     "semLegenda": true,
     "semNotaTamanhos": true,
@@ -4500,7 +4581,7 @@ export const modelos: Modelo[] = [
     "composicao": "65% Poliéster, 35% Algodão, Densidade: 300 g/m²",
     "referencia": "#MEL-MEL",
     "imagem": melodias1.url,
-    "lifestyle": pub("/lifestyle/melodias-new.jpg"),
+    "lifestyle": pub("/lifestyle/melodias-gemini.jpg"),
     "cores": [
       {
         "nome": "Branco",
@@ -10447,6 +10528,7 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "abuja",
+    "semNotaTamanhos": true,
     "soFotoPrincipal": true,
     "semFicha": true,
     "semLegenda": true,
@@ -10474,6 +10556,14 @@ export const modelos: Modelo[] = [
       [
         "Tamanho",
         "Única"
+      ],
+      [
+        "Comprimento",
+        "9,5 cm"
+      ],
+      [
+        "Largura",
+        "9,5 cm"
       ]
     ],
     "precos": [
@@ -10493,7 +10583,7 @@ export const modelos: Modelo[] = [
   },
   {
     "id": "torre-de-madeira",
-    "soFotoPrincipal": true,
+    "opcoesModelos": true,
     "semFicha": true,
     "semLegenda": true,
     "semTamanhos": true,
@@ -10502,19 +10592,27 @@ export const modelos: Modelo[] = [
     "categoria": "brindes",
     "subcategoria": "Jogos",
     "genero": "unissexo",
-    "descricao": "Jogo clássico de torre em madeira, composto por X peças. Todas as peças são personalizáveis ao gosto do comprador, tornando-o um brinde original e divertido para empresas, eventos ou ofertas.",
+    "descricao": "Jogo clássico de torre em madeira, composto por 45 peças, agora com desafios diferentes escritos em cada peça. Disponível em dois modelos: uma versão de jogo de bebidas, para animar festas e convívios entre adultos, e uma versão para jogar com crianças, com desafios divertidos e adequados à idade. Todas as peças são personalizáveis, tornando-o um brinde original para empresas, eventos ou ofertas.",
     "composicao": "Composição a confirmar",
     "referencia": "#TOR-TOR",
     "imagem": pub("/lifestyle/torre-de-madeira.jpg"),
     "lifestyle": pub("/lifestyle/torre-de-madeira.jpg"),
     "cores": [
       {
-        "nome": "Madeira",
+        "nome": "Jogo de bebidas",
         "hex": "#c4a77d",
         "hexes": [
           "#c4a77d"
         ],
-        "imagem": pub("/lifestyle/torre-de-madeira.jpg")
+        "imagem": pub("/placeholder-modelo.svg")
+      },
+      {
+        "nome": "Para crianças",
+        "hex": "#c4a77d",
+        "hexes": [
+          "#c4a77d"
+        ],
+        "imagem": pub("/placeholder-modelo.svg")
       }
     ],
     "tamanhos": [
@@ -10534,15 +10632,15 @@ export const modelos: Modelo[] = [
     "precos": [
       [
         "0–99 unidades",
-        "5,00€"
+        "17,50€"
       ],
       [
         "100–499 unidades",
-        "4,50€"
+        "15,75€"
       ],
       [
         "+499 unidades",
-        "4,00€"
+        "14,00€"
       ]
     ],
     "caracteristicas": [

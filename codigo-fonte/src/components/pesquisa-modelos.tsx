@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { modelos } from "@/lib/catalogo";
+import { modelos, getCategoria } from "@/lib/catalogo";
 
 function normalizar(texto: string): string {
   return texto
@@ -125,7 +125,7 @@ export function PesquisaModelos() {
                     <div className="min-w-0">
                       <p className="text-sm font-medium truncate">{m.nome}</p>
                       <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground truncate">
-                        {m.subcategoria}
+                        {getCategoria(m.categoria)?.nome ?? ""}
                       </p>
                     </div>
                   </Link>

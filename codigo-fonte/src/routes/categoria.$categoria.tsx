@@ -65,14 +65,28 @@ function CategoriaPage() {
               Início
             </Link>
             <span>/</span>
-            <span className="text-foreground">{categoria.nome}</span>
+            {filtro !== "Todos" ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => navigate({ search: { sub: undefined, tipo: undefined } as any })}
+                  className="uppercase tracking-widest hover:text-foreground transition-colors"
+                >
+                  {categoria.nome}
+                </button>
+                <span>/</span>
+                <span className="text-foreground">{filtro}</span>
+              </>
+            ) : (
+              <span className="text-foreground">{categoria.nome}</span>
+            )}
           </nav>
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4 sm:flex sm:justify-between sm:gap-6">
             <h1 className="font-display text-3xl sm:text-4xl md:text-6xl">
               {categoria.nome}
             </h1>
             <span className="shrink-0 text-[10px] sm:text-[11px] uppercase tracking-widest text-muted-foreground whitespace-nowrap">
-              {modelos.length} Modelos
+              {visiveis.length} Modelos
             </span>
           </div>
 
@@ -83,48 +97,31 @@ function CategoriaPage() {
       </section>
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-10 md:py-16">
-        {/* Filtro principal: tipos quando uma subcategoria com variações está selecionada; caso contrário subcategorias */}
-        <div className="-mx-4 sm:mx-0 px-4 sm:px-0 mb-10 md:mb-16 flex gap-2.5 sm:gap-3 overflow-x-auto sm:flex-wrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {familia ? (
-            <>
-              <button
-                onClick={() =>
-                  navigate({
-                    search: { sub: undefined, tipo: undefined } as any,
-                  })
-                }
-                className="shrink-0 px-4 sm:px-5 py-2 rounded-full text-[10px] sm:text-[11px] uppercase tracking-widest border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+        {/* Subcategoria escolhida: botão «Voltar» igual em todas as categorias; caso contrário, filtros */}
+        {filtro !== "Todos" ? (
+          <div className="mb-10 md:mb-16 flex flex-wrap items-center gap-x-5 gap-y-3">
+            <button
+              type="button"
+              onClick={() => navigate({ search: { sub: undefined, tipo: undefined } as any })}
+              className="group inline-flex items-center gap-3 rounded-full border border-accent bg-accent py-1.5 pl-1.5 pr-5 text-[11px] font-medium uppercase tracking-widest text-accent-foreground shadow-sm transition-colors hover:border-accent/50 hover:bg-accent/10 hover:text-foreground"
+            >
+              <span
+                aria-hidden="true"
+                className="flex size-8 items-center justify-center rounded-full bg-accent-foreground text-sm text-accent transition-all group-hover:-translate-x-0.5 group-hover:bg-accent group-hover:text-accent-foreground"
               >
-                ← {familia.nome}
-              </button>
-              {familia.subcategorias.length > 1 && (
-                <>
-                  <span className="w-px bg-border shrink-0" />
-                  {tipos.map((t) => (
-                    <button
-                      key={t}
-                      onClick={() =>
-                        navigate({
-                          search: {
-                            sub: filtro,
-                            tipo: t === "Todos" ? undefined : t,
-                          } as any,
-                        })
-                      }
-                      className={`shrink-0 px-4 sm:px-5 py-2 rounded-full text-[10px] sm:text-[11px] uppercase tracking-widest transition-colors ${
-                        tipo === t
-                          ? "bg-primary text-primary-foreground"
-                          : "border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
-                      }`}
-                    >
-                      {t}
-                    </button>
-                  ))}
-                </>
-              )}
-            </>
-          ) : (
-            opcoes.map((op) => (
+                ←
+              </span>
+              Voltar
+            </button>
+            <span className="text-[11px] uppercase tracking-widest text-muted-foreground">
+              {categoria.nome} <span className="mx-1.5">/</span>
+              <span className="text-foreground font-medium">{filtro}</span>
+            </span>
+          </div>
+        ) : (
+          opcoes.length > 1 && (
+            <div className="-mx-4 sm:mx-0 px-4 sm:px-0 mb-10 md:mb-16 flex gap-2.5 sm:gap-3 overflow-x-auto sm:flex-wrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {opcoes.map((op) => (
               <button
                 key={op}
                 onClick={() => {
@@ -146,9 +143,10 @@ function CategoriaPage() {
               >
                 {op}
               </button>
-            ))
-          )}
-        </div>
+            ))}
+            </div>
+          )
+        )}
 
 
         {visiveis.length === 0 ? (

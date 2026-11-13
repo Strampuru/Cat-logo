@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useState, type MouseEvent } from "react";
 import { useSwipe } from "@/hooks/use-swipe";
 import { coresDaFaixa } from "@/lib/catalogo";
+import { DESCONTO, emPromocao } from "@/lib/promocoes";
 import type { FaixaEtaria, Modelo } from "@/lib/catalogo";
 
 export function ModelCard({ modelo, faixa }: { modelo: Modelo; faixa?: FaixaEtaria }) {
@@ -118,9 +119,11 @@ export function ModelCard({ modelo, faixa }: { modelo: Modelo; faixa?: FaixaEtar
             } duration-700 ease-out group-hover:scale-[1.07]`}
           />
         )}
-        <span className="absolute left-3 top-3 rounded-full bg-background/85 px-2.5 py-1 text-[9px] uppercase tracking-[0.18em] text-muted-foreground backdrop-blur-sm">
-          {modelo.subcategoria}
-        </span>
+        {emPromocao(modelo.id) && (
+          <span className="absolute left-3 top-3 z-10 rounded-full bg-accent px-2.5 py-1 text-[10px] font-bold tracking-wider text-accent-foreground shadow-md">
+            −{Math.round(DESCONTO * 100)}%
+          </span>
+        )}
         <span className="absolute right-3 bottom-3 rounded-full bg-foreground/85 px-2.5 py-1 text-[9px] uppercase tracking-[0.15em] text-background opacity-0 translate-y-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">
           Ver modelo
         </span>
@@ -154,7 +157,7 @@ export function ModelCard({ modelo, faixa }: { modelo: Modelo; faixa?: FaixaEtar
           {modelo.nome}
         </span>
         <span className="text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-widest whitespace-nowrap">
-          {coresBase.length} cores
+          {coresBase.length} {modelo.opcoesModelos ? (coresBase.length === 1 ? "modelo" : "modelos") : coresBase.length === 1 ? "cor" : "cores"}
         </span>
       </div>
       <div className="mt-3 flex items-center gap-2.5 sm:gap-2">
@@ -189,8 +192,8 @@ export function ModelCard({ modelo, faixa }: { modelo: Modelo; faixa?: FaixaEtar
         {corAtiva?.nome ??
           (emUso ? (
             <>
-              <span className="sm:hidden">Toque nas cores</span>
-              <span className="hidden sm:inline">Passe o rato nas cores</span>
+              <span className="sm:hidden">{modelo.opcoesModelos ? "Toque nos modelos" : "Toque nas cores"}</span>
+              <span className="hidden sm:inline">{modelo.opcoesModelos ? "Passe o rato nos modelos" : "Passe o rato nas cores"}</span>
             </>
           ) : (
             ""

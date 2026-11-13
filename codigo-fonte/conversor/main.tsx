@@ -8,8 +8,9 @@ import { Route as CatalogoRoute } from "@/routes/catalogo";
 import { Route as CategoriaRoute } from "@/routes/categoria.$categoria";
 import { Route as ModeloRoute } from "@/routes/modelo.$id";
 import { Route as ContactosRoute } from "@/routes/contactos";
+import { Route as DestaqueRoute } from "@/routes/destaque.$id";
 
-const routes: RouteDef[] = [IndexRoute, CatalogoRoute, CategoriaRoute, ModeloRoute, ContactosRoute];
+const routes: RouteDef[] = [IndexRoute, CatalogoRoute, CategoriaRoute, ModeloRoute, ContactosRoute, DestaqueRoute];
 const DEFAULT_TITLE = "STRAM PURU — Catálogo de Vestuário";
 
 function NotFoundComponent() {

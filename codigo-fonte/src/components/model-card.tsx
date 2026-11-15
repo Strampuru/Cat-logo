@@ -3,6 +3,7 @@ import { useEffect, useState, type MouseEvent } from "react";
 import { useSwipe } from "@/hooks/use-swipe";
 import { coresDaFaixa } from "@/lib/catalogo";
 import { DESCONTO, emPromocao } from "@/lib/promocoes";
+import { eNovidade } from "@/lib/destaques";
 import type { FaixaEtaria, Modelo } from "@/lib/catalogo";
 
 export function ModelCard({ modelo, faixa }: { modelo: Modelo; faixa?: FaixaEtaria }) {
@@ -125,10 +126,19 @@ export function ModelCard({ modelo, faixa }: { modelo: Modelo; faixa?: FaixaEtar
             } duration-700 ease-out group-hover:scale-[1.07]`}
           />
         )}
-        {emPromocao(modelo.id) && (
-          <span className="absolute left-3 top-3 z-10 rounded-full bg-accent px-2.5 py-1 text-[10px] font-bold tracking-wider text-accent-foreground shadow-md">
-            −{Math.round(DESCONTO * 100)}%
-          </span>
+        {(eNovidade(modelo.id) || emPromocao(modelo.id)) && (
+          <div className="absolute left-3 top-3 z-10 flex flex-col items-start gap-1.5">
+            {eNovidade(modelo.id) && (
+              <span className="rounded-full bg-foreground px-2.5 py-1 text-[9px] sm:text-[10px] font-semibold uppercase tracking-[0.15em] text-background shadow-md">
+                Novidade
+              </span>
+            )}
+            {emPromocao(modelo.id) && (
+              <span className="rounded-full bg-accent px-2.5 py-1 text-[10px] font-bold tracking-wider text-accent-foreground shadow-md">
+                −{Math.round(DESCONTO * 100)}%
+              </span>
+            )}
+          </div>
         )}
         <span className="absolute right-3 bottom-3 rounded-full bg-foreground/85 px-2.5 py-1 text-[9px] uppercase tracking-[0.15em] text-background opacity-0 translate-y-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">
           Ver modelo

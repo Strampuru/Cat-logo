@@ -613,10 +613,6 @@ export type Modelo = {
   escolhaIdade?: boolean;
   /** true = a lista «cores» representa modelos/versões (mostra botões com o nome em vez de círculos de cor). */
   opcoesModelos?: boolean;
-  /** Título da tabela de preços (omitido = «Preços por quantidade»). */
-  tituloPrecos?: string;
-  /** Nota por baixo da tabela de preços (substitui a nota geral). */
-  notaPrecos?: string;
 };
 
 export type FaixaEtaria = "adulto" | "crianca";
@@ -689,7 +685,7 @@ export const categorias: Categoria[] = [
   { id: "mulher", nome: "Mulher", titulo: "Mulher", descricao: "Vestuário de adulto para personalizar.", imagem: "", subcategorias: ["T-shirts", "Polos", "Sweats", "Jaquetas"] },
   { id: "crianca", nome: "Criança", titulo: "Criança", descricao: "Modelos disponíveis em tamanhos de criança.", imagem: "", subcategorias: ["T-shirts", "Polos", "Sweats", "Babetes", "Bodies"] },
   { id: "conjuntos", nome: "Conjuntos", titulo: "Conjuntos", descricao: "Coleções com várias peças.", imagem: "", subcategorias: [] },
-  { id: "brindes", nome: "Outros", titulo: "Outros", descricao: "Outros artigos para personalizar.", imagem: "", subcategorias: ["Coletes desportivos", "Sacos", "Cozinha", "Canecas", "Bases", "Jogos", "Fotografias"] },
+  { id: "brindes", nome: "Outros", titulo: "Outros", descricao: "Outros artigos para personalizar.", imagem: "", subcategorias: ["Coletes desportivos", "Sacos", "Cozinha", "Canecas", "Bases", "Jogos"] },
 ];
 
 export function getSubcategoriaModelo(modelo: Modelo, categoria: CategoriaId): string {
@@ -10608,7 +10604,7 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#c4a77d"
         ],
-        "imagem": pub("/lifestyle/torre-bebidas.webp")
+        "imagem": pub("/placeholder-modelo.svg")
       },
       {
         "nome": "Para crianças",
@@ -10616,7 +10612,7 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#c4a77d"
         ],
-        "imagem": pub("/lifestyle/torre-criancas.webp")
+        "imagem": pub("/placeholder-modelo.svg")
       }
     ],
     "tamanhos": [
@@ -10650,76 +10646,6 @@ export const modelos: Modelo[] = [
     "caracteristicas": [
       "Material e dimensões a confirmar",
       "Detalhes e cores a confirmar"
-    ]
-  },
-  {
-    "id": "atlantida",
-    "semFicha": true,
-    "semLegenda": true,
-    "semNotaTamanhos": true,
-    "fotosCheias": true,
-    "soFotoPrincipal": true,
-    "nome": "Fotografia em Alumínio ATLÂNTIDA",
-    "referenciaNome": "ATLÂNTIDA",
-    "categoria": "brindes",
-    "subcategoria": "Fotografias",
-    "genero": "unissexo",
-    "descricao": "Imagem impressa diretamente em alumínio, com cores vivas, nitidez impressionante e um acabamento feito para durar. Ideal para dar destaque ao logótipo da sua marca no escritório, na loja ou num evento, ou para transformar uma fotografia num presente único para oferecer a alguém especial. Leve e resistente, tem as costas em alumínio escovado e um suporte que a mantém de pé em qualquer mesa, móvel ou secretária. Disponível em três tamanhos.",
-    "composicao": "Alumínio",
-    "referencia": "#ATL-ALU",
-    "imagem": pub("/lifestyle/atlantida.webp"),
-    "lifestyle": pub("/lifestyle/atlantida.webp"),
-    "cores": [
-      {
-        "nome": "Branco",
-        "hex": "#ffffff",
-        "hexes": [
-          "#ffffff"
-        ],
-        "imagem": pub("/lifestyle/atlantida.webp")
-      }
-    ],
-    "tamanhos": [
-      [
-        "Tamanho",
-        "10×15",
-        "15×20",
-        "20×25"
-      ],
-      [
-        "Largura",
-        "10 cm",
-        "15 cm",
-        "20 cm"
-      ],
-      [
-        "Altura",
-        "15 cm",
-        "20 cm",
-        "25 cm"
-      ]
-    ],
-    "tituloPrecos": "Preços por tamanho",
-    "notaPrecos": "Valor por unidade, já com a personalização. Pode ser alterado consoante as quantidades.",
-    "precos": [
-      [
-        "10×15 cm",
-        "7,99€"
-      ],
-      [
-        "15×20 cm",
-        "9,99€"
-      ],
-      [
-        "20×25 cm",
-        "11,99€"
-      ]
-    ],
-    "caracteristicas": [
-      "Impressão a cores diretamente no alumínio",
-      "Costas em alumínio escovado",
-      "Suporte de mesa incluído",
-      "Três tamanhos: 10×15, 15×20 e 20×25 cm"
     ]
   }
 ];

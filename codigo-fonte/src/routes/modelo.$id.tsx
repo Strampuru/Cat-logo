@@ -15,6 +15,11 @@ function Preco({ modeloId, preco, className = "" }: { modeloId: string; preco: s
   );
 }
 
+/** Esconde composições provisórias («a confirmar») ou que remetem para outra secção. */
+function composicaoVisivel(c?: string) {
+  return !!c && !/a confirmar|ver cada modelo/i.test(c);
+}
+
 function NotaPrecos() {
   return (
     <p className="flex items-start gap-2 pt-1 text-[11px] leading-relaxed text-muted-foreground">
@@ -218,7 +223,7 @@ function PecaCard({
             </span>
           )}
         </div>
-        {!modelo.semFicha && <p className="text-[11px] text-muted-foreground">{peca.composicao}</p>}
+        {composicaoVisivel(peca.composicao) && <p className="text-[11px] text-muted-foreground">{peca.composicao}</p>}
 
         {corControlada === undefined && peca.cores.length > 0 && (
           <div className="flex flex-wrap items-center gap-2 pt-1">
@@ -499,7 +504,7 @@ function ConfiguradorAbuDhabi({ modelo, categoria, pecas }: {
                 <h2 className="font-display text-2xl italic">{peca.nome}</h2>
                 <p className="text-[9px] tracking-[0.2em] uppercase text-accent font-medium">{corAtual?.nome}</p>
               </div>
-              {!modelo.semFicha && <p className="text-xs text-muted-foreground">{peca.composicao}</p>}
+              {composicaoVisivel(peca.composicao) && <p className="text-xs text-muted-foreground">{peca.composicao}</p>}
             </div>
 
             {/* Controlos */}
@@ -851,14 +856,18 @@ function DetalheModelo({
           )}
 
           {/* Ficha */}
-          {!modelo.semFicha && (
+          {(!modelo.semFicha || composicaoVisivel(vista.composicao)) && (
           <div className="pt-10 border-t border-border flex flex-col gap-6">
+            {composicaoVisivel(vista.composicao) && (
             <div className="flex justify-between items-start gap-6">
               <span className="text-sm">Composição</span>
               <span className="text-sm text-muted-foreground text-right">
                 {vista.composicao}
               </span>
             </div>
+            )}
+            {!modelo.semFicha && (
+            <>
             <div className="flex justify-between items-center">
               <span className="text-sm">Referência</span>
               <span className="text-sm text-muted-foreground">
@@ -871,6 +880,8 @@ function DetalheModelo({
                 {categoria?.titulo ?? modelo.subcategoria}
               </span>
             </div>
+            </>
+            )}
           </div>
           )}
 

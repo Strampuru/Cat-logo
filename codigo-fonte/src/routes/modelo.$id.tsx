@@ -52,6 +52,7 @@ import { getCategoria, coresDaFaixa, tamanhosDaFaixa } from "@/lib/catalogo";
 import { getModeloComNatal, eModeloNatal } from "@/lib/natal";
 import { TemporizadorPequeno } from "@/components/temporizador";
 import { FIM_NATAL } from "@/lib/tempo";
+import { AvisoStockLimitado } from "@/components/stock-limitado";
 import type { Categoria, Cor, FaixaEtaria, Modelo, Peca } from "@/lib/catalogo";
 
 export const Route = createFileRoute("/modelo/$id")({
@@ -887,6 +888,8 @@ function DetalheModelo({
             )}
           </div>
           )}
+
+          {modelo.stockLimitado && <AvisoStockLimitado />}
 
           {/* Temporizador da campanha de Natal */}
           {eModeloNatal(modelo.id) && (

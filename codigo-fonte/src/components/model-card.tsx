@@ -7,6 +7,7 @@ import { eNovidade } from "@/lib/destaques";
 import type { FaixaEtaria, Modelo } from "@/lib/catalogo";
 import { FitaPresente } from "@/components/fita-presente";
 import { TemporizadorPequeno } from "@/components/temporizador";
+import { SeloStockLimitado } from "@/components/stock-limitado";
 
 export function ModelCard({ modelo, faixa, presente, fim }: { modelo: Modelo; faixa?: FaixaEtaria; presente?: boolean; fim?: number }) {
   // Na secção Criança, os modelos com escolhaIdade só mostram as cores de criança
@@ -129,6 +130,7 @@ export function ModelCard({ modelo, faixa, presente, fim }: { modelo: Modelo; fa
           />
         )}
         {presente && <FitaPresente />}
+        {modelo.stockLimitado && <SeloStockLimitado />}
         {fim !== undefined && <TemporizadorPequeno fim={fim} style={{ left: 10, bottom: 10 }} />}
         {(eNovidade(modelo.id) || emPromocao(modelo.id)) && (
           <div className="absolute left-3 top-3 z-10 flex flex-col items-start gap-1.5">

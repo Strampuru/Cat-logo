@@ -617,6 +617,8 @@ export type Modelo = {
   tituloPrecos?: string;
   /** Nota por baixo da tabela de preços (substitui a nota geral). */
   notaPrecos?: string;
+  /** true = mostra o selo e o aviso «Stock limitado». */
+  stockLimitado?: boolean;
 };
 
 export type FaixaEtaria = "adulto" | "crianca";

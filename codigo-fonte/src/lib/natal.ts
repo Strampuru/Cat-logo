@@ -147,11 +147,10 @@ export const modelosNatal: Modelo[] = [
       { nome: "Desenhos infantis", hex: "#d9c3a0", hexes: ["#d9c3a0"], imagem: pub("/natal/bolas-desenhos.webp") },
     ],
     caracteristicas: ["Madeira natural gravada a laser", "Fita ou cordel para pendurar", "Personalizável com frases, nomes ou desenhos"],
-    precos: [
-      ["0–99 unidades", "2,50€"],
-      ["100–499 unidades", "2,25€"],
-      ["Mais de 499 unidades", "1,75€"],
-    ],
+    precos: [["Preço por unidade", "2,50€"]],
+    notaPrecos: "Stock limitado: preço por unidade, já com a personalização, enquanto houver stock.",
+    tituloPrecos: "Preço",
+    stockLimitado: true,
   }),
   natal("torre-de-madeira", {
     id: "natal-velas",
@@ -170,8 +169,10 @@ export const modelosNatal: Modelo[] = [
       { nome: "Boneco de neve", hex: "#e8dcc4", hexes: ["#e8dcc4"], imagem: pub("/natal/velas-boneco.webp") },
       { nome: "Sino", hex: "#e8dcc4", hexes: ["#e8dcc4"], imagem: pub("/natal/velas-sino.webp") },
     ],
-    precos: [["Preço", "Sob consulta"]],
-    notaPrecos: "Peça-nos um orçamento: o preço depende da quantidade e da personalização.",
+    precos: [["Preço por unidade", "3,50€"]],
+    notaPrecos: "Stock limitado: preço por unidade, já com a personalização, enquanto houver stock.",
+    tituloPrecos: "Preço",
+    stockLimitado: true,
   }),
 ];
 

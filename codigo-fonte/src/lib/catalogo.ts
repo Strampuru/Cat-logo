@@ -550,6 +550,8 @@ export type Cor = {
   /** Hexes adicionais para cores combinadas (bicolor / tricolor). */
   hexes: string[];
   imagem: string;
+  /** Fotos adicionais desta cor/opção (aparecem na galeria logo a seguir à foto principal). */
+  imagensExtra?: { src: string; legenda: string }[];
   /** true = esta cor só existe em tamanhos de adulto (não aparece em «Criança»). */
   soAdulto?: boolean;
   /** true = esta cor só existe em tamanhos de criança (não aparece em «Adulto»). */
@@ -10610,7 +10612,10 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#c4a77d"
         ],
-        "imagem": pub("/lifestyle/torre-bebidas.webp")
+        "imagem": pub("/lifestyle/torre-bebidas.webp"),
+        "imagensExtra": [
+          { "src": pub("/lifestyle/torre-bebidas-pecas.webp"), "legenda": "Exemplo das peças do jogo de bebidas" }
+        ]
       },
       {
         "nome": "Para crianças",
@@ -10618,7 +10623,10 @@ export const modelos: Modelo[] = [
         "hexes": [
           "#c4a77d"
         ],
-        "imagem": pub("/lifestyle/torre-criancas.webp")
+        "imagem": pub("/lifestyle/torre-criancas.webp"),
+        "imagensExtra": [
+          { "src": pub("/lifestyle/torre-criancas-pecas.webp"), "legenda": "Exemplo das peças do jogo para crianças" }
+        ]
       }
     ],
     "tamanhos": [

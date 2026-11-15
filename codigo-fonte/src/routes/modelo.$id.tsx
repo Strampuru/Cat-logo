@@ -651,12 +651,20 @@ function DetalheModelo({
           },
         ]
       : []),
-    ...(modelo.soFotoPrincipal && vista.lifestyle ? [] : coresV).map((c, i) => ({
-      src: c.imagem,
-      alt: `${modelo.nome} — ${c.nome}`,
-      legenda: `${modelo.referenciaNome}${vista.titulo ? ` ${vista.titulo}` : ""} — ${c.nome}`,
-      corIndex: i,
-    })),
+    ...(modelo.soFotoPrincipal && vista.lifestyle ? [] : coresV).flatMap((c, i) => [
+      {
+        src: c.imagem,
+        alt: `${modelo.nome} — ${c.nome}`,
+        legenda: `${modelo.referenciaNome}${vista.titulo ? ` ${vista.titulo}` : ""} — ${c.nome}`,
+        corIndex: i,
+      },
+      ...(c.imagensExtra ?? []).map((e) => ({
+        src: e.src,
+        alt: `${modelo.nome} — ${c.nome} — ${e.legenda}`,
+        legenda: e.legenda,
+        corIndex: i,
+      })),
+    ]),
   ];
 
   const [slide, setSlide] = useState(0);
@@ -694,7 +702,13 @@ function DetalheModelo({
     const i = nomeCor ? novas.findIndex((c) => c.nome === nomeCor) : -1;
     const fotosCores = !(modelo.soFotoPrincipal && vista.lifestyle);
     setFaixa(nova);
-    setSlide(i >= 0 && fotosCores ? i + (vista.lifestyle ? 1 : 0) : 0);
+    if (i < 0 || !fotosCores) {
+      setSlide(0);
+    } else {
+      let pos = vista.lifestyle ? 1 : 0;
+      for (let k = 0; k < i; k++) pos += 1 + (novas[k].imagensExtra?.length ?? 0);
+      setSlide(pos);
+    }
   };
   const totalCores = vista.cores.length;
 

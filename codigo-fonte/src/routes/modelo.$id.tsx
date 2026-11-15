@@ -1,3 +1,4 @@
+import { BotaoEncomendar } from "@/components/botao-encomendar";
 import { createFileRoute, notFound, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { SiteLayout } from "@/components/site-layout";
@@ -411,6 +412,8 @@ function DetalheConjunto({
           </div>
         )}
 
+        <BotaoEncomendar modelo={modelo.nome} />
+
         <VoltarPaginaAnterior />
       </section>
     </>
@@ -611,6 +614,7 @@ function ConfiguradorAbuDhabi({ modelo, categoria, pecas }: {
               <div className="divide-y divide-border mt-4">{modelo.precos.map(([quantidade, preco]) => <div key={quantidade} className="flex justify-between py-2 text-xs"><span className="text-muted-foreground">{quantidade}</span><span>{preco} / unidade</span></div>)}</div><div className="mt-3"><NotaPrecos /></div>
             </details>
           )}
+          <BotaoEncomendar modelo={modelo.nome} />
         </aside>
       </div>
       <div className="mt-12"><VoltarPaginaAnterior /></div>
@@ -924,6 +928,8 @@ function DetalheModelo({
               )}
             </div>
           )}
+
+          <BotaoEncomendar modelo={modelo.nome} />
 
           <VoltarPaginaAnterior />
         </div>

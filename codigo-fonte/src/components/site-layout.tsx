@@ -82,30 +82,6 @@ export function SiteLayout({ children }: { children: ReactNode }) {
                   Peças pensadas ao pormenor, prontas a ganhar a sua marca.
                 </p>
               </div>
-              <div className="space-y-4">
-                <h4 className="text-[11px] uppercase tracking-widest font-bold">
-                  Informação
-                </h4>
-                <ul className="text-[11px] uppercase tracking-[0.15em] space-y-2 text-muted-foreground">
-                  <li>
-                    <Link
-                      to="/"
-                      hash="sobre-nos"
-                      className="hover:text-foreground transition-colors"
-                    >
-                      Sobre nós
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/contactos"
-                      className="hover:text-foreground transition-colors"
-                    >
-                      Contactos
-                    </Link>
-                  </li>
-                </ul>
-              </div>
             </div>
             <div className="flex items-center gap-3">
               <a

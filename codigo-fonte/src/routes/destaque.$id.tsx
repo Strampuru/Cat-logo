@@ -5,6 +5,7 @@ import { modelos } from "@/lib/catalogo";
 import { destaques, getDestaque } from "@/lib/destaques";
 import { PaginaPromocoes } from "@/components/pagina-promocoes";
 import { BotaoVoltarInicio } from "@/components/botao-voltar-inicio";
+import { GaleriaTrabalhos } from "@/components/galeria-trabalhos";
 
 export const Route = createFileRoute("/destaque/$id")({
   loader: ({ params }) => {
@@ -67,7 +68,9 @@ function DestaquePage() {
         <div className="mb-8 md:mb-10">
           <BotaoVoltarInicio />
         </div>
-        {itens.length > 0 ? (
+        {destaque.fotos && destaque.fotos.length > 0 ? (
+          <GaleriaTrabalhos fotos={destaque.fotos} />
+        ) : itens.length > 0 ? (
           <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6 sm:gap-y-12 md:grid-cols-4">
             {itens.map((m) => (
               <ModelCard key={m.id} modelo={m} />

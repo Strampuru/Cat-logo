@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { categorias, getFamiliaPorSubcategoria } from "@/lib/catalogo";
 import { destaques } from "@/lib/destaques";
@@ -29,6 +29,17 @@ export function CatalogoSidebar({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [aberta, onFechar]);
+
+  const navegar = useNavigate();
+  const irParaSobreNos = () => {
+    onFechar();
+    const rolar = (tentativas: number) => {
+      const el = document.getElementById("sobre-nos");
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      else if (tentativas > 0) window.setTimeout(() => rolar(tentativas - 1), 100);
+    };
+    void navegar({ to: "/" }).then(() => window.setTimeout(() => rolar(20), 50));
+  };
 
   return (
     <>
@@ -223,6 +234,13 @@ export function CatalogoSidebar({
         </nav>
 
         <div className="px-6 py-6 border-t border-border shrink-0 space-y-3 text-[11px] uppercase tracking-[0.2em]">
+          <button
+            type="button"
+            onClick={irParaSobreNos}
+            className="block text-left uppercase tracking-[0.2em] text-muted-foreground hover:text-accent transition-colors"
+          >
+            Sobre nós
+          </button>
           <Link
             to="/contactos"
             onClick={onFechar}

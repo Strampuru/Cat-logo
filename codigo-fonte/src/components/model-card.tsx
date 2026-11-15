@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useState, type MouseEvent } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import { useSwipe } from "@/hooks/use-swipe";
 import { coresDaFaixa } from "@/lib/catalogo";
 import { DESCONTO, emPromocao } from "@/lib/promocoes";
@@ -9,6 +9,12 @@ export function ModelCard({ modelo, faixa }: { modelo: Modelo; faixa?: FaixaEtar
   // Na secção Criança, os modelos com escolhaIdade só mostram as cores de criança
   const faixaCartao = modelo.escolhaIdade && faixa ? faixa : undefined;
   const [ativa, setAtiva] = useState<number | null>(null);
+  // Ao fim de 10 s sem nova interação, volta à imagem «em uso»
+  useEffect(() => {
+    if (ativa === null) return;
+    const t = window.setTimeout(() => setAtiva(null), 10_000);
+    return () => window.clearTimeout(t);
+  }, [ativa]);
   const pecas = modelo.pecas;
   const mostraPecas =
     Boolean(pecas && pecas.length > 1) &&
@@ -189,15 +195,7 @@ export function ModelCard({ modelo, faixa }: { modelo: Modelo; faixa?: FaixaEtar
         )}
       </div>
       <span className="mt-2 block h-3 text-[9px] sm:text-[10px] uppercase tracking-widest text-muted-foreground truncate">
-        {corAtiva?.nome ??
-          (emUso ? (
-            <>
-              <span className="sm:hidden">{modelo.opcoesModelos ? "Toque nos modelos" : "Toque nas cores"}</span>
-              <span className="hidden sm:inline">{modelo.opcoesModelos ? "Passe o rato nos modelos" : "Passe o rato nas cores"}</span>
-            </>
-          ) : (
-            ""
-          ))}
+        {corAtiva?.nome ?? ""}
       </span>
     </Link>
   );

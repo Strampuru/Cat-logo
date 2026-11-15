@@ -15,6 +15,18 @@ function Preco({ modeloId, preco, className = "" }: { modeloId: string; preco: s
   );
 }
 
+function NotaPrecos() {
+  return (
+    <p className="flex items-start gap-2 pt-1 text-[11px] leading-relaxed text-muted-foreground">
+      <span aria-hidden="true" className="mt-[3px] inline-block size-1.5 shrink-0 rounded-full bg-accent" />
+      <span>
+        Preços por unidade, <strong className="font-medium text-foreground">com personalização incluída</strong>.
+        Portes de envio não incluídos.
+      </span>
+    </p>
+  );
+}
+
 function SeloPromocao({ modeloId }: { modeloId: string }) {
   if (!emPromocao(modeloId)) return null;
   return (
@@ -386,6 +398,7 @@ function DetalheConjunto({
                 </div>
               ))}
             </div>
+            <NotaPrecos />
           </div>
         )}
 
@@ -586,7 +599,7 @@ function ConfiguradorAbuDhabi({ modelo, categoria, pecas }: {
           {modelo.precos.length > 0 && (
             <details className="group border-t border-border pt-5">
               <summary className="cursor-pointer list-none flex justify-between text-[10px] uppercase tracking-[0.2em] font-bold">Tabela de preços<span className="transition-transform group-open:rotate-180">⌄</span></summary>
-              <div className="divide-y divide-border mt-4">{modelo.precos.map(([quantidade, preco]) => <div key={quantidade} className="flex justify-between py-2 text-xs"><span className="text-muted-foreground">{quantidade}</span><span>{preco} / unidade</span></div>)}</div>
+              <div className="divide-y divide-border mt-4">{modelo.precos.map(([quantidade, preco]) => <div key={quantidade} className="flex justify-between py-2 text-xs"><span className="text-muted-foreground">{quantidade}</span><span>{preco} / unidade</span></div>)}</div><div className="mt-3"><NotaPrecos /></div>
             </details>
           )}
         </aside>
@@ -865,7 +878,7 @@ function DetalheModelo({
           {vista.precos.length > 0 && (
             <div className="space-y-4">
               <h2 className="text-[11px] uppercase tracking-widest font-semibold">
-                Preços por quantidade
+                {modelo.tituloPrecos ?? "Preços por quantidade"}
                 {vista.titulo ? ` — ${vista.titulo}` : ""}
               </h2>
               <div className="divide-y divide-border border-y border-border">
@@ -876,6 +889,11 @@ function DetalheModelo({
                   </div>
                 ))}
               </div>
+              {modelo.notaPrecos ? (
+                <p className="text-[12px] text-muted-foreground leading-relaxed">{modelo.notaPrecos}</p>
+              ) : (
+                <NotaPrecos />
+              )}
             </div>
           )}
 

@@ -27,10 +27,9 @@
       // mude FOTOS_LOCAIS para false.
       window.FOTOS_LOCAIS = true;
       window.__IMG = function (p) {
-        if (p.charAt(0) !== "/") return p;
-        var m = window.FOTOS_LOCAIS && p.match(/^\/__l5e\/assets-v1\/[^\/]+\/(.+)\.[a-z0-9]+$/i);
+        var m = window.FOTOS_LOCAIS && String(p).match(/\/__l5e\/assets-v1\/[^\/]+\/([^\/?#]+)\.[a-z0-9]+$/i);
         if (m) return "./lovable/" + m[1] + ".webp";
-        return (window.IMAGENS_ORIGEM || "") + p;
+        return p.charAt(0) === "/" ? (window.IMAGENS_ORIGEM || "") + p : p;
       };
     </script>
   </head>

@@ -67,7 +67,7 @@ const GRUPOS: Grupo[] = [
     titulo: "Outros artigos",
     descricao: "Sacos, canecas, aventais, coletes e brindes para levar a sua marca a todo o lado.",
     filtro: (m) => m.categoria === "brindes",
-    ordemSub: ["Sacos", "Canecas", "Cozinha", "Coletes desportivos", "Bases", "Jogos"],
+    ordemSub: ["Sacos", "Canecas", "Cozinha", "Coletes desportivos", "Bases", "Jogos", "Fotografias"],
     link: { to: "/categoria/$categoria", params: { categoria: "brindes" } },
   },
 ];

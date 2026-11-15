@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { DESCONTO, modelosEmPromocao } from "@/lib/promocoes";
+import { cicloAtual, DESCONTO, modelosEmPromocao } from "@/lib/promocoes";
+import { FIM_NATAL, useAgora } from "@/lib/tempo";
+import { TemporizadorPequeno } from "@/components/temporizador";
 import { getDestaque } from "@/lib/destaques";
 
 /**
@@ -153,7 +155,10 @@ export function BannerPrincipal() {
   const [pausa, setPausa] = useState(false);
   const toque = useRef<{ x: number; y: number } | null>(null);
   const arrastou = useRef(false);
-  const total = SLIDES.length;
+  // O banner do Especial de Natal desaparece quando a campanha acaba
+  const agora = useAgora(30_000);
+  const slides = SLIDES.filter((s) => s.destino !== "natal" || agora < FIM_NATAL);
+  const total = slides.length;
   const [fotosPromo, setFotosPromo] = useState<string[]>([]);
 
   useEffect(() => {
@@ -165,6 +170,10 @@ export function BannerPrincipal() {
   }, []);
 
   const ir = (i: number) => setAtual(((i % total) + total) % total);
+
+  useEffect(() => {
+    if (atual >= total) setAtual(0);
+  }, [atual, total]);
 
   useEffect(() => {
     if (pausa) return;
@@ -205,7 +214,7 @@ export function BannerPrincipal() {
       }}
     >
       <div className="relative aspect-[4/5] sm:aspect-[16/9] md:aspect-[21/9] w-full">
-        {SLIDES.map((s, i) => (
+        {slides.map((s, i) => (
           <Link
             key={s.titulo}
             to="/destaque/$id"
@@ -303,6 +312,17 @@ export function BannerPrincipal() {
                 </div>
               </div>
             </div>
+            {s.destino === "natal" && (
+              <TemporizadorPequeno fim={FIM_NATAL} rotulo="Termina em" style={{ right: 14, bottom: 14 }} />
+            )}
+            {s.promocao && (
+              <TemporizadorPequeno
+                fim={cicloAtual(agora).fim}
+                rotulo="Termina em"
+                cor="var(--accent)"
+                style={{ right: 14, bottom: 14 }}
+              />
+            )}
           </Link>
         ))}
 
@@ -314,7 +334,7 @@ export function BannerPrincipal() {
         </button>
 
         <div className="absolute bottom-5 md:bottom-7 left-0 right-0 z-20 flex justify-center gap-2.5">
-          {SLIDES.map((s, i) => (
+          {slides.map((s, i) => (
             <button
               key={s.titulo}
               type="button"

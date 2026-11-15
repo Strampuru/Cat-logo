@@ -1,11 +1,14 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site-layout";
 import { ModelCard } from "@/components/model-card";
-import { modelos } from "@/lib/catalogo";
+import { getModeloComNatal } from "@/lib/natal";
 import { destaques, getDestaque } from "@/lib/destaques";
 import { PaginaPromocoes } from "@/components/pagina-promocoes";
 import { BotaoVoltarInicio } from "@/components/botao-voltar-inicio";
 import { GaleriaTrabalhos } from "@/components/galeria-trabalhos";
+import { ContagemNatal } from "@/components/contagem-natal";
+import { FIM_NATAL, useAgora } from "@/lib/tempo";
+import { eModeloNatal } from "@/lib/natal";
 
 export const Route = createFileRoute("/destaque/$id")({
   loader: ({ params }) => {
@@ -29,9 +32,15 @@ export const Route = createFileRoute("/destaque/$id")({
 
 function DestaquePage() {
   const { destaque } = Route.useLoaderData();
+  const agora = useAgora();
+  const eNatal = destaque.id === "natal";
+  // Quando a campanha de Natal acaba, os artigos de Natal saem (fica só o que é do catálogo normal, ex.: a torre)
+  const natalAcabou = eNatal && agora >= FIM_NATAL;
+  const visivel = (id: string) => !(natalAcabou && eModeloNatal(id));
   const itens = destaque.modelos
-    .map((id) => modelos.find((m) => m.id === id))
-    .filter((m): m is (typeof modelos)[number] => Boolean(m));
+    .filter(visivel)
+    .map((id) => getModeloComNatal(id))
+    .filter((m): m is NonNullable<typeof m> => Boolean(m));
   const outros = destaques.filter((d) => d.id !== destaque.id);
 
   return (
@@ -61,6 +70,7 @@ function DestaquePage() {
           <p className="mt-5 md:mt-6 max-w-xl text-[13px] sm:text-sm leading-relaxed text-muted-foreground">
             {destaque.introducao}
           </p>
+          {destaque.id === "natal" && <ContagemNatal />}
         </div>
       </section>
 
@@ -70,6 +80,33 @@ function DestaquePage() {
         </div>
         {destaque.fotos && destaque.fotos.length > 0 ? (
           <GaleriaTrabalhos fotos={destaque.fotos} />
+        ) : destaque.grupos && destaque.grupos.length > 0 ? (
+          <div className="space-y-14 md:space-y-20">
+            {destaque.grupos.map((g) => {
+              const doGrupo = g.modelos
+                .filter(visivel)
+                .map((id) => getModeloComNatal(id))
+                .filter((m): m is NonNullable<typeof m> => Boolean(m));
+              if (doGrupo.length === 0) return null;
+              return (
+                <div key={g.titulo}>
+                  <div className="mb-6 md:mb-8 flex flex-col gap-2 border-b border-border pb-4 md:flex-row md:items-end md:justify-between">
+                    <h2 className="font-display text-2xl md:text-4xl leading-none">{g.titulo}</h2>
+                    {g.descricao && (
+                      <p className="max-w-md text-[12px] sm:text-[13px] leading-relaxed text-muted-foreground md:text-right">
+                        {g.descricao}
+                      </p>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6 sm:gap-y-12 md:grid-cols-4">
+                    {doGrupo.map((m) => (
+                      <ModelCard key={m.id} modelo={m} presente={eNatal && !natalAcabou} fim={eNatal && !natalAcabou ? FIM_NATAL : undefined} />
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         ) : itens.length > 0 ? (
           <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6 sm:gap-y-12 md:grid-cols-4">
             {itens.map((m) => (

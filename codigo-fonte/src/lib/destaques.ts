@@ -17,6 +17,8 @@ export type Destaque = {
   vazio: string;
   /** Fotos de trabalhos (galeria). Quando existe, a página mostra a galeria em vez dos modelos. */
   fotos?: { imagem: string; legenda: string; tipo: string }[];
+  /** Secções opcionais: quando existem, a página mostra os modelos agrupados com um título por secção. */
+  grupos?: { titulo: string; descricao?: string; modelos: string[] }[];
 };
 
 export const destaques: Destaque[] = [
@@ -27,8 +29,30 @@ export const destaques: Destaque[] = [
     tituloItalico: "Natal",
     etiqueta: "Presentes personalizados",
     introducao:
-      "Ideias de presente com a sua marca para oferecer à equipa, a clientes e à família. Peças confortáveis e brindes originais, personalizados ao seu gosto.",
-    modelos: [],
+      "A nossa coleção de Natal, com ilustrações exclusivas: t-shirts, sweats, sweats para casal, canecas, bases de copos, aventais, bolas de Natal em madeira e o jogo da torre de madeira, para adultos e para crianças. Todas as peças podem levar o seu nome ou logótipo.",
+    modelos: ["natal-lisboa", "natal-lima", "natal-melodias", "natal-couple", "natal-vaduz", "natal-motu-nui", "natal-abuja", "natal-otava", "natal-bolas", "natal-velas", "torre-de-madeira"],
+    grupos: [
+      {
+        titulo: "Para vestir",
+        descricao: "T-shirts, hoodies e sweats com ilustrações de Natal — também para casais.",
+        modelos: ["natal-lisboa", "natal-lima", "natal-melodias", "natal-couple"],
+      },
+      {
+        titulo: "Para a mesa e a cozinha",
+        descricao: "Canecas, bases de copos e aventais para a ceia e para oferecer.",
+        modelos: ["natal-vaduz", "natal-motu-nui", "natal-abuja", "natal-otava"],
+      },
+      {
+        titulo: "Para decorar",
+        descricao: "Bolas de Natal e castiçais em madeira, gravados e recortados a laser.",
+        modelos: ["natal-bolas", "natal-velas"],
+      },
+      {
+        titulo: "Para jogar",
+        descricao: "Jogo de torre em madeira com desafios: versão de jogo de bebidas para adultos e versão para crianças.",
+        modelos: ["torre-de-madeira"],
+      },
+    ],
     vazio: "Estamos a preparar a seleção de Natal. Volte em breve.",
   },
   {

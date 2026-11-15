@@ -48,12 +48,15 @@ function SeloPromocao({ modeloId }: { modeloId: string }) {
     </Link>
   );
 }
-import { getModelo, getCategoria, coresDaFaixa, tamanhosDaFaixa } from "@/lib/catalogo";
+import { getCategoria, coresDaFaixa, tamanhosDaFaixa } from "@/lib/catalogo";
+import { getModeloComNatal, eModeloNatal } from "@/lib/natal";
+import { TemporizadorPequeno } from "@/components/temporizador";
+import { FIM_NATAL } from "@/lib/tempo";
 import type { Categoria, Cor, FaixaEtaria, Modelo, Peca } from "@/lib/catalogo";
 
 export const Route = createFileRoute("/modelo/$id")({
   loader: ({ params }) => {
-    const modelo = getModelo(params.id);
+    const modelo = getModeloComNatal(params.id);
     if (!modelo) throw notFound();
     const categoria = getCategoria(modelo.categoria) ?? null;
     return { modelo, categoria };
@@ -883,6 +886,17 @@ function DetalheModelo({
             </>
             )}
           </div>
+          )}
+
+          {/* Temporizador da campanha de Natal */}
+          {eModeloNatal(modelo.id) && (
+            <div>
+              <TemporizadorPequeno
+                fim={FIM_NATAL}
+                rotulo="Campanha de Natal termina em"
+                style={{ position: "relative", fontSize: 12, padding: "6px 14px" }}
+              />
+            </div>
           )}
 
           {/* Preços */}

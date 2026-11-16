@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Seta } from "@/components/seta";
 
 /**
  * Contentor para tabelas largas (ex.: tamanhos).
@@ -50,7 +51,7 @@ export function TabelaDeslizante({
     <div className="space-y-2">
       {temMais && (
         <p className="text-[10px] uppercase tracking-widest text-accent font-medium">
-          Deslize para ver todos os tamanhos →
+          Deslize para ver todos os tamanhos <Seta direcao="direita" className="size-3.5 -mt-0.5" />
         </p>
       )}
       <div className="relative">
@@ -67,7 +68,7 @@ export function TabelaDeslizante({
             aria-label="Ver tamanhos anteriores"
             className={`${seta} left-1`}
           >
-            ←
+            <Seta direcao="esquerda" />
           </button>
         )}
         {dir && (
@@ -77,7 +78,7 @@ export function TabelaDeslizante({
             aria-label="Ver mais tamanhos"
             className={`${seta} right-1`}
           >
-            →
+            <Seta direcao="direita" />
           </button>
         )}
       </div>

@@ -4045,7 +4045,7 @@ export const modelos: Modelo[] = [
     "subcategoria": "Com Capuz",
     "genero": "unissexo",
     "descricao": "O hoodie que toda a família vai querer vestir. O Hoodie CAIRO combina um capuz com cordões, um amplo bolso canguru e punhos e cintura em malha canelada num corte descontraído que nunca sai de moda. Macio e confortável, está disponível em 15 cores vivas e clássicas e em tamanhos de criança a adulto — ideal para equipas, escolas, eventos ou para levar a sua marca a todas as idades.",
-    "composicao": "100% Poliéster, Densidade: 280 g/m²",
+    "composicao": "65% Poliéster, 35% Algodão, Densidade: 325 g/m²",
     "referencia": "#CAI-CAI",
     "lifestyle": cairoEditorial,
     "imagem": asset_cairo_1.url,
@@ -4103,7 +4103,7 @@ export const modelos: Modelo[] = [
       ]
     ],
     "caracteristicas": [
-      "100% Poliéster",
+      "65% Poliéster, 35% Algodão",
       "Disponível em 15 cores"
     ]
   },
@@ -4184,7 +4184,7 @@ export const modelos: Modelo[] = [
     "subcategoria": "Com Capuz",
     "genero": "unissexo",
     "descricao": "Descontraído e cheio de carácter, o Hoodie LUANDA junta o conforto de um clássico à praticidade do fecho de correr integral. O capuz com cordões ajustáveis, os bolsos frontais e os punhos e cintura em malha canelada fazem dele a peça ideal para os dias mais frescos, no trabalho ou fora dele. Em seis cores versáteis, é a tela perfeita para dar destaque à sua marca.",
-    "composicao": "100% Poliéster, Densidade: 280 g/m²",
+    "composicao": "65% Poliéster, 35% Algodão, Densidade: 325 g/m²",
     "referencia": "#LUA-LUA",
     "lifestyle": luandaEditorial,
     "imagem": asset_luanda_cor_1.url,
@@ -4285,7 +4285,7 @@ export const modelos: Modelo[] = [
       ]
     ],
     "caracteristicas": [
-      "100% Poliéster",
+      "65% Poliéster, 35% Algodão",
       "Detalhes e cores a confirmar"
     ]
   },
@@ -8739,7 +8739,7 @@ export const modelos: Modelo[] = [
             },
             {
                 "nome": "Calças",
-                "composicao": "65% Poliéster, Densidade: 250 g/m²",
+                "composicao": "65% Poliéster, 35% Algodão, Densidade: 250 g/m²",
                 "imagem": abu_calcas_1.url,
                 "cores": [
                     {
@@ -9179,7 +9179,7 @@ export const modelos: Modelo[] = [
     "subcategoria": "Babetes",
     "genero": "crianca",
     "descricao": "Babete de bebé em tecido suave e absorvente, com debrum colorido e fecho de abas que se ajusta com delicadeza ao pescoço. Confortável e fácil de lavar, acompanha as primeiras papas com ternura e sem nódoas. Em branco puro ou com debrum bordô, rosa, azul ou preto, ganha um encanto especial com o nome do bebé, um desenho ou uma mensagem, um presente perfeito para nascimentos, batizados e creches.",
-    "composicao": "Composição a confirmar",
+    "composicao": "60% Algodão, 20% Poliéster, 20% Poliuretano, Densidade: 250 g/m²",
     "referencia": "#PAL-PAL",
     "imagem": palau1.url,
     "lifestyle": palauEditorial,
@@ -9260,7 +9260,7 @@ export const modelos: Modelo[] = [
     "subcategoria": "Babetes",
     "genero": "crianca",
     "descricao": "Babete leve e macio, de cantos arredondados e fitas para atar ao pescoço, pensado para tornar cada refeição mais tranquila e sem nódoas. Prático de usar e fácil de lavar, protege a roupa com conforto do primeiro ao último prato. Disponível em branco, verde lima, azul e preto, ganha um toque especial com um nome, um desenho ou o seu logótipo, ideal para creches, escolas, restaurantes e ofertas personalizadas.",
-    "composicao": "Densidade: 70 g/m²",
+    "composicao": "100% Polipropileno, Densidade: 70 g/m²",
     "referencia": "#SAM-SAM",
     "imagem": samoa1.url,
     "lifestyle": samoaEditorial,
@@ -9335,7 +9335,7 @@ export const modelos: Modelo[] = [
     "subcategoria": "Cozinha",
     "genero": "unissexo",
     "descricao": "Avental curto de cintura, leve e discreto, que dá um toque profissional à farda sem pesar no serviço. Os bolsos frontais guardam blocos, canetas e trocos ao alcance da mão, e as fitas longas ajustam-se com conforto a qualquer silhueta. Disponível em quinze cores, dos tons naturais aos mais vibrantes, ganha identidade com o logótipo do seu café, restaurante ou loja. Ideal para equipas de sala, baristas e pastelarias.",
-    "composicao": "Composição a confirmar",
+    "composicao": "65% Poliéster, 35% Algodão, Densidade: 210 g/m²",
     "referencia": "#TON-TON",
     "imagem": tonga1.url,
     "lifestyle": tongaEditorial,
@@ -9613,7 +9613,7 @@ export const modelos: Modelo[] = [
     "subcategoria": "Cozinha",
     "genero": "unissexo",
     "descricao": "Avental comprido de linhas simples, com peitilho, alça ao pescoço e um bolso frontal amplo que deixa tudo à mão. Protege da bancada à mesa com conforto e elegância e mantém um aspeto cuidado em cada serviço. Disponível numa paleta de vinte e duas cores, dos neutros intemporais aos tons mais vivos, ganha identidade com o logótipo do seu restaurante, café ou marca. Ideal para cozinhas, cafetarias, workshops e eventos.",
-    "composicao": "Composição a confirmar",
+    "composicao": "65% Poliéster, 35% Algodão, Densidade: 210 g/m²",
     "referencia": "#OTA-OTA",
     "imagem": otava1.url,
     "lifestyle": otavaEditorial,
@@ -9804,7 +9804,7 @@ export const modelos: Modelo[] = [
     "subcategoria": "Cozinha",
     "genero": "unissexo",
     "descricao": "Jaleca de cozinha de corte clássico, com gola mandarim, abotoamento duplo e manga curta, pensada para o calor e o ritmo intenso do serviço. Confortável e fácil de cuidar, mantém um aspeto impecável do primeiro ao último prato. Disponível em branco e preto, de S a 3XL, ganha personalidade com o nome do chef ou o logótipo do seu restaurante, ideal para cozinhas profissionais, escolas de hotelaria e eventos gastronómicos.",
-    "composicao": "Composição a confirmar",
+    "composicao": "65% Poliéster, 35% Algodão, Densidade: 150 g/m²",
     "referencia": "#DOA-DOA",
     "imagem": asset_doa_cor_1.url,
     "lifestyle": doaEditorial,
@@ -10389,7 +10389,7 @@ export const modelos: Modelo[] = [
     "subcategoria": "Sacos",
     "genero": "unissexo",
     "descricao": "Saco em algodão natural, de toque macio e linhas simples, pensado para acompanhar o dia a dia com leveza. Espaçoso e resistente, com asas longas que se usam confortavelmente ao ombro, é a tela perfeita para o seu logótipo ou mensagem. Um brinde útil, sustentável e intemporal, que leva a sua marca a todo o lado.",
-    "composicao": "Algodão",
+    "composicao": "100% Algodão, Densidade: 160 g/m²",
     "referencia": "#SUV-SUV",
     "imagem": suvaEditorial2,
     "lifestyle": suvaEditorial,

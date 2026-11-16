@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { Seta } from "@/components/seta";
 import { useEffect, useState } from "react";
 import { ModelCard } from "@/components/model-card";
 import { BotaoVoltarInicio } from "@/components/botao-voltar-inicio";
@@ -143,7 +144,7 @@ export function PaginaPromocoes() {
             >
               Encomendar
               <span className="flex size-9 items-center justify-center rounded-full bg-accent-foreground text-accent transition-transform group-hover:translate-x-0.5">
-                →
+                <Seta direcao="direita" />
               </span>
             </Link>
           </div>

@@ -215,17 +215,23 @@ export function CatalogoSidebar({
           {/* Destaques */}
           <div className="pt-6">
             <p className="text-[10px] uppercase tracking-[0.3em] text-accent font-semibold mb-3">Destaques</p>
-            <ul className="space-y-2.5">
+            <ul className="space-y-1">
               {destaques.map((d) => (
                 <li key={d.id}>
                   <Link
                     to="/destaque/$id"
                     params={{ id: d.id }}
                     onClick={onFechar}
-                    className="text-[12px] uppercase tracking-[0.18em] text-foreground hover:text-accent transition-colors"
-                    activeProps={{ className: "text-accent" }}
+                    className="-mx-3 flex items-center justify-between gap-3 rounded-full px-3 py-2 text-[12px] uppercase tracking-[0.18em] transition-colors"
+                    activeProps={{ className: "bg-foreground text-background font-semibold shadow-sm", "aria-current": "page" }}
+                    inactiveProps={{ className: "text-foreground hover:bg-foreground/5 hover:text-accent" }}
                   >
-                    {d.nome}
+                    {({ isActive }: { isActive: boolean }) => (
+                      <>
+                        <span>{d.nome}</span>
+                        {isActive && <span aria-hidden="true" className="size-1.5 shrink-0 rounded-full bg-accent" />}
+                      </>
+                    )}
                   </Link>
                 </li>
               ))}

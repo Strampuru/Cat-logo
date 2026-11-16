@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { Seta } from "@/components/seta";
 import { SiteLayout } from "@/components/site-layout";
 import { ModelCard } from "@/components/model-card";
 import { getModeloComNatal } from "@/lib/natal";
@@ -122,7 +123,7 @@ function DestaquePage() {
               className="mt-8 inline-flex items-center gap-3 rounded-full bg-accent text-accent-foreground py-1.5 pl-5 pr-1.5 text-[11px] font-medium uppercase tracking-widest shadow-sm transition-colors hover:bg-foreground hover:text-background"
             >
               Fale connosco
-              <span className="flex size-8 items-center justify-center rounded-full bg-accent-foreground text-accent">→</span>
+              <span className="flex size-8 items-center justify-center rounded-full bg-accent-foreground text-accent"><Seta direcao="direita" /></span>
             </Link>
           </div>
         )}

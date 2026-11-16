@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { Seta } from "@/components/seta";
 import { useEffect, useState, type MouseEvent } from "react";
 import { useSwipe } from "@/hooks/use-swipe";
 import { coresDaFaixa } from "@/lib/catalogo";
@@ -157,9 +158,7 @@ export function ModelCard({ modelo, faixa, presente, fim }: { modelo: Modelo; fa
               onClick={(e) => navegar(e, -1)}
               className="absolute left-2 top-1/2 -translate-y-1/2 z-10 size-8 rounded-full bg-background/85 backdrop-blur-sm flex items-center justify-center text-foreground shadow-sm transition-opacity duration-300 sm:opacity-0 sm:group-hover:opacity-100 hover:bg-accent hover:text-accent-foreground"
             >
-              <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor">
-                <path strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" d="M15 6l-6 6 6 6" />
-              </svg>
+              <Seta direcao="esquerda" />
             </button>
             <button
               type="button"
@@ -167,9 +166,7 @@ export function ModelCard({ modelo, faixa, presente, fim }: { modelo: Modelo; fa
               onClick={(e) => navegar(e, 1)}
               className="absolute right-2 top-1/2 -translate-y-1/2 z-10 size-8 rounded-full bg-background/85 backdrop-blur-sm flex items-center justify-center text-foreground shadow-sm transition-opacity duration-300 sm:opacity-0 sm:group-hover:opacity-100 hover:bg-accent hover:text-accent-foreground"
             >
-              <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor">
-                <path strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" d="M9 6l6 6-6 6" />
-              </svg>
+              <Seta direcao="direita" />
             </button>
           </>
         )}

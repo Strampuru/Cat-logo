@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { Seta } from "@/components/seta";
 import { ModelCard } from "@/components/model-card";
 import { modelos, type Modelo } from "@/lib/catalogo";
 
@@ -138,7 +139,7 @@ export function CatalogoInicio() {
                   params={g.link.params as never}
                   className="text-[10px] sm:text-[11px] uppercase tracking-widest text-accent font-medium hover:text-foreground transition-colors whitespace-nowrap"
                 >
-                  Ver só {g.titulo.toLowerCase()} ({g.itens.length}) →
+                  Ver só {g.titulo.toLowerCase()} ({g.itens.length}) <Seta direcao="direita" className="size-3.5 -mt-0.5" />
                 </Link>
               )}
             </div>

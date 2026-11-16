@@ -1,4 +1,5 @@
 import { createFileRoute, notFound, Link, useNavigate } from "@tanstack/react-router";
+import { Seta } from "@/components/seta";
 
 
 import { SiteLayout } from "@/components/site-layout";
@@ -109,7 +110,7 @@ function CategoriaPage() {
                 aria-hidden="true"
                 className="flex size-8 items-center justify-center rounded-full bg-accent-foreground text-sm text-accent transition-all group-hover:-translate-x-0.5 group-hover:bg-accent group-hover:text-accent-foreground"
               >
-                ←
+                <Seta direcao="esquerda" />
               </span>
               Voltar
             </button>
@@ -129,7 +130,7 @@ function CategoriaPage() {
                 aria-hidden="true"
                 className="flex size-8 items-center justify-center rounded-full bg-accent-foreground text-sm text-accent transition-all group-hover:-translate-x-0.5 group-hover:bg-accent group-hover:text-accent-foreground"
               >
-                ←
+                <Seta direcao="esquerda" />
               </span>
               Voltar
             </Link>

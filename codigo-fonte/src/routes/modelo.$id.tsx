@@ -1,6 +1,8 @@
 import { BotaoEncomendar } from "@/components/botao-encomendar";
+import { Seta } from "@/components/seta";
 import { createFileRoute, notFound, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { BotaoLupa, VisualizadorZoom } from "@/components/visualizador-zoom";
 import { SiteLayout } from "@/components/site-layout";
 import { useSwipe } from "@/hooks/use-swipe";
 import { TabelaDeslizante } from "@/components/tabela-deslizante";
@@ -19,6 +21,22 @@ function Preco({ modeloId, preco, className = "" }: { modeloId: string; preco: s
 /** Esconde composições provisórias («a confirmar») ou que remetem para outra secção. */
 function composicaoVisivel(c?: string) {
   return !!c && !/a confirmar|ver cada modelo/i.test(c);
+}
+
+
+/** Abre o zoom com um clique simples na foto, sem interferir com o deslizar entre fotos. */
+function useCliqueFoto(abrir: () => void) {
+  const inicio = useRef<{ x: number; y: number } | null>(null);
+  return {
+    onPointerDownCapture: (e: React.PointerEvent) => {
+      inicio.current = { x: e.clientX, y: e.clientY };
+    },
+    onClick: (e: React.MouseEvent) => {
+      const i = inicio.current;
+      if (i && Math.hypot(e.clientX - i.x, e.clientY - i.y) > 8) return;
+      abrir();
+    },
+  };
 }
 
 function NotaPrecos() {
@@ -118,7 +136,7 @@ function VoltarPaginaAnterior() {
         aria-hidden="true"
         className="flex size-8 items-center justify-center rounded-full bg-accent-foreground text-sm text-accent transition-all group-hover:-translate-x-0.5 group-hover:bg-accent group-hover:text-accent-foreground"
       >
-        ←
+        <Seta direcao="esquerda" />
       </span>
       Voltar
     </button>
@@ -197,13 +215,22 @@ function PecaCard({
     onSwipeLeft: () => mudar(1),
     onSwipeRight: () => mudar(-1),
   });
+  const [zoom, setZoom] = useState<number | null>(null);
+  const fotosZoom = (peca.cores.length ? peca.cores : [{ imagem: peca.imagem, nome: "" }]).map((c) => ({
+    src: c.imagem,
+    alt: `${modelo.nome} — ${peca.nome}${c.nome ? ` — ${c.nome}` : ""}`,
+  }));
+  const clique = useCliqueFoto(() => setZoom(peca.cores.length ? cor : 0));
 
   return (
     <article className="space-y-3">
+      {zoom !== null && <VisualizadorZoom fotos={fotosZoom} inicio={zoom} onFechar={() => setZoom(null)} />}
       <div
-        className="relative aspect-[4/5] bg-secondary ring-1 ring-black/5 overflow-hidden touch-pan-y"
+        className="relative aspect-[4/5] bg-secondary ring-1 ring-black/5 overflow-hidden touch-pan-y cursor-zoom-in"
         {...(peca.cores.length > 1 ? swipe : {})}
+        {...clique}
       >
+        <BotaoLupa onClick={() => setZoom(peca.cores.length ? cor : 0)} />
         <img
           key={imagem}
           src={imagem}
@@ -456,6 +483,8 @@ function ConfiguradorAbuDhabi({ modelo, categoria, pecas }: {
     setCor(0);
   };
 
+  const [zoomAbu, setZoomAbu] = useState<number | null>(null);
+  const cliqueAbu = useCliqueFoto(() => setZoomAbu(peca.cores.length ? cor : 0));
   const swipeFoto = useSwipe({
     onSwipeLeft: () => setCor((c) => (c + 1) % peca.cores.length),
     onSwipeRight: () => setCor((c) => (c - 1 + peca.cores.length) % peca.cores.length),
@@ -499,10 +528,22 @@ function ConfiguradorAbuDhabi({ modelo, categoria, pecas }: {
           <div className="grid md:grid-cols-2 gap-10">
             {/* Fotografia */}
             <div className="space-y-4">
+              {zoomAbu !== null && (
+                <VisualizadorZoom
+                  fotos={(peca.cores.length ? peca.cores : [{ imagem: peca.imagem, nome: "" }]).map((c) => ({
+                    src: c.imagem,
+                    alt: `${modelo.nome} — ${peca.nome}${c.nome ? ` — ${c.nome}` : ""}`,
+                  }))}
+                  inicio={zoomAbu}
+                  onFechar={() => setZoomAbu(null)}
+                />
+              )}
               <div
-                className="aspect-[3/4] bg-secondary border border-border overflow-hidden touch-pan-y"
+                className="relative aspect-[3/4] bg-secondary border border-border overflow-hidden touch-pan-y cursor-zoom-in"
                 {...(peca.cores.length > 1 ? swipeFoto : {})}
+                {...cliqueAbu}
               >
+                <BotaoLupa onClick={() => setZoomAbu(peca.cores.length ? cor : 0)} />
                 <img key={`${peca.nome}-${imagem}`} src={imagem}
                   alt={`${modelo.nome} — ${peca.nome}${corAtual ? ` — ${corAtual.nome}` : ""}`}
                   width={1024} height={1280} className={`w-full h-full ${modelo.fotosCheias ? "object-cover" : "object-contain p-5"}`} />
@@ -668,6 +709,8 @@ function DetalheModelo({
   ];
 
   const [slide, setSlide] = useState(0);
+  const [zoom, setZoom] = useState<number | null>(null);
+  const cliqueFoto = useCliqueFoto(() => setZoom(slides.length ? slide : 0));
   const atual =
     slides[slide] ??
     slides[0] ?? {
@@ -723,10 +766,19 @@ function DetalheModelo({
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-20 grid md:grid-cols-2 gap-10 md:gap-20 items-start">
         {/* Galeria */}
         <div className="md:sticky md:top-32 space-y-2">
+          {zoom !== null && (
+            <VisualizadorZoom
+              fotos={slides.map((sl) => ({ src: sl.src, alt: sl.alt }))}
+              inicio={zoom}
+              onFechar={() => setZoom(null)}
+            />
+          )}
           <div
-            className="relative w-full aspect-[4/5] bg-secondary ring-1 ring-black/5 overflow-hidden group touch-pan-y"
+            className="relative w-full aspect-[4/5] bg-secondary ring-1 ring-black/5 overflow-hidden group touch-pan-y cursor-zoom-in"
             {...(slides.length > 1 ? swipe : {})}
+            {...cliqueFoto}
           >
+            <BotaoLupa onClick={() => setZoom(slides.length ? slide : 0)} />
             <img
               key={atual.src}
               src={atual.src}
@@ -742,18 +794,20 @@ function DetalheModelo({
             {slides.length > 1 && (
               <>
                 <button
-                  onClick={anterior}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  onClick={(e) => { e.stopPropagation(); anterior(); }}
                   aria-label="Imagem anterior"
                   className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 size-11 sm:size-10 rounded-full bg-background/80 backdrop-blur ring-1 ring-black/10 flex items-center justify-center text-lg hover:bg-background transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100"
                 >
-                  ←
+                  <Seta direcao="esquerda" />
                 </button>
                 <button
-                  onClick={seguinte}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  onClick={(e) => { e.stopPropagation(); seguinte(); }}
                   aria-label="Imagem seguinte"
                   className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 size-11 sm:size-10 rounded-full bg-background/80 backdrop-blur ring-1 ring-black/10 flex items-center justify-center text-lg hover:bg-background transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100"
                 >
-                  →
+                  <Seta direcao="direita" />
                 </button>
                 <span className="absolute bottom-3 right-3 text-[10px] uppercase tracking-widest bg-background/80 backdrop-blur px-2 py-1 ring-1 ring-black/10">
                   {slide + 1} / {slides.length}

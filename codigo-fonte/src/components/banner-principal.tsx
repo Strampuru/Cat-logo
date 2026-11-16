@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { Seta } from "@/components/seta";
 import { useEffect, useRef, useState } from "react";
 import { cicloAtual, DESCONTO, modelosEmPromocao } from "@/lib/promocoes";
 import { FIM_NATAL, useAgora } from "@/lib/tempo";
@@ -306,7 +307,7 @@ export function BannerPrincipal() {
                   <span className="mt-6 md:mt-8 inline-flex items-center gap-3 rounded-full bg-accent text-accent-foreground py-1.5 pl-5 pr-1.5 text-[11px] font-medium uppercase tracking-widest shadow-md transition-colors group-hover:bg-white group-hover:text-foreground">
                     {s.botao}
                     <span className="flex size-8 items-center justify-center rounded-full bg-accent-foreground text-accent transition-transform group-hover:translate-x-0.5">
-                      →
+                      <Seta direcao="direita" />
                     </span>
                   </span>
                 </div>
@@ -327,10 +328,10 @@ export function BannerPrincipal() {
         ))}
 
         <button type="button" aria-label="Destaque anterior" onClick={() => ir(atual - 1)} className={`${seta} left-3 md:left-6 hidden sm:flex`}>
-          ←
+          <Seta direcao="esquerda" />
         </button>
         <button type="button" aria-label="Destaque seguinte" onClick={() => ir(atual + 1)} className={`${seta} right-3 md:right-6 hidden sm:flex`}>
-          →
+          <Seta direcao="direita" />
         </button>
 
         <div className="absolute bottom-5 md:bottom-7 left-0 right-0 z-20 flex justify-center gap-2.5">

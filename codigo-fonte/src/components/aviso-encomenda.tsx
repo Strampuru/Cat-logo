@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { Seta } from "@/components/seta";
 import { useEffect, useState } from "react";
 
 /**
@@ -135,7 +136,7 @@ export function AvisoEncomenda() {
           >
             Pedir orçamento
             <span className="flex size-9 items-center justify-center rounded-full bg-accent-foreground text-accent transition-transform group-hover:translate-x-0.5">
-              →
+              <Seta direcao="direita" />
             </span>
           </Link>
         </div>

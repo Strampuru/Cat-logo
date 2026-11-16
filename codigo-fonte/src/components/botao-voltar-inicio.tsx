@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { Seta } from "@/components/seta";
 
 /** Botão «Voltar» (estilo bronze do site) que leva à página principal. */
 export function BotaoVoltarInicio({ className = "" }: { className?: string }) {
@@ -11,7 +12,7 @@ export function BotaoVoltarInicio({ className = "" }: { className?: string }) {
         aria-hidden="true"
         className="flex size-8 items-center justify-center rounded-full bg-accent-foreground text-sm text-accent transition-all group-hover:-translate-x-0.5 group-hover:bg-accent group-hover:text-accent-foreground"
       >
-        ←
+        <Seta direcao="esquerda" />
       </span>
       Voltar
     </Link>

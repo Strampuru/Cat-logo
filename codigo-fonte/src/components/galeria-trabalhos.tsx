@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { Seta } from "@/components/seta";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type Foto = { imagem: string; legenda: string; tipo: string };
@@ -121,7 +122,7 @@ export function GaleriaTrabalhos({ fotos }: { fotos: Foto[] }) {
             className="inline-flex items-center gap-3 rounded-full bg-accent text-accent-foreground py-1.5 pl-5 pr-1.5 text-[11px] font-semibold uppercase tracking-widest shadow-md transition-colors hover:bg-background hover:text-foreground"
           >
             WhatsApp
-            <span className="flex size-8 items-center justify-center rounded-full bg-accent-foreground text-accent">→</span>
+            <span className="flex size-8 items-center justify-center rounded-full bg-accent-foreground text-accent"><Seta direcao="direita" /></span>
           </a>
           <Link
             to="/contactos"
@@ -181,7 +182,7 @@ export function GaleriaTrabalhos({ fotos }: { fotos: Foto[] }) {
                   }}
                   className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 hidden sm:flex size-12 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-accent"
                 >
-                  ←
+                  <Seta direcao="esquerda" />
                 </button>
                 <button
                   type="button"
@@ -192,7 +193,7 @@ export function GaleriaTrabalhos({ fotos }: { fotos: Foto[] }) {
                   }}
                   className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 hidden sm:flex size-12 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-accent"
                 >
-                  →
+                  <Seta direcao="direita" />
                 </button>
               </>
             )}
@@ -213,7 +214,7 @@ export function GaleriaTrabalhos({ fotos }: { fotos: Foto[] }) {
               className="inline-flex shrink-0 items-center gap-3 self-start rounded-full bg-accent text-accent-foreground py-1.5 pl-5 pr-1.5 text-[11px] font-semibold uppercase tracking-widest shadow-md transition-colors hover:bg-white hover:text-foreground sm:self-auto"
             >
               Quero algo assim
-              <span className="flex size-8 items-center justify-center rounded-full bg-accent-foreground text-accent">→</span>
+              <span className="flex size-8 items-center justify-center rounded-full bg-accent-foreground text-accent"><Seta direcao="direita" /></span>
             </a>
           </div>
 

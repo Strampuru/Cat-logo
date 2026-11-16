@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { Seta } from "@/components/seta";
 import type { ReactNode } from "react";
 import { SiteLayout } from "@/components/site-layout";
 import { categorias } from "@/lib/catalogo";
@@ -143,14 +144,8 @@ function ContactosPage() {
             As encomendas são feitas diretamente connosco. Escolha abaixo como prefere falar — tratamos consigo da
             personalização, do pagamento e do envio.
           </p>
-          {modelo && (
-            <div className="mt-7 inline-flex items-center gap-3 rounded-full bg-background/10 ring-1 ring-accent/50 px-5 py-2.5">
-              <span className="text-[10px] uppercase tracking-[0.25em] text-background/70">Modelo escolhido</span>
-              <span className="text-[13px] font-semibold text-accent">{modelo}</span>
-            </div>
-          )}
           <p className="mt-8 md:mt-10 pb-6 md:pb-8 text-[10px] sm:text-[11px] uppercase tracking-[0.3em] text-background/60">
-            Escolha um meio de contacto ↓
+            Escolha um meio de contacto <Seta direcao="direita" className="size-3.5 -mt-0.5 rotate-90" />
           </p>
         </div>
       </section>
@@ -191,7 +186,7 @@ function ContactosPage() {
                 }`}
               >
                 {c.botao}
-                <span className="flex size-8 items-center justify-center rounded-full bg-background text-foreground">→</span>
+                <span className="flex size-8 items-center justify-center rounded-full bg-background text-foreground"><Seta direcao="direita" /></span>
               </span>
             </a>
           ))}

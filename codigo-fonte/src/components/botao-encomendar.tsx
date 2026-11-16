@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { Seta } from "@/components/seta";
 
 /**
  * Botão «Encomende já» das páginas de produto.
@@ -21,7 +22,7 @@ export function BotaoEncomendar({ modelo, className = "" }: { modelo: string; cl
       >
         Encomende já
         <span className="flex size-10 items-center justify-center rounded-full bg-accent-foreground text-accent transition-transform group-hover:translate-x-0.5">
-          →
+          <Seta direcao="direita" />
         </span>
       </Link>
     </div>

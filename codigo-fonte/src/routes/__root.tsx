@@ -81,14 +81,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Catálogo de vestuário STRAM PURU: t-shirts, polos, sweats e jaquetas com todas as cores, tamanhos e escalões de preço.",
+          "Catálogo de vestuário STRAM PURU: t-shirts, polos, sweats e casacos com todas as cores, tamanhos e escalões de preço.",
       },
       { name: "author", content: "STRAM PURU" },
       { property: "og:title", content: "STRAM PURU — Catálogo de Vestuário" },
       {
         property: "og:description",
         content:
-          "T-shirts, polos, sweats e jaquetas com todas as cores, tamanhos e escalões de preço.",
+          "T-shirts, polos, sweats e casacos com todas as cores, tamanhos e escalões de preço.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

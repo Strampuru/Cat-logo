@@ -8,7 +8,7 @@ import {
   DESCONTO,
   formatarEuros,
   modelosEmPromocao,
-  precoMinimo,
+  precoBase,
 } from "@/lib/promocoes";
 
 function useAgora(intervalo = 1000) {
@@ -114,20 +114,23 @@ export function PaginaPromocoes() {
           </div>
           <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-4">
             {itens.map((m) => {
-              const min = precoMinimo(m);
+              const base = precoBase(m);
               return (
                 <div key={m.id} className="relative">
                   <div className="rounded-sm ring-2 ring-accent/70 ring-offset-4 ring-offset-transparent">
                     <ModelCard modelo={m} />
                   </div>
-                  {min !== undefined && (
-                    <p className="mt-3 flex items-baseline gap-2 text-[12px]">
-                      <span className="uppercase tracking-widest text-muted-foreground text-[10px]">desde</span>
-                      <span className="line-through text-muted-foreground">{formatarEuros(min)}</span>
-                      <span className="font-display text-xl text-accent font-semibold">
-                        {formatarEuros(min * (1 - DESCONTO))}
-                      </span>
-                    </p>
+                  {base !== undefined && (
+                    <div className="mt-3">
+                      <p className="flex items-baseline gap-2 text-[12px]">
+                        <span className="line-through text-muted-foreground">{formatarEuros(base.valor)}</span>
+                        <span className="font-display text-xl text-accent font-semibold">
+                          {formatarEuros(base.valor * (1 - DESCONTO))}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground">/ unid.</span>
+                      </p>
+                      <p className="mt-0.5 text-[10px] uppercase tracking-widest text-muted-foreground">{base.escalao}</p>
+                    </div>
                   )}
                 </div>
               );

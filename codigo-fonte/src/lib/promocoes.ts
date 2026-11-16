@@ -69,6 +69,15 @@ export function precoMinimo(m: Modelo) {
   return vals.length ? Math.min(...vals) : undefined;
 }
 
+/** Preço do primeiro escalão (o que paga quem encomenda poucas unidades) e o respetivo escalão. */
+export function precoBase(m: Modelo): { valor: number; escalao: string } | undefined {
+  for (const [escalao, p] of m.precos) {
+    const x = p.match(/(\d+(?:[.,]\d+)?)/);
+    if (x) return { valor: parseFloat(x[1].replace(",", ".")), escalao };
+  }
+  return undefined;
+}
+
 export function formatarEuros(v: number) {
   return v.toFixed(2).replace(".", ",") + "€";
 }

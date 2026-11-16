@@ -44,7 +44,7 @@ const GRUPOS: Grupo[] = [
   },
   {
     id: "jaquetas",
-    titulo: "Jaquetas",
+    titulo: "Casacos",
     descricao: "Proteção contra o vento e a chuva, com a sua marca.",
     filtro: (m) => m.categoria === "jaquetas",
     link: { to: "/categoria/$categoria", params: { categoria: "jaquetas" } },

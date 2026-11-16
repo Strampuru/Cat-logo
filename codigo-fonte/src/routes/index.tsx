@@ -10,13 +10,13 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Catálogo STRAM PURU: t-shirts, polos, sweats e jaquetas para personalizar, com todas as cores, tamanhos e escalões de preço.",
+          "Catálogo STRAM PURU: t-shirts, polos, sweats e casacos para personalizar, com todas as cores, tamanhos e escalões de preço.",
       },
       { property: "og:title", content: "Strampuru — Catálogo de Vestuário" },
       {
         property: "og:description",
         content:
-          "T-shirts, polos, sweats e jaquetas com todas as cores disponíveis, tabela de tamanhos e preços por quantidade.",
+          "T-shirts, polos, sweats e casacos com todas as cores disponíveis, tabela de tamanhos e preços por quantidade.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -63,7 +63,7 @@ function Index() {
           <p>
             Trabalhamos com empresas, clubes, escolas, associações e famílias,
             em encomendas grandes ou pequenas, sempre com o mesmo rigor. Das
-            t-shirts aos polos, das sweats às jaquetas, dos bodies de bebé aos
+            t-shirts aos polos, das sweats aos casacos, dos bodies de bebé aos
             brindes, cada artigo deste catálogo foi pensado para ganhar a sua
             marca.
           </p>

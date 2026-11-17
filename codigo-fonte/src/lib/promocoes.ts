@@ -35,16 +35,40 @@ function temPreco(m: Modelo) {
   return m.id !== "abu-dhabi" && m.precos.some(([, p]) => /\d/.test(p));
 }
 
-export function modelosEmPromocao(agora = Date.now()): Modelo[] {
-  const { n } = cicloAtual(agora);
+/**
+ * Regra legal (DL 109-G/2021): o preço riscado tem de ser o mais baixo dos 30 dias anteriores.
+ * Por isso, um modelo que esteve em promoção num dos CICLOS_PAUSA ciclos anteriores
+ * (5 semanas = 35 dias) não volta a ser sorteado.
+ */
+export const CICLOS_PAUSA = 5;
+const memoCiclos = new Map<number, Modelo[]>();
+
+function selecaoDoCiclo(n: number): Modelo[] {
+  const guardado = memoCiclos.get(n);
+  if (guardado) return guardado;
+  const excluidos = new Set<string>();
+  for (let k = 1; k <= CICLOS_PAUSA && n - k >= 0; k++) {
+    for (const m of selecaoDoCiclo(n - k)) excluidos.add(m.id);
+  }
   const r = aleatorio(20261113 + n * 7919);
-  const candidatos = modelos.filter(temPreco);
+  const todos = modelos.filter(temPreco);
+  const livres = todos.filter((m) => !excluidos.has(m.id));
+  const candidatos = livres.length >= QUANTOS ? livres : todos;
   const copia = [...candidatos];
   for (let i = copia.length - 1; i > 0; i--) {
     const j = Math.floor(r() * (i + 1));
     [copia[i], copia[j]] = [copia[j], copia[i]];
   }
-  return copia.slice(0, QUANTOS);
+  const escolha = copia.slice(0, QUANTOS);
+  memoCiclos.set(n, escolha);
+  return escolha;
+}
+
+export function modelosEmPromocao(agora = Date.now()): Modelo[] {
+  const { n } = cicloAtual(agora);
+  // calcula os ciclos por ordem (evita recursão profunda)
+  for (let i = 0; i < n; i++) selecaoDoCiclo(i);
+  return selecaoDoCiclo(n);
 }
 
 export function emPromocao(id: string, agora = Date.now()) {

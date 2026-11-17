@@ -17,8 +17,20 @@ export const VENDEDOR = {
 /** Data da última atualização dos textos legais. */
 export const ATUALIZADO_EM = "17 de novembro de 2026";
 
+// Regime de IVA (interruptor IVA_ISENTO e textos): ver lib/regime-iva.ts
+import { IVA_ISENTO } from "@/lib/regime-iva";
+import { PESO_MAXIMO, PORTE_CONTINENTE } from "@/lib/portes";
+export { IVA_ISENTO, FRASE_IVA, FRASE_IVA_CURTA } from "@/lib/regime-iva";
+
 export const LIVRO_RECLAMACOES = "https://www.livroreclamacoes.pt/";
 export const CNIACC = { nome: "CNIACC – Centro Nacional de Informação e Arbitragem de Conflitos de Consumo", site: "https://www.cniacc.pt", email: "geral@cniacc.pt" };
+/** Centro competente na área do Vendedor (Seixal — Área Metropolitana de Lisboa). */
+export const CACCL = {
+  nome: "CACCL – Centro de Arbitragem de Conflitos de Consumo de Lisboa",
+  site: "https://www.centroarbitragemlisboa.pt",
+  email: "director@centroarbitragemlisboa.pt",
+  morada: "Rua dos Douradores, 108 a 116, 2.º e 3.º, 1100-207 Lisboa",
+};
 export const PORTAL_CONSUMIDOR = "https://www.consumidor.gov.pt";
 
 /** true enquanto faltarem dados do vendedor (mostra um aviso só na pré-visualização). */
@@ -55,10 +67,15 @@ export const paginasLegais: PaginaLegal[] = [
       {
         titulo: "3. Preços, pagamento e portes de envio",
         paragrafos: [
-          "Os preços apresentados no catálogo estão em euros (€), são por unidade, incluem a personalização e incluem IVA à taxa legal em vigor. Os preços variam consoante a quantidade encomendada, de acordo com os escalões indicados em cada produto.",
-          "Os portes de envio não estão incluídos nos preços e são comunicados ao cliente antes da confirmação da encomenda.",
+          `Os preços apresentados no catálogo estão em euros (€), são por unidade e incluem a personalização. ${
+            IVA_ISENTO
+              ? "O Vendedor está abrangido pelo regime especial de isenção de IVA previsto no artigo 53.º do Código do IVA, pelo que os preços indicados são preços finais, sem IVA a acrescer."
+              : "Os preços incluem IVA à taxa legal em vigor."
+          } Os preços variam consoante a quantidade encomendada, de acordo com os escalões indicados em cada produto.`,
+          `Os portes de envio não estão incluídos nos preços dos produtos. Portugal continental: ${PORTE_CONTINENTE} por encomenda até ${PESO_MAXIMO}, por CTT Expresso, com entrega prevista no dia útil seguinte ao envio; em encomendas acima de ${PESO_MAXIMO}, os portes são combinados caso a caso. Açores e Madeira: portes sob consulta. Entrega ou levantamento em mão na zona de Corroios/Seixal: sem custos, mediante combinação com o Vendedor.`,
+          "O valor final dos portes é sempre indicado ao cliente antes da confirmação da encomenda.",
           "As promoções indicadas no site (por exemplo, «−10% esta semana») são válidas apenas durante o período indicado e aplicam-se às encomendas confirmadas dentro desse período.",
-          "Os meios de pagamento disponíveis e os respetivos dados são indicados na confirmação da encomenda. Por cada pagamento é emitida a respetiva fatura ou fatura-recibo.",
+          "O pagamento é feito por MB WAY ou por transferência bancária. Os dados para pagamento são indicados na confirmação da encomenda. Por cada pagamento é emitida a respetiva fatura ou fatura-recibo.",
         ],
       },
       {
@@ -74,6 +91,7 @@ export const paginasLegais: PaginaLegal[] = [
           "Nos termos do artigo 17.º, n.º 1, alínea c), do Decreto-Lei n.º 24/2014, não existe direito de livre resolução (devolução no prazo de 14 dias sem indicar motivo) no fornecimento de bens confecionados de acordo com especificações do consumidor ou manifestamente personalizados.",
           "Assim, depois de o cliente aprovar a personalização e de a produção começar, não são aceites cancelamentos, trocas ou devoluções por mudança de ideia (por exemplo, escolha errada de tamanho ou cor).",
           "Se for vendido algum artigo sem personalização, o consumidor mantém o direito de livre resolução de 14 dias a contar da receção, devendo devolver o artigo em perfeito estado; os custos de devolução ficam a cargo do cliente.",
+          `Para exercer este direito, basta comunicar a decisão de forma inequívoca (por exemplo, por email para ${v.email}), podendo usar o modelo de formulário de livre resolução que se encontra no fim destes Termos (uso facultativo). O reembolso, incluindo os portes de envio iniciais, é feito no prazo de 14 dias após a receção dessa comunicação, pelo mesmo meio de pagamento usado na compra, podendo ser retido até à receção do artigo devolvido ou de prova do seu envio.`,
         ],
       },
       {
@@ -96,7 +114,7 @@ export const paginasLegais: PaginaLegal[] = [
         titulo: "8. Reclamações e resolução de litígios",
         paragrafos: [
           `O cliente pode apresentar reclamação diretamente ao Vendedor (${v.email}) ou no Livro de Reclamações Eletrónico (www.livroreclamacoes.pt).`,
-          `Em caso de litígio de consumo, o consumidor pode recorrer a uma entidade de Resolução Alternativa de Litígios de Consumo: ${CNIACC.nome} — ${CNIACC.site} · ${CNIACC.email}. Mais informações no Portal do Consumidor: ${PORTAL_CONSUMIDOR}.`,
+          `Em caso de litígio de consumo, o consumidor pode recorrer às seguintes entidades de Resolução Alternativa de Litígios de Consumo: ${CACCL.nome} (${CACCL.site} · ${CACCL.email} · ${CACCL.morada}), competente na área do Vendedor; e ${CNIACC.nome} (${CNIACC.site} · ${CNIACC.email}), de âmbito nacional. Mais informações no Portal do Consumidor: ${PORTAL_CONSUMIDOR}.`,
         ],
       },
       {
@@ -111,6 +129,17 @@ export const paginasLegais: PaginaLegal[] = [
         titulo: "10. Lei aplicável",
         paragrafos: [
           "Estes Termos e Condições regem-se pela lei portuguesa. O Vendedor pode atualizá-los; aplica-se a cada encomenda a versão em vigor na data da sua confirmação.",
+        ],
+      },
+      {
+        titulo: "Anexo — Modelo de formulário de livre resolução",
+        paragrafos: [
+          "Só para artigos sem personalização (ver ponto 5). Preencha e envie este formulário apenas se quiser resolver o contrato.",
+          `Para: ${v.nome} (${v.marca}), ${v.morada} · ${v.email}`,
+          "Pela presente comunico que resolvo o meu contrato de venda do(s) seguinte(s) bem(ns): ____________________",
+          "Solicitado em (data da encomenda): __________ · Recebido em (data da receção): __________",
+          "Nome do consumidor: ____________________ · Morada do consumidor: ____________________",
+          "Assinatura do consumidor (só no caso de o formulário ser enviado em papel): ____________________ · Data: __________",
         ],
       },
     ],
@@ -188,7 +217,9 @@ export const paginasLegais: PaginaLegal[] = [
       {
         titulo: "Resolução Alternativa de Litígios (RAL)",
         paragrafos: [
-          `Em caso de litígio de consumo, o consumidor pode recorrer à seguinte Entidade de Resolução Alternativa de Litígios de Consumo: ${CNIACC.nome}. Website: ${CNIACC.site} · Email: ${CNIACC.email}.`,
+          "Em caso de litígio de consumo, o consumidor pode recorrer às seguintes Entidades de Resolução Alternativa de Litígios de Consumo:",
+          `${CACCL.nome} — competente na área do Vendedor. Website: ${CACCL.site} · Email: ${CACCL.email} · Morada: ${CACCL.morada}.`,
+          `${CNIACC.nome} — de âmbito nacional. Website: ${CNIACC.site} · Email: ${CNIACC.email}.`,
           `Mais informações no Portal do Consumidor: ${PORTAL_CONSUMIDOR}.`,
         ],
       },

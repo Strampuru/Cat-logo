@@ -3,6 +3,7 @@ import { Seta } from "@/components/seta";
 import type { ReactNode } from "react";
 import { SiteLayout } from "@/components/site-layout";
 import { categorias } from "@/lib/catalogo";
+import { OPCOES_ENVIO } from "@/lib/portes";
 
 export const Route = createFileRoute("/contactos")({
   head: () => ({
@@ -75,7 +76,7 @@ const PASSOS = [
   { titulo: "Escolha", texto: "O modelo, as cores, os tamanhos e as quantidades no nosso catálogo." },
   { titulo: "Fale connosco", texto: "Pelo WhatsApp, Instagram ou email. Envie-nos a sua ideia ou o logótipo." },
   { titulo: "Aprove", texto: "Preparamos a proposta da personalização e o valor final da encomenda." },
-  { titulo: "Pague e receba", texto: "Combinamos consigo o pagamento e o envio. Depois é só esperar." },
+  { titulo: "Pague e receba", texto: "Paga por MB WAY ou transferência bancária e combinamos consigo o envio. Depois é só esperar." },
 ];
 
 const ENVIAR = [
@@ -233,8 +234,8 @@ function ContactosPage() {
               Para sermos mais rápidos, <span className="italic">diga-nos:</span>
             </h3>
             <p className="mt-3 text-[13px] leading-relaxed text-muted-foreground">
-              Não precisa de ter tudo decidido — ajudamos no que faltar. Os preços já incluem IVA e a personalização; os
-              portes de envio são combinados consigo.
+              Não precisa de ter tudo decidido — ajudamos no que faltar. Os preços indicados são finais e já incluem a
+              personalização. As opções de entrega estão indicadas abaixo.
             </p>
           </div>
           <ul className="grid gap-3 sm:grid-cols-2">
@@ -247,6 +248,28 @@ function ContactosPage() {
               </li>
             ))}
           </ul>
+        </div>
+
+        {/* Opções de entrega */}
+        <div className="mt-12 md:mt-16">
+          <div className="text-center mb-8">
+            <p className="text-[10px] uppercase tracking-[0.3em] text-accent font-semibold">Portes de envio</p>
+            <h3 className="mt-3 font-display text-2xl sm:text-3xl md:text-4xl leading-tight">
+              Como prefere <span className="italic">receber?</span>
+            </h3>
+          </div>
+          <ul className="grid gap-4 sm:grid-cols-3">
+            {OPCOES_ENVIO.map((o) => (
+              <li key={o.titulo} className="rounded-2xl border border-border bg-card p-6">
+                <p className="text-[12px] uppercase tracking-[0.2em] font-semibold">{o.titulo}</p>
+                <p className="mt-2 font-display text-3xl leading-none text-accent">{o.valor}</p>
+                <p className="mt-3 text-[13px] leading-relaxed text-muted-foreground">{o.texto}</p>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-4 text-center text-[11px] text-muted-foreground">
+            O valor final dos portes é sempre confirmado consigo antes de fechar a encomenda.
+          </p>
         </div>
       </section>
 

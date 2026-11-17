@@ -7,6 +7,7 @@
  */
 import { modelos, getModelo, type Cor, type Modelo } from "@/lib/catalogo";
 import { natalAtivo } from "@/lib/tempo";
+import { aplicarIvaNosPrecos } from "@/lib/iva";
 
 const __base = import.meta.env.BASE_URL ?? "/";
 const pub = (p: string): string => (__base === "/" ? p : __base.replace(/\/$/, "") + p);
@@ -36,7 +37,8 @@ function natal(baseId: string, extra: Partial<Modelo> & Pick<Modelo, "id" | "nom
     fotosCheias: true,
     referencia: `${b.referencia}-NAT`,
     imagem: extra.cores[0].imagem,
-    ...extra,
+    // os preços próprios do Natal estão escritos sem IVA; os do modelo base já vêm com o IVA aplicado
+    ...aplicarIvaNosPrecos(extra),
   };
 }
 
@@ -148,7 +150,7 @@ export const modelosNatal: Modelo[] = [
     ],
     caracteristicas: ["Madeira natural gravada a laser", "Fita ou cordel para pendurar", "Personalizável com frases, nomes ou desenhos"],
     precos: [["Preço por unidade", "2,50€"]],
-    notaPrecos: "Stock limitado: preço por unidade, com IVA e personalização incluídos, enquanto houver stock. Portes de envio não incluídos.",
+    notaPrecos: "Stock limitado: preço por unidade, com personalização incluída, enquanto houver stock.",
     tituloPrecos: "Preço",
     stockLimitado: true,
   }),
@@ -170,7 +172,7 @@ export const modelosNatal: Modelo[] = [
       { nome: "Sino", hex: "#e8dcc4", hexes: ["#e8dcc4"], imagem: pub("/natal/velas-sino.webp") },
     ],
     precos: [["Preço por unidade", "3,50€"]],
-    notaPrecos: "Stock limitado: preço por unidade, com IVA e personalização incluídos, enquanto houver stock. Portes de envio não incluídos.",
+    notaPrecos: "Stock limitado: preço por unidade, com personalização incluída, enquanto houver stock.",
     tituloPrecos: "Preço",
     stockLimitado: true,
   }),

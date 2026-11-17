@@ -533,6 +533,7 @@ import asset_rabat_3 from "@/assets/rabat/rabat-3.png.asset.json";
 import asset_rabat_4 from "@/assets/rabat/rabat-4.png.asset.json";
 import asset_rabat_5 from "@/assets/rabat/rabat-5.png.asset.json";
 import asset_rabat_6 from "@/assets/rabat/rabat-6.png.asset.json";
+import { aplicarIvaNosPrecos } from "@/lib/iva";
 
 
 // Prefixo base do site ("/" na Lovable, "/strampuru1/" no GitHub Pages) para
@@ -734,7 +735,8 @@ const coresRabat: Cor[] = [
 ];
 
 
-export const modelos: Modelo[] = [
+/** Preços escritos SEM IVA (regime de isenção). O IVA, se aplicável, é somado em lib/iva.ts. */
+const modelosSemIva: Modelo[] = [
   {
     "id": "racing",
     "escolhaIdade": true,
@@ -10546,7 +10548,7 @@ export const modelos: Modelo[] = [
     "subcategoria": "Bases",
     "genero": "unissexo",
     "descricao": "Base para copos e canecas de linhas simples e cantos arredondados, com acabamento branco liso. Uma superfície limpa, pronta a receber o seu logótipo, uma imagem ou uma mensagem, que transforma um objeto do dia a dia num detalhe com a sua marca, ideal para escritórios, eventos e ofertas.",
-    "composicao": "Material a confirmar",
+    "composicao": "100% Poliéster",
     "referencia": "#ABU-ABU",
     "lifestyle": abujaEditorial,
     "imagem": abujaEditorial,
@@ -10710,7 +10712,7 @@ export const modelos: Modelo[] = [
       ]
     ],
     "tituloPrecos": "Preços por tamanho",
-    "notaPrecos": "Valor por unidade, com IVA e personalização incluídos. Pode ser alterado consoante as quantidades. Portes de envio não incluídos.",
+    "notaPrecos": "Valor por unidade, com personalização incluída. Pode ser alterado consoante as quantidades.",
     "precos": [
       [
         "10×15 cm",
@@ -10733,6 +10735,8 @@ export const modelos: Modelo[] = [
     ]
   }
 ];
+
+export const modelos: Modelo[] = aplicarIvaNosPrecos(modelosSemIva);
 
 export function getCategoria(id: string): Categoria | undefined {
   return [...categorias, ...familias].find((c) => c.id === id);

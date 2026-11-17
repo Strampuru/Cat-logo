@@ -5,7 +5,7 @@ import { PesquisaModelos } from "@/components/pesquisa-modelos";
 import logo from "@/assets/strampuru-logo.png.asset.json";
 import { AvisoEncomenda } from "@/components/aviso-encomenda";
 import { AceitarTermos } from "@/components/aceitar-termos";
-import { CNIACC, LIVRO_RECLAMACOES, VENDEDOR, paginasLegais } from "@/lib/legal";
+import { CACCL, CNIACC, FRASE_IVA, LIVRO_RECLAMACOES, VENDEDOR, paginasLegais } from "@/lib/legal";
 
 export function SiteLayout({ children }: { children: ReactNode }) {
   const [menuAberto, setMenuAberto] = useState(false);
@@ -163,11 +163,15 @@ export function SiteLayout({ children }: { children: ReactNode }) {
               </a>
             </p>
             <p className="text-[11px] leading-relaxed text-muted-foreground max-w-xl">
-              Preços com IVA incluído à taxa legal em vigor. Em caso de litígio de consumo pode recorrer ao{" "}
+              {FRASE_IVA} Em caso de litígio de consumo pode recorrer ao{" "}
+              <a href={CACCL.site} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-accent">
+                Centro de Arbitragem de Lisboa
+              </a>{" "}
+              ou ao{" "}
               <a href={CNIACC.site} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-accent">
                 CNIACC
               </a>{" "}
-              (entidade de Resolução Alternativa de Litígios de Consumo).
+              (entidades de Resolução Alternativa de Litígios de Consumo).
             </p>
           </div>
           <a

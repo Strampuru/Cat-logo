@@ -7,6 +7,8 @@ import { SiteLayout } from "@/components/site-layout";
 import { useSwipe } from "@/hooks/use-swipe";
 import { TabelaDeslizante } from "@/components/tabela-deslizante";
 import { DESCONTO, emPromocao, precoComDesconto } from "@/lib/promocoes";
+import { FRASE_IVA_CURTA } from "@/lib/legal";
+import { FRASE_PORTES_CURTA } from "@/lib/portes";
 
 function Preco({ modeloId, preco, className = "" }: { modeloId: string; preco: string; className?: string }) {
   if (!emPromocao(modeloId) || !/\d/.test(preco)) return <span className={className}>{preco}</span>;
@@ -44,8 +46,8 @@ function NotaPrecos() {
     <p className="flex items-start gap-2 pt-1 text-[11px] leading-relaxed text-muted-foreground">
       <span aria-hidden="true" className="mt-[3px] inline-block size-1.5 shrink-0 rounded-full bg-accent" />
       <span>
-        Preços por unidade, <strong className="font-medium text-foreground">com IVA e personalização incluídos</strong>.
-        Portes de envio não incluídos.
+        Preços por unidade, <strong className="font-medium text-foreground">com personalização incluída</strong>.{" "}
+        {FRASE_IVA_CURTA} {FRASE_PORTES_CURTA}
       </span>
     </p>
   );
@@ -990,7 +992,7 @@ function DetalheModelo({
                 ))}
               </div>
               {modelo.notaPrecos ? (
-                <p className="text-[12px] text-muted-foreground leading-relaxed">{modelo.notaPrecos}</p>
+                <p className="text-[12px] text-muted-foreground leading-relaxed">{modelo.notaPrecos} {FRASE_IVA_CURTA} {FRASE_PORTES_CURTA}</p>
               ) : (
                 <NotaPrecos />
               )}

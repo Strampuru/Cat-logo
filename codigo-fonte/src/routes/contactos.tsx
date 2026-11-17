@@ -196,6 +196,17 @@ function ContactosPage() {
             No WhatsApp e no email, a mensagem já segue com o modelo «{modelo}». Só precisa de a enviar.
           </p>
         )}
+        <p className="mt-3 text-center text-[12px] text-muted-foreground">
+          Ao fazer uma encomenda, aceita os nossos{" "}
+          <Link to="/legal/$pagina" params={{ pagina: "termos" }} className="text-accent underline underline-offset-2 hover:text-foreground">
+            Termos e Condições
+          </Link>{" "}
+          e a{" "}
+          <Link to="/legal/$pagina" params={{ pagina: "privacidade" }} className="text-accent underline underline-offset-2 hover:text-foreground">
+            Política de Privacidade
+          </Link>
+          .
+        </p>
       </section>
 
       {/* Como funciona */}
@@ -222,7 +233,7 @@ function ContactosPage() {
               Para sermos mais rápidos, <span className="italic">diga-nos:</span>
             </h3>
             <p className="mt-3 text-[13px] leading-relaxed text-muted-foreground">
-              Não precisa de ter tudo decidido — ajudamos no que faltar. Os preços já incluem a personalização; os
+              Não precisa de ter tudo decidido — ajudamos no que faltar. Os preços já incluem IVA e a personalização; os
               portes de envio são combinados consigo.
             </p>
           </div>

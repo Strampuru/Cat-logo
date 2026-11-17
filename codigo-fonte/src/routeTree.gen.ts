@@ -15,6 +15,7 @@ import { Route as ContactosRouteImport } from './routes/contactos'
 import { Route as CategoriaCategoriaRouteImport } from './routes/categoria.$categoria'
 import { Route as ModeloIdRouteImport } from './routes/modelo.$id'
 import { Route as DestaqueIdRouteImport } from './routes/destaque.$id'
+import { Route as LegalPaginaRouteImport } from './routes/legal.$pagina'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,6 +47,11 @@ const DestaqueIdRoute = DestaqueIdRouteImport.update({
   path: '/destaque/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LegalPaginaRoute = LegalPaginaRouteImport.update({
+  id: '/legal/$pagina',
+  path: '/legal/$pagina',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   '/categoria/$categoria': typeof CategoriaCategoriaRoute
   '/modelo/$id': typeof ModeloIdRoute
   '/destaque/$id': typeof DestaqueIdRoute
+  '/legal/$pagina': typeof LegalPaginaRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   '/categoria/$categoria': typeof CategoriaCategoriaRoute
   '/modelo/$id': typeof ModeloIdRoute
   '/destaque/$id': typeof DestaqueIdRoute
+  '/legal/$pagina': typeof LegalPaginaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,13 +79,14 @@ export interface FileRoutesById {
   '/categoria/$categoria': typeof CategoriaCategoriaRoute
   '/modelo/$id': typeof ModeloIdRoute
   '/destaque/$id': typeof DestaqueIdRoute
+  '/legal/$pagina': typeof LegalPaginaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/catalogo' | '/contactos' | '/categoria/$categoria' | '/modelo/$id' | '/destaque/$id'
+    '/' | '/catalogo' | '/contactos' | '/categoria/$categoria' | '/modelo/$id' | '/destaque/$id' | '/legal/$pagina'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/catalogo' | '/contactos' | '/categoria/$categoria' | '/modelo/$id' | '/destaque/$id'
+  to: '/' | '/catalogo' | '/contactos' | '/categoria/$categoria' | '/modelo/$id' | '/destaque/$id' | '/legal/$pagina'
   id:
     | '__root__'
     | '/'
@@ -86,6 +95,7 @@ export interface FileRouteTypes {
     | '/categoria/$categoria'
     | '/modelo/$id'
     | '/destaque/$id'
+    | '/legal/$pagina'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -95,6 +105,7 @@ export interface RootRouteChildren {
   CategoriaCategoriaRoute: typeof CategoriaCategoriaRoute
   ModeloIdRoute: typeof ModeloIdRoute
   DestaqueIdRoute: typeof DestaqueIdRoute
+  LegalPaginaRoute: typeof LegalPaginaRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -141,6 +152,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DestaqueIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/legal/$pagina': {
+      id: '/legal/$pagina'
+      path: '/legal/$pagina'
+      fullPath: '/legal/$pagina'
+      preLoaderRoute: typeof LegalPaginaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -151,6 +169,7 @@ const rootRouteChildren: RootRouteChildren = {
   CategoriaCategoriaRoute: CategoriaCategoriaRoute,
   ModeloIdRoute: ModeloIdRoute,
   DestaqueIdRoute: DestaqueIdRoute,
+  LegalPaginaRoute: LegalPaginaRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

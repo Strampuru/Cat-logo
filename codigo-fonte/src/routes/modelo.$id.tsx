@@ -44,7 +44,7 @@ function NotaPrecos() {
     <p className="flex items-start gap-2 pt-1 text-[11px] leading-relaxed text-muted-foreground">
       <span aria-hidden="true" className="mt-[3px] inline-block size-1.5 shrink-0 rounded-full bg-accent" />
       <span>
-        Preços por unidade, <strong className="font-medium text-foreground">com personalização incluída</strong>.
+        Preços por unidade, <strong className="font-medium text-foreground">com IVA e personalização incluídos</strong>.
         Portes de envio não incluídos.
       </span>
     </p>

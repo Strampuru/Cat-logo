@@ -25,6 +25,13 @@ export function BotaoEncomendar({ modelo, className = "" }: { modelo: string; cl
           <Seta direcao="direita" />
         </span>
       </Link>
+      <p className="mt-3 text-[11px] text-background/60">
+        Ao encomendar, aceita os{" "}
+        <Link to="/legal/$pagina" params={{ pagina: "termos" }} className="underline underline-offset-2 hover:text-accent">
+          Termos e Condições
+        </Link>
+        . Bens personalizados não admitem devolução por mudança de ideia.
+      </p>
     </div>
   );
 }

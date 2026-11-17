@@ -10710,7 +10710,7 @@ export const modelos: Modelo[] = [
       ]
     ],
     "tituloPrecos": "Preços por tamanho",
-    "notaPrecos": "Valor por unidade, já com a personalização. Pode ser alterado consoante as quantidades.",
+    "notaPrecos": "Valor por unidade, com IVA e personalização incluídos. Pode ser alterado consoante as quantidades. Portes de envio não incluídos.",
     "precos": [
       [
         "10×15 cm",

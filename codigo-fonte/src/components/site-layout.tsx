@@ -4,6 +4,8 @@ import { CatalogoSidebar } from "@/components/catalogo-sidebar";
 import { PesquisaModelos } from "@/components/pesquisa-modelos";
 import logo from "@/assets/strampuru-logo.png.asset.json";
 import { AvisoEncomenda } from "@/components/aviso-encomenda";
+import { AceitarTermos } from "@/components/aceitar-termos";
+import { CNIACC, LIVRO_RECLAMACOES, VENDEDOR, paginasLegais } from "@/lib/legal";
 
 export function SiteLayout({ children }: { children: ReactNode }) {
   const [menuAberto, setMenuAberto] = useState(false);
@@ -137,12 +139,61 @@ export function SiteLayout({ children }: { children: ReactNode }) {
             </div>
           </div>
         </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-12 md:mt-20 text-[10px] uppercase tracking-widest text-muted-foreground">
+        {/* Informação legal */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-12 md:mt-16 border-t border-border pt-8 md:pt-10 grid gap-8 md:grid-cols-[1.4fr_1fr] md:items-start">
+          <div className="space-y-4">
+            <p className="text-[10px] uppercase tracking-[0.3em] font-semibold text-foreground">Informação legal</p>
+            <ul className="flex flex-wrap gap-x-6 gap-y-2 text-[11px] uppercase tracking-[0.15em] text-muted-foreground">
+              {paginasLegais.map((p) => (
+                <li key={p.id}>
+                  <Link
+                    to="/legal/$pagina"
+                    params={{ pagina: p.id }}
+                    className="hover:text-accent transition-colors"
+                  >
+                    {p.nome}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <p className="text-[11px] leading-relaxed text-muted-foreground max-w-xl">
+              {VENDEDOR.marca} · {VENDEDOR.nome} · NIF {VENDEDOR.nif} · {VENDEDOR.morada} ·{" "}
+              <a href={`mailto:${VENDEDOR.email}`} className="hover:text-accent transition-colors">
+                {VENDEDOR.email}
+              </a>
+            </p>
+            <p className="text-[11px] leading-relaxed text-muted-foreground max-w-xl">
+              Preços com IVA incluído à taxa legal em vigor. Em caso de litígio de consumo pode recorrer ao{" "}
+              <a href={CNIACC.site} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-accent">
+                CNIACC
+              </a>{" "}
+              (entidade de Resolução Alternativa de Litígios de Consumo).
+            </p>
+          </div>
+          <a
+            href={LIVRO_RECLAMACOES}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-flex items-center gap-4 self-start justify-self-start md:justify-self-end rounded-xl border border-border bg-background px-5 py-4 transition-colors hover:border-accent"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="size-8 shrink-0 text-[#c8102e]">
+              <path d="M4 5.5A2.5 2.5 0 016.5 3H20v15H6.5A2.5 2.5 0 004 20.5z" />
+              <path d="M4 20.5A2.5 2.5 0 016.5 18H20v3H6.5A2.5 2.5 0 014 20.5z" />
+              <path d="M9 8h7M9 11h5" />
+            </svg>
+            <span>
+              <span className="block text-[13px] font-semibold leading-tight text-foreground group-hover:text-accent">Livro de Reclamações</span>
+              <span className="block text-[11px] text-muted-foreground">Eletrónico · livroreclamacoes.pt</span>
+            </span>
+          </a>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-10 text-[10px] uppercase tracking-widest text-muted-foreground">
           &copy; {new Date().getFullYear()} Strampuru. Todos os direitos
           reservados.
         </div>
       </footer>
       <AvisoEncomenda />
+      <AceitarTermos />
     </div>
   );
 }

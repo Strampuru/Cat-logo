@@ -21,12 +21,12 @@ export const Route = createFileRoute("/categoria/$categoria")({
     const nome = loaderData?.categoria.titulo ?? "Catálogo";
     return {
       meta: [
-        { title: `${nome} — STRAM PURU` },
+        { title: `${nome} — Strampuru` },
         {
           name: "description",
-          content: `${nome} do catálogo STRAM PURU, com as cores disponíveis, tamanhos e preços por quantidade de cada modelo.`,
+          content: `${nome} do catálogo Strampuru, com as cores disponíveis, tamanhos e preços por quantidade de cada modelo.`,
         },
-        { property: "og:title", content: `${nome} — STRAM PURU` },
+        { property: "og:title", content: `${nome} — Strampuru` },
         {
           property: "og:description",
           content: `${nome}: modelos com as respetivas cores disponíveis.`,

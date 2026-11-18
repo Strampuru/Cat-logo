@@ -87,12 +87,12 @@ export const Route = createFileRoute("/modelo/$id")({
     const nome = loaderData?.modelo.nome ?? "Modelo";
     return {
       meta: [
-        { title: `${nome} — STRAM PURU` },
+        { title: `${nome} — Strampuru` },
         {
           name: "description",
           content: `${nome}: cores disponíveis, composição, tabela de tamanhos e preços por quantidade.`,
         },
-        { property: "og:title", content: `${nome} — STRAM PURU` },
+        { property: "og:title", content: `${nome} — Strampuru` },
         {
           property: "og:description",
           content: `${nome}: cores disponíveis, tamanhos e preços por quantidade.`,

@@ -77,18 +77,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "STRAM PURU — Catálogo de Vestuário" },
+      { title: "Strampuru — Vestuário e brindes personalizados" },
       {
         name: "description",
         content:
-          "Catálogo de vestuário STRAM PURU: t-shirts, polos, sweats e casacos com todas as cores, tamanhos e escalões de preço.",
+          "Strampuru: t-shirts, polos, sweats, casacos e brindes personalizados com o seu logótipo, nome ou imagem. Catálogo com cores, tamanhos e preços por quantidade. Encomendas por WhatsApp, Instagram ou email.",
       },
-      { name: "author", content: "STRAM PURU" },
-      { property: "og:title", content: "STRAM PURU — Catálogo de Vestuário" },
+      { name: "author", content: "Strampuru" },
+      { property: "og:title", content: "Strampuru — Vestuário e brindes personalizados" },
       {
         property: "og:description",
         content:
-          "T-shirts, polos, sweats e casacos com todas as cores, tamanhos e escalões de preço.",
+          "T-shirts, polos, sweats, casacos e brindes personalizados com o seu logótipo. Veja o catálogo e encomende por WhatsApp, Instagram ou email.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

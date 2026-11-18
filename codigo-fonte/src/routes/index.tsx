@@ -6,17 +6,17 @@ import { CatalogoInicio } from "@/components/catalogo-inicio";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Strampuru — Catálogo de Vestuário" },
+      { title: "Strampuru — Vestuário e brindes personalizados" },
       {
         name: "description",
         content:
-          "Catálogo STRAM PURU: t-shirts, polos, sweats e casacos para personalizar, com todas as cores, tamanhos e escalões de preço.",
+          "Strampuru: t-shirts, polos, sweats, casacos e brindes personalizados com o seu logótipo, nome ou imagem. Catálogo com cores, tamanhos e preços por quantidade. Encomendas por WhatsApp, Instagram ou email.",
       },
-      { property: "og:title", content: "Strampuru — Catálogo de Vestuário" },
+      { property: "og:title", content: "Strampuru — Vestuário e brindes personalizados" },
       {
         property: "og:description",
         content:
-          "T-shirts, polos, sweats e casacos com todas as cores disponíveis, tabela de tamanhos e preços por quantidade.",
+          "T-shirts, polos, sweats, casacos e brindes personalizados com o seu logótipo. Veja o catálogo e encomende por WhatsApp, Instagram ou email.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
